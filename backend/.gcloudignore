@@ -1,0 +1,11 @@
+# Exclude everything by default
+*
+
+# Explicitly include necessary files
+!Dockerfile
+!cloudbuild.yaml
+!requirements.txt
+!app.py
+!config.py
+!credentials/**
+!.dockerignore 
