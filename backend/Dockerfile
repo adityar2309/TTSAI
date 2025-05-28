@@ -10,12 +10,16 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the credentials
+COPY ./credentials/google-credentials.json /app/google-credentials.json
+
 # Copy the rest of the application
 COPY . .
 
 # Set environment variables
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/google-credentials.json
 
 # Expose port
 EXPOSE 8080

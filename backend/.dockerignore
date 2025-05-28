@@ -42,4 +42,8 @@ data/
 
 # Docker
 Dockerfile
-.dockerignore 
+.dockerignore
+
+# Allow credentials
+!credentials/
+!credentials/google-credentials.json 
