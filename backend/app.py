@@ -11,6 +11,7 @@ import logging
 import json
 from datetime import datetime
 import random
+import base64
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -397,6 +398,71 @@ def translate():
         
     except Exception as e:
         error_msg = f"Translation error: {str(e)}"
+        logger.error(error_msg, exc_info=True)
+        return jsonify({'error': error_msg}), 500
+
+@app.route('/api/text-to-speech', methods=['POST'])
+def text_to_speech():
+    try:
+        data = request.json
+        text = data.get('text')
+        language_code = data.get('languageCode', 'en-US')
+
+        if not text:
+            return jsonify({'error': 'Missing text parameter'}), 400
+
+        # Map language codes to appropriate voice names
+        voice_mapping = {
+            'en': 'en-US-Standard-C',
+            'es': 'es-ES-Standard-A',
+            'fr': 'fr-FR-Standard-A',
+            'de': 'de-DE-Standard-A',
+            'it': 'it-IT-Standard-A',
+            'pt': 'pt-BR-Standard-A',
+            'ru': 'ru-RU-Standard-A',
+            'ja': 'ja-JP-Standard-A',
+            'ko': 'ko-KR-Standard-A',
+            'zh': 'cmn-CN-Standard-A',
+            'hi': 'hi-IN-Standard-A',
+            'ar': 'ar-XA-Standard-A',
+        }
+
+        # Get the base language code (e.g., 'en' from 'en-US')
+        base_language = language_code.split('-')[0].lower()
+        
+        # Get the appropriate voice name or fallback to a default
+        voice_name = voice_mapping.get(base_language, 'en-US-Standard-C')
+
+        # Configure the voice request
+        synthesis_input = tts.SynthesisInput(text=text)
+        
+        # Build the voice parameters
+        voice = tts.VoiceSelectionParams(
+            language_code=language_code,
+            name=voice_name
+        )
+
+        # Select the audio file type
+        audio_config = tts.AudioConfig(
+            audio_encoding=tts.AudioEncoding.MP3,
+            speaking_rate=1.0,
+            pitch=0.0
+        )
+
+        # Perform the text-to-speech request
+        response = tts_client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
+        )
+
+        # Convert the binary audio content to base64
+        audio_content = base64.b64encode(response.audio_content).decode('utf-8')
+        
+        return jsonify({'audioContent': audio_content})
+
+    except Exception as e:
+        error_msg = f"Text-to-speech error: {str(e)}"
         logger.error(error_msg, exc_info=True)
         return jsonify({'error': error_msg}), 500
 

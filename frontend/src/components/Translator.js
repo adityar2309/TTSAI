@@ -291,12 +291,18 @@ export const Translator = ({ initialMode = 'type' }) => {
 
       const audioContent = response.data.audioContent;
       const audioBlob = new Blob(
-        [Uint8Array.from(audioContent.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))],
+        [Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))],
         { type: 'audio/mp3' }
       );
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
-      audio.play();
+      
+      // Clean up the URL after the audio finishes playing
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      await audio.play();
     } catch (err) {
       setError('Failed to play audio');
       console.error(err);
