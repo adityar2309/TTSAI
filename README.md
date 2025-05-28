@@ -1,92 +1,178 @@
 # Real-Time Speech Translation App
 
-This application provides real-time speech translation using Google Cloud Speech-to-Text, Gemini LLM, and Google Cloud Text-to-Speech APIs.
+A powerful real-time speech translation application with advanced learning tools, built with React, Flask, and Google's AI services.
 
 ## Features
 
-- Real-time speech recognition
-- Dynamic language translation using Gemini LLM
-- Text-to-speech output in target language
-- Mobile-responsive design
-- Support for multiple language pairs
+### Translation
+- Real-time speech-to-text translation
+- Support for multiple languages with dialect selection
+- Formality level control (formal, neutral, informal)
+- Text-to-speech playback of translations
+- Conversation mode for bilingual chats
+- Translation history with favorites
+- Advanced translation details including:
+  - Alternative translations with confidence scores
+  - IPA pronunciation
+  - Grammar analysis
+  - Contextual usage examples
+
+### Learning Tools
+- Daily word/phrase learning
+- Flashcard system with spaced repetition
+- Interactive quizzes
+- Progress tracking
+- Pronunciation practice
+- Cultural notes and usage examples
+
+## Tech Stack
+
+### Frontend
+- React 18
+- Material-UI (MUI) v5
+- Axios for API calls
+- Web Speech API for voice input
+- LocalStorage for persistence
+
+### Backend
+- Flask
+- Google Cloud Services:
+  - Gemini AI for translations
+  - Text-to-Speech
+  - Speech-to-Text
+- CORS handling
+- JSON file-based storage
 
 ## Prerequisites
 
 1. Node.js (v16 or higher)
 2. Python 3.8+
-3. Google Cloud Platform account
-4. Gemini API access
+3. Google Cloud account with API access
+4. Gemini API key
 
-## Environment Variables
+## Setup Instructions
 
-Create `.env` files in both frontend and backend directories:
+### Backend Setup
 
-### Frontend (.env):
+1. Create and activate a Python virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\\Scripts\\activate
 ```
-REACT_APP_API_URL=http://localhost:5000
+
+2. Install dependencies:
+```bash
+cd backend
+pip install -r requirements.txt
 ```
 
-### Backend (.env):
-```
-GOOGLE_APPLICATION_CREDENTIALS=path/to/your/credentials.json
+3. Set up environment variables:
+```bash
+# Create .env file in backend directory
 GEMINI_API_KEY=your_gemini_api_key
 FLASK_ENV=development
 ```
 
-## Setup
+### Frontend Setup
 
-1. Clone the repository
-2. Set up the backend:
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+1. Install dependencies:
+```bash
+cd frontend
+npm install
+```
 
-3. Set up the frontend:
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-4. Configure your Google Cloud credentials and Gemini API key
+2. Set up environment variables:
+```bash
+# Create .env file in frontend directory
+REACT_APP_API_URL=http://localhost:5000/api
+```
 
 ## Running the Application
 
-1. Start the backend:
-   ```bash
-   cd backend
-   flask run
-   ```
+1. Start the backend server:
+```bash
+cd backend
+python app.py
+```
 
-2. Start the frontend:
-   ```bash
-   cd frontend
-   npm start
-   ```
+2. Start the frontend development server:
+```bash
+cd frontend
+npm start
+```
 
-3. Open http://localhost:3000 in your browser
+3. Access the application at `http://localhost:3000`
 
-## Security Considerations
+## Project Structure
 
-- Store API keys in environment variables
-- Use HTTPS in production
-- Implement rate limiting
-- Add user authentication if needed
+```
+├── backend/
+│   ├── app.py              # Main Flask application
+│   ├── requirements.txt    # Python dependencies
+│   └── data/              # JSON storage
+│       ├── common_phrases.json
+│       ├── word_of_day.json
+│       └── user_progress.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Translator.js
+│   │   │   ├── AdvancedTranslation.js
+│   │   │   └── LearningTools.js
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── package.json
+│   └── public/
+└── README.md
+```
 
-## Deployment
+## API Endpoints
 
-### Frontend
-- Build the React app using `npm run build`
-- Deploy to a static hosting service (Netlify, Vercel, etc.)
+### Translation Endpoints
+- `POST /api/translate` - Basic translation
+- `POST /api/advanced-translate` - Advanced translation with details
+- `POST /api/detect-language` - Language detection
+- `POST /api/text-to-speech` - Text to speech conversion
 
-### Backend
-- Deploy to a cloud platform (Google Cloud Run, Heroku, etc.)
-- Set up environment variables in your deployment platform
-- Enable CORS for your frontend domain
-- Use HTTPS for all API calls
+### Learning Tools Endpoints
+- `GET /api/word-of-day` - Get word of the day
+- `GET /api/flashcards` - Get user's flashcards
+- `POST /api/flashcards` - Create new flashcard
+- `POST /api/quiz/generate` - Generate new quiz
+- `POST /api/quiz/submit` - Submit quiz answer
+- `POST /api/progress/update` - Update learning progress
+
+## Error Handling
+
+The application includes comprehensive error handling:
+- Network error detection and retry logic
+- User-friendly error messages
+- Fallback behaviors for unsupported features
+- CORS error prevention
+- API rate limiting protection
+
+## Browser Support
+
+- Chrome (recommended for full speech recognition support)
+- Firefox
+- Safari
+- Edge
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-MIT 
+MIT License - feel free to use this project for your own purposes.
+
+## Acknowledgments
+
+- Google Cloud Platform for AI services
+- Material-UI team for the component library
+- React team for the framework
+- Flask team for the backend framework 

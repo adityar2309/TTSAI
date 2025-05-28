@@ -16,9 +16,11 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.env
 venv/
 
 # Node
@@ -26,6 +28,30 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+build/
+coverage/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Project specific
+backend/data/*.json
+!backend/data/common_phrases.json
+!backend/data/word_of_day.json
+!backend/data/user_progress.json
+
+# Google Cloud credentials
+backend/credentials/
+*.json
 
 # Environment variables
 .env
@@ -36,14 +62,4 @@ yarn-error.log*
 
 # Google Cloud credentials
 backend/credentials/
-*.json
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db 
+*.json 
