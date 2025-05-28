@@ -23,11 +23,12 @@ load_dotenv()
 app = Flask(__name__)
 # Configure CORS to allow all origins, methods and headers
 CORS(app, resources={
-    r"/api/*": {
+    r"/*": {  # Allow all routes
         "origins": [
             "http://localhost:3000",  # Development
             "https://ttsai.netlify.app",  # Production Netlify domain
             "https://*.netlify.app",  # All Netlify preview deployments
+            "https://6837027b175dc48ca24afe5c--ttsai.netlify.app"  # Current preview deployment
         ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
