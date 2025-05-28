@@ -24,7 +24,11 @@ app = Flask(__name__)
 # Configure CORS to allow all origins, methods and headers
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:3000"],
+        "origins": [
+            "http://localhost:3000",  # Development
+            "https://ttsai.netlify.app",  # Production Netlify domain
+            "https://*.netlify.app",  # All Netlify preview deployments
+        ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }

@@ -63,3 +63,5 @@ backend/credentials/
 # Google Cloud credentials
 backend/credentials/
 *.json 
+# Local Netlify folder
+.netlify
