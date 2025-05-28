@@ -399,7 +399,7 @@ def translate():
             'translatedText': response.text.strip(),
             'detectedSourceLanguage': source_lang or 'auto'
         })
-        
+    
     except Exception as e:
         error_msg = f"Translation error: {str(e)}"
         logger.error(error_msg, exc_info=True)
@@ -411,10 +411,10 @@ def text_to_speech():
         data = request.json
         text = data.get('text')
         language_code = data.get('languageCode', 'en-US')
-
+        
         if not text:
             return jsonify({'error': 'Missing text parameter'}), 400
-
+        
         # Map language codes to appropriate voice names
         voice_mapping = {
             'en': 'en-US-Standard-C',
@@ -452,19 +452,19 @@ def text_to_speech():
             speaking_rate=1.0,
             pitch=0.0
         )
-
+        
         # Perform the text-to-speech request
         response = tts_client.synthesize_speech(
             input=synthesis_input,
             voice=voice,
             audio_config=audio_config
         )
-
+        
         # Convert the binary audio content to base64
         audio_content = base64.b64encode(response.audio_content).decode('utf-8')
         
         return jsonify({'audioContent': audio_content})
-
+    
     except Exception as e:
         error_msg = f"Text-to-speech error: {str(e)}"
         logger.error(error_msg, exc_info=True)
