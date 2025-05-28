@@ -20,6 +20,7 @@ import TranslateIcon from '@mui/icons-material/Translate';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Logo from './Logo';
 
 const Layout = ({ children, toggleColorMode, mode }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -72,19 +73,11 @@ const Layout = ({ children, toggleColorMode, mode }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography 
-            variant={isMobile ? "subtitle1" : "h6"} 
-            component="div" 
-            sx={{ 
-              flexGrow: 1,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontWeight: 600,
-            }}
-          >
-            Real-Time Translator
-          </Typography>
+          
+          <Box sx={{ flexGrow: 1 }}>
+            <Logo />
+          </Box>
+
           <Tooltip 
             title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}
             TransitionComponent={Fade}

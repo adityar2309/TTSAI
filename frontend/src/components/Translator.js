@@ -31,6 +31,7 @@ import {
   Tabs,
   Tab,
   Tooltip,
+  Collapse,
 } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
@@ -532,160 +533,154 @@ export const Translator = ({ initialMode = 'type' }) => {
   };
 
   return (
-    <Container maxWidth="md" disableGutters={isMobile}>
-      <Typography variant="h4" gutterBottom align="center" sx={{ mb: 4 }}>
-        Real-Time Speech Translator
-      </Typography>
-
-      {error && (
-        <Paper
-          sx={{
-            p: 1.5,
-            mb: 2,
-            mx: { xs: 1, sm: 0 },
-            backgroundColor: 'error.light',
-            color: 'error.contrastText',
-          }}
+    <Container maxWidth="md">
+      <Box sx={{ mb: 4 }}>
+        <Tabs
+          value={activeView}
+          onChange={(e, newValue) => setActiveView(newValue)}
+          variant="fullWidth"
         >
-          {error}
-        </Paper>
-      )}
-
-      <Tabs
-        value={activeView}
-        onChange={(e, newValue) => setActiveView(newValue)}
-        sx={{ mb: 3 }}
-        variant={isMobile ? "scrollable" : "standard"}
-        scrollButtons={isMobile ? "auto" : false}
-      >
-        <Tab value="translate" icon={<TranslateIcon />} label="Translate" />
-        <Tab value="learn" icon={<SchoolIcon />} label="Learn" />
-      </Tabs>
+          <Tab value="translate" icon={<TranslateIcon />} label="Translate" />
+          <Tab value="learn" icon={<SchoolIcon />} label="Learn" />
+        </Tabs>
+      </Box>
 
       {activeView === 'translate' && (
-        <>
-          <Card
-            elevation={0}
-            sx={{
-              background: theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.05)'
-                : 'rgba(0, 0, 0, 0.02)',
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            <CardContent>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel>Source Language</InputLabel>
-                    <Select
-                      value={sourceLang}
-                      onChange={(e) => setSourceLang(e.target.value)}
-                      label="Source Language"
-                    >
-                      {languages.map((lang) => (
-                        <MenuItem key={lang.code} value={lang.code}>
-                          {lang.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel>Target Language</InputLabel>
-                    <Select
-                      value={targetLang}
-                      onChange={(e) => setTargetLang(e.target.value)}
-                      label="Target Language"
-                    >
-                      {languages.map((lang) => (
-                        <MenuItem key={lang.code} value={lang.code}>
-                          {lang.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
+        <Stack spacing={3}>
+          {/* Language Selection */}
+          <Paper elevation={2} sx={{ p: 2 }}>
+            <Stack
+              direction={isMobile ? "column" : "row"}
+              spacing={2}
+              alignItems="center"
+            >
+              <FormControl sx={{ minWidth: 160 }}>
+                <InputLabel>From</InputLabel>
+                <Select
+                  value={sourceLang}
+                  onChange={(e) => setSourceLang(e.target.value)}
+                  label="From"
+                  size="small"
+                >
+                  {languages.map((lang) => (
+                    <MenuItem key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel>Formality</InputLabel>
-                    <Select
-                      value={formality}
-                      onChange={(e) => setFormality(e.target.value)}
-                      label="Formality"
-                    >
-                      {formalityLevels.map((level) => (
-                        <MenuItem key={level.value} value={level.value}>
-                          {level.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel>Dialect</InputLabel>
-                    <Select
-                      value={dialect}
-                      onChange={(e) => setDialect(e.target.value)}
-                      label="Dialect"
-                      disabled={!dialects[targetLang]}
-                    >
-                      <MenuItem value="">
-                        <em>Standard</em>
-                      </MenuItem>
-                      {dialects[targetLang]?.map((d) => (
-                        <MenuItem key={d.value} value={d.value}>
-                          {d.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
+              <IconButton onClick={handleSwapLanguages}>
+                <SwapHorizIcon />
+              </IconButton>
 
+              <FormControl sx={{ minWidth: 160 }}>
+                <InputLabel>To</InputLabel>
+                <Select
+                  value={targetLang}
+                  onChange={(e) => setTargetLang(e.target.value)}
+                  label="To"
+                  size="small"
+                >
+                  {languages.map((lang) => (
+                    <MenuItem key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
+          </Paper>
+
+          {/* Original Text Display */}
+          <Paper elevation={2} sx={{ p: 2 }}>
+            <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Original Text
+              </Typography>
+              <IconButton size="small" onClick={() => handleCopyText(originalText)}>
+                <ContentCopyIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+            <Typography variant="body1" sx={getTextStyle(originalText, sourceLang)}>
+              {originalText || 'Your text will appear here'}
+            </Typography>
+          </Paper>
+
+          {/* Translated Text Display */}
+          <Paper elevation={2} sx={{ p: 2 }}>
+            <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Translation
+              </Typography>
+              <Stack direction="row" spacing={1}>
+                <IconButton size="small" onClick={() => handleCopyText(translatedText)}>
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
+                {translatedText && (
+                  <IconButton size="small" onClick={playTranslatedAudio}>
+                    <PlayArrowIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </Stack>
+            </Stack>
+            <Typography variant="body1" sx={getTextStyle(translatedText, targetLang)}>
+              {translatedText || 'Translation will appear here'}
+            </Typography>
+            {isNonRomanScript(targetLang) && romanizedText && (
+              <Typography 
+                variant="body2" 
+                color="text.secondary"
+                sx={{ mt: 1, fontStyle: 'italic' }}
+              >
+                {romanizedText}
+              </Typography>
+            )}
+          </Paper>
+
+          {/* Input Section */}
+          <Paper elevation={2} sx={{ p: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="flex-start">
               <TextField
                 fullWidth
                 multiline
-                rows={4}
+                rows={3}
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Enter text to translate..."
-                sx={{ mb: 2 }}
+                onChange={handleTextInput}
+                placeholder="Type or speak your text..."
+                variant="outlined"
+                disabled={isRecording}
+                size="small"
+                sx={{ bgcolor: 'background.paper' }}
               />
-
-              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                <Button
-                  variant="contained"
-                  onClick={handleTranslate}
-                  disabled={!inputText.trim()}
-                  sx={{ flex: 1 }}
+              <Stack direction="column" spacing={1}>
+                <IconButton
+                  onClick={toggleRecording}
+                  color={isRecording ? 'error' : 'primary'}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    bgcolor: isRecording ? 'error.light' : 'primary.light',
+                  }}
                 >
-                  Translate
-                </Button>
-                <Tooltip title={isRecording ? 'Stop Recording' : 'Start Recording'}>
-                  <IconButton
-                    color={isRecording ? 'error' : 'primary'}
-                    onClick={toggleRecording}
-                  >
-                    {isRecording ? <StopIcon /> : <MicIcon />}
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </CardContent>
-          </Card>
-
-          {translation && (
-            <AdvancedTranslation
-              translation={translation}
-              onSaveFlashcard={handleSaveFlashcard}
-            />
-          )}
-        </>
+                  {isRecording ? <StopIcon /> : <MicIcon />}
+                </IconButton>
+                <IconButton
+                  color="primary"
+                  onClick={handleSubmit}
+                  disabled={!inputText.trim() || isRecording || isTranslating}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    bgcolor: 'primary.light',
+                  }}
+                >
+                  <SendIcon />
+                </IconButton>
+              </Stack>
+            </Stack>
+          </Paper>
+        </Stack>
       )}
 
       {activeView === 'learn' && (
@@ -695,420 +690,16 @@ export const Translator = ({ initialMode = 'type' }) => {
         />
       )}
 
-      <Grid container spacing={isMobile ? 1 : 3}>
-        {/* Language Selection */}
-        <Grid item xs={12}>
-          <Paper sx={{ p: { xs: 1, sm: 2 } }}>
-            <Stack
-              direction={isMobile ? "column" : "row"}
-              spacing={isMobile ? 1 : 2}
-              alignItems="center"
-              justifyContent="center"
-            >
-              <FormControl fullWidth={isMobile} sx={{ minWidth: isMobile ? '100%' : 200 }}>
-                <InputLabel>Source Language</InputLabel>
-                <Select
-                  value={sourceLang}
-                  onChange={(e) => setSourceLang(e.target.value)}
-                  label="Source Language"
-                  disabled={languages.length === 0}
-                  size={isMobile ? "small" : "medium"}
-                  endAdornment={
-                    <IconButton
-                      size="small"
-                      onClick={() => detectLanguage(inputText)}
-                      disabled={!inputText || isDetecting}
-                      sx={{ mr: 2 }}
-                      title="Auto-detect language"
-                    >
-                      <AutorenewIcon fontSize="small" />
-                    </IconButton>
-                  }
-                >
-                  {languages.map((lang) => (
-                    <MenuItem 
-                      key={lang.code} 
-                      value={lang.code}
-                      sx={{ fontFamily: getFontFamily(lang.code) }}
-                    >
-                      {lang.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <IconButton 
-                onClick={handleSwapLanguages}
-                disabled={languages.length === 0}
-                sx={{ transform: isMobile ? 'rotate(90deg)' : 'none' }}
-              >
-                <SwapHorizIcon />
-              </IconButton>
-
-              <FormControl fullWidth={isMobile} sx={{ minWidth: isMobile ? '100%' : 200 }}>
-                <InputLabel>Target Language</InputLabel>
-                <Select
-                  value={targetLang}
-                  onChange={(e) => setTargetLang(e.target.value)}
-                  label="Target Language"
-                  disabled={languages.length === 0}
-                  size={isMobile ? "small" : "medium"}
-                >
-                  {languages.map((lang) => (
-                    <MenuItem 
-                      key={lang.code} 
-                      value={lang.code}
-                      sx={{ fontFamily: getFontFamily(lang.code) }}
-                    >
-                      {lang.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <Stack direction="row" spacing={1}>
-                <IconButton
-                  onClick={() => setShowHistory(true)}
-                  color="primary"
-                  title="Translation History"
-                >
-                  <HistoryIcon />
-                </IconButton>
-                <IconButton
-                  onClick={() => setShowConversations(true)}
-                  color={isConversationMode ? "primary" : "default"}
-                  title="Saved Conversations"
-                >
-                  <ForumIcon />
-                </IconButton>
-                <IconButton
-                  onClick={() => {
-                    if (isConversationMode && conversation.length > 0) {
-                      startNewConversation();
-                    }
-                    setIsConversationMode(!isConversationMode);
-                  }}
-                  color={isConversationMode ? "primary" : "default"}
-                  title={isConversationMode ? "Switch to Single Translation" : "Switch to Conversation Mode"}
-                >
-                  <ChatIcon />
-                </IconButton>
-              </Stack>
-            </Stack>
-          </Paper>
-        </Grid>
-
-        {/* Conversation or Translation Cards */}
-        {isConversationMode ? (
-          <Grid item xs={12}>
-            <Paper 
-              sx={{ 
-                p: { xs: 1.5, sm: 2 },
-                minHeight: 300,
-                maxHeight: 500,
-                overflow: 'auto',
-              }}
-            >
-              {conversation.length === 0 ? (
-                <Box
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Typography color="text.secondary">
-                    Start your conversation by typing or speaking
-                  </Typography>
-                </Box>
-              ) : (
-                conversation.map((message) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    isSource={message.sourceLang === sourceLang}
-                  />
-                ))
-              )}
-            </Paper>
-          </Grid>
-        ) : (
-          <>
-            {/* Translation Cards */}
-            <Grid item xs={12}>
-              <Card>
-                <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
-                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                      Original Text
-                    </Typography>
-                    <IconButton
-                      onClick={() => handleCopyText(originalText)}
-                      size={isMobile ? "small" : "medium"}
-                      title="Copy text"
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                  </Stack>
-                  <Typography 
-                    variant="body1" 
-                    sx={{
-                      ...getTextStyle(originalText, sourceLang),
-                      minHeight: { xs: 60, sm: 100 },
-                    }}
-                  >
-                    {originalText}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Card>
-                <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
-                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                      Translated Text
-                    </Typography>
-                    <IconButton
-                      onClick={() => handleCopyText(translatedText)}
-                      size={isMobile ? "small" : "medium"}
-                      title="Copy text"
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={playTranslatedAudio}
-                      disabled={!translatedText}
-                      color="primary"
-                      size={isMobile ? "small" : "medium"}
-                    >
-                      <PlayArrowIcon />
-                    </IconButton>
-                  </Stack>
-                  <Box sx={{ mb: isNonRomanScript(targetLang) && romanizedText ? 2 : 0 }}>
-                    <Typography 
-                      variant="body1" 
-                      sx={{
-                        ...getTextStyle(translatedText, targetLang),
-                        mb: 1,
-                      }}
-                    >
-                      {translatedText}
-                    </Typography>
-                    {isNonRomanScript(targetLang) && romanizedText && (
-                      <Stack direction="row" alignItems="center" spacing={1}>
-                        <Typography 
-                          variant="body2" 
-                          color="text.secondary"
-                          sx={{
-                            fontStyle: 'italic',
-                            pl: 1,
-                            borderLeft: '2px solid',
-                            borderColor: 'divider',
-                            flexGrow: 1,
-                          }}
-                        >
-                          {romanizedText}
-                        </Typography>
-                        <IconButton
-                          onClick={() => handleCopyText(romanizedText)}
-                          size="small"
-                          title="Copy romanized text"
-                        >
-                          <ContentCopyIcon fontSize="small" />
-                        </IconButton>
-                      </Stack>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </>
-        )}
-
-        {/* Unified Input Section */}
-        <Grid item xs={12}>
-          <Paper sx={{ p: { xs: 1.5, sm: 2 } }}>
-            <Stack direction="row" spacing={1} alignItems="flex-start">
-              {showTextInput ? (
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={isMobile ? 3 : 2}
-                  value={inputText}
-                  onChange={handleTextInput}
-                  placeholder="Type or click the microphone to speak..."
-                  variant="outlined"
-                  disabled={isRecording}
-                  size={isMobile ? "small" : "medium"}
-                  InputProps={{
-                    style: {
-                      fontFamily: getFontFamily(sourceLang),
-                      direction: getTextDirection(sourceLang),
-                      fontSize: sourceLang === 'hi' ? '1.1rem' : 'inherit',
-                    },
-                  }}
-                />
-              ) : (
-                <Box
-                  sx={{
-                    flexGrow: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    minHeight: isMobile ? 120 : 100,
-                    bgcolor: 'action.hover',
-                    borderRadius: 1,
-                    p: 2,
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    align="center"
-                  >
-                    {inputText || "Listening..."}
-                  </Typography>
-                </Box>
-              )}
-              <Stack direction={isMobile ? "row" : "column"} spacing={1}>
-                <IconButton
-                  onClick={toggleRecording}
-                  color={isRecording ? 'error' : 'primary'}
-                  sx={{
-                    width: { xs: 40, sm: 56 },
-                    height: { xs: 40, sm: 56 },
-                    backgroundColor: isRecording ? 'error.light' : 'primary.light',
-                    '&:hover': {
-                      backgroundColor: isRecording ? 'error.main' : 'primary.main',
-                    },
-                  }}
-                >
-                  {isRecording ? <StopIcon /> : <MicIcon />}
-                </IconButton>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSubmit}
-                  disabled={!inputText.trim() || isRecording || isTranslating}
-                  sx={{
-                    height: { xs: 40, sm: 56 },
-                    minWidth: { xs: 40, sm: 56 },
-                    p: { xs: 1, sm: 2 },
-                  }}
-                >
-                  <SendIcon />
-                </Button>
-              </Stack>
-            </Stack>
-          </Paper>
-        </Grid>
-      </Grid>
-
-      {/* Saved Conversations Dialog */}
-      <Dialog
-        open={showConversations}
-        onClose={() => setShowConversations(false)}
-        maxWidth="sm"
-        fullWidth
+      {/* Error Snackbar */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
       >
-        <DialogTitle>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <ForumIcon />
-            <Typography>Saved Conversations</Typography>
-          </Stack>
-        </DialogTitle>
-        <DialogContent>
-          {conversations.length === 0 ? (
-            <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
-              No saved conversations yet
-            </Typography>
-          ) : (
-            <List>
-              {conversations.map((conv) => (
-                <ListItem
-                  key={conv.id}
-                  button
-                  onClick={() => loadConversation(conv)}
-                >
-                  <ListItemIcon>
-                    <ChatIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`Conversation from ${format(new Date(conv.timestamp), 'MMM d, yyyy HH:mm')}`}
-                    secondary={`${conv.messages.length} messages`}
-                  />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      edge="end"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteConversation(conv.id);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              ))}
-            </List>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* History Dialog */}
-      <Dialog
-        open={showHistory}
-        onClose={() => setShowHistory(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Translation History</DialogTitle>
-        <DialogContent>
-          <List>
-            {[...favorites, ...history.filter(h => !favorites.some(f => f.id === h.id))].map((entry) => (
-              <ListItem
-                key={entry.id}
-                button
-                onClick={() => handleHistoryItemClick(entry)}
-              >
-                <ListItemText
-                  primary={entry.originalText}
-                  secondary={
-                    <React.Fragment>
-                      <Typography variant="body2" color="text.secondary">
-                        {entry.translatedText}
-                        {entry.romanizedText && ` (${entry.romanizedText})`}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {new Date(entry.timestamp).toLocaleString()}
-                      </Typography>
-                    </React.Fragment>
-                  }
-                />
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    onClick={() => toggleFavorite(entry)}
-                    title={favorites.some(f => f.id === entry.id) ? "Remove from favorites" : "Add to favorites"}
-                  >
-                    {favorites.some(f => f.id === entry.id) ? <StarIcon color="primary" /> : <StarBorderIcon />}
-                  </IconButton>
-                  <IconButton
-                    edge="end"
-                    onClick={() => deleteHistoryEntry(entry.id)}
-                    title="Delete from history"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
-      </Dialog>
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      </Snackbar>
 
       {/* Notification Snackbar */}
       <Snackbar
@@ -1116,11 +707,7 @@ export const Translator = ({ initialMode = 'type' }) => {
         autoHideDuration={3000}
         onClose={() => setNotification({ ...notification, open: false })}
       >
-        <Alert
-          onClose={() => setNotification({ ...notification, open: false })}
-          severity={notification.severity}
-          sx={{ width: '100%' }}
-        >
+        <Alert severity={notification.severity}>
           {notification.message}
         </Alert>
       </Snackbar>
