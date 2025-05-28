@@ -1,0 +1,123 @@
+{
+  "words": {
+    "en": [
+      {
+        "word": "serendipity",
+        "translation": "The occurrence and development of events by chance in a happy or beneficial way",
+        "example": "Finding this book in the library was pure serendipity",
+        "pronunciation": "ˌserənˈdipədi",
+        "part_of_speech": "noun",
+        "difficulty": "advanced"
+      },
+      {
+        "word": "ephemeral",
+        "translation": "Lasting for a very short time",
+        "example": "The beauty of cherry blossoms is ephemeral",
+        "pronunciation": "əˈfem(ə)rəl",
+        "part_of_speech": "adjective",
+        "difficulty": "advanced"
+      }
+    ],
+    "es": [
+      {
+        "word": "mariposa",
+        "translation": "butterfly",
+        "part_of_speech": "noun",
+        "example": "La mariposa voló por el jardín.",
+        "pronunciation": "mah-ree-POH-sah"
+      },
+      {
+        "word": "alegría",
+        "translation": "joy",
+        "part_of_speech": "noun",
+        "example": "Su sonrisa transmite alegría.",
+        "pronunciation": "ah-leh-GREE-ah"
+      },
+      {
+        "word": "amanecer",
+        "translation": "dawn/sunrise",
+        "part_of_speech": "noun/verb",
+        "example": "Me gusta ver el amanecer.",
+        "pronunciation": "ah-mah-neh-SAIR"
+      },
+      {
+        "word": "madrugada",
+        "translation": "dawn, early morning",
+        "example": "Me despierto en la madrugada para estudiar",
+        "pronunciation": "ma.ðɾuˈɣa.ða",
+        "part_of_speech": "noun",
+        "difficulty": "intermediate"
+      },
+      {
+        "word": "sobremesa",
+        "translation": "time spent at the table after finishing a meal",
+        "example": "La sobremesa duró más que la cena",
+        "pronunciation": "so.βɾeˈme.sa",
+        "part_of_speech": "noun",
+        "difficulty": "intermediate"
+      }
+    ],
+    "fr": [
+      {
+        "word": "papillon",
+        "translation": "butterfly",
+        "part_of_speech": "noun",
+        "example": "Le papillon vole dans le jardin.",
+        "pronunciation": "pah-pee-YOHN"
+      },
+      {
+        "word": "bonheur",
+        "translation": "happiness",
+        "part_of_speech": "noun",
+        "example": "Le bonheur est dans les petites choses.",
+        "pronunciation": "boh-NUHR"
+      },
+      {
+        "word": "aube",
+        "translation": "dawn",
+        "part_of_speech": "noun",
+        "example": "L'aube se lève sur la ville.",
+        "pronunciation": "ohb"
+      },
+      {
+        "word": "dépaysement",
+        "translation": "the feeling of being in a foreign place",
+        "example": "Le dépaysement total lors de mon premier voyage à Tokyo",
+        "pronunciation": "de.pɛiz.mɑ̃",
+        "part_of_speech": "noun",
+        "difficulty": "advanced"
+      },
+      {
+        "word": "flâner",
+        "translation": "to wander aimlessly with pleasure",
+        "example": "J'aime flâner dans les rues de Paris",
+        "pronunciation": "fla.ne",
+        "part_of_speech": "verb",
+        "difficulty": "intermediate"
+      }
+    ],
+    "de": [
+      {
+        "word": "Schmetterling",
+        "translation": "butterfly",
+        "part_of_speech": "noun",
+        "example": "Der Schmetterling fliegt durch den Garten.",
+        "pronunciation": "SHMET-ter-ling"
+      },
+      {
+        "word": "Freude",
+        "translation": "joy",
+        "part_of_speech": "noun",
+        "example": "Die Freude war in ihren Augen zu sehen.",
+        "pronunciation": "FROY-duh"
+      },
+      {
+        "word": "Morgendämmerung",
+        "translation": "dawn",
+        "part_of_speech": "noun",
+        "example": "Die Morgendämmerung bricht an.",
+        "pronunciation": "MOR-gen-dem-er-ung"
+      }
+    ]
+  }
+} 

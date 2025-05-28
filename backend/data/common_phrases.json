@@ -1,0 +1,69 @@
+{
+  "phrases": {
+    "en": [
+      {
+        "text": "Hello, how are you?",
+        "translation": "A common greeting",
+        "category": "greetings",
+        "formality": "neutral"
+      },
+      {
+        "text": "Thank you very much",
+        "translation": "Expression of gratitude",
+        "category": "courtesy",
+        "formality": "formal"
+      }
+    ],
+    "es": [
+      {
+        "text": "¡Buenos días!",
+        "translation": "Good morning!",
+        "category": "greetings",
+        "formality": "neutral"
+      },
+      {
+        "text": "Muchas gracias",
+        "translation": "Thank you very much",
+        "category": "courtesy",
+        "formality": "formal"
+      }
+    ],
+    "fr": [
+      {
+        "text": "Bonjour, comment allez-vous?",
+        "translation": "Hello, how are you?",
+        "category": "greetings",
+        "formality": "formal"
+      },
+      {
+        "text": "Merci beaucoup",
+        "translation": "Thank you very much",
+        "category": "courtesy",
+        "formality": "formal"
+      }
+    ],
+    "de": [
+      {
+        "text": "Wie geht's?",
+        "translation": "How are you?",
+        "category": "Greetings",
+        "formality": "informal",
+        "usage_notes": "Casual way to ask how someone is doing"
+      },
+      {
+        "text": "Guten Tag",
+        "translation": "Good day",
+        "category": "Greetings",
+        "formality": "formal",
+        "usage_notes": "Formal greeting used throughout the day"
+      },
+      {
+        "text": "Freut mich",
+        "translation": "Nice to meet you",
+        "category": "Introductions",
+        "formality": "neutral",
+        "usage_notes": "Literally means 'pleases me'"
+      }
+    ]
+  }
+} 

@@ -51,7 +51,6 @@ backend/data/*.json
 
 # Google Cloud credentials
 backend/credentials/
-*.json
 
 # Environment variables
 .env
@@ -61,7 +60,6 @@ backend/credentials/
 .env.production.local
 
 # Google Cloud credentials
-backend/credentials/
-*.json 
+backend/credentials/ 
 # Local Netlify folder
 .netlify

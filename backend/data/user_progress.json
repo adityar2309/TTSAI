@@ -1,0 +1,53 @@
+{
+  "users": {
+    "user123": {
+      "flashcards": [
+        {
+          "id": 1,
+          "translation": {
+            "originalText": "Hello",
+            "translatedText": "Hola",
+            "sourceLang": "en",
+            "targetLang": "es",
+            "timestamp": "2024-03-15T10:30:00Z"
+          },
+          "review_count": 3,
+          "mastery_level": 2,
+          "last_reviewed": "2024-03-15T10:30:00Z",
+          "next_review": "2024-03-16T10:30:00Z"
+        }
+      ],
+      "quiz_scores": [
+        {
+          "timestamp": "2024-03-15T11:00:00Z",
+          "score": 8,
+          "total_questions": 10,
+          "difficulty": "beginner",
+          "language": "es"
+        }
+      ],
+      "practice_sessions": [
+        {
+          "timestamp": "2024-03-15T11:30:00Z",
+          "duration": 900,
+          "type": "pronunciation",
+          "performance": 0.85,
+          "language": "es"
+        }
+      ],
+      "daily_streaks": {
+        "current_streak": 3,
+        "longest_streak": 5,
+        "last_practice": "2024-03-15T00:00:00Z"
+      },
+      "language_levels": {
+        "es": {
+          "level": "beginner",
+          "xp": 150,
+          "words_learned": 25,
+          "accuracy": 0.8
+        }
+      }
+    }
+  }
+} 
