@@ -18,6 +18,7 @@ import threading
 from collections import defaultdict, deque
 import hashlib
 import uuid
+from google.auth import default
 
 # Configure comprehensive logging
 logging.basicConfig(
@@ -62,9 +63,10 @@ tts_cache = {}
 
 # Initialize Google Cloud clients with error handling
 try:
-    # Initialize clients - they should automatically use the service account attached to Cloud Run
+    # Initialize clients - explicitly use default credentials
     logger.info("Initializing Google Cloud Speech client...")
-    speech_client = SpeechClient()
+    credentials, project = default()
+    speech_client = SpeechClient(credentials=credentials)
     logger.info("Google Cloud Speech client initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize Google Cloud Speech client: {e}")
@@ -72,7 +74,8 @@ except Exception as e:
 
 try:
     logger.info("Initializing Google Cloud TTS client...")
-    tts_client = TextToSpeechClient()
+    credentials, project = default()
+    tts_client = TextToSpeechClient(credentials=credentials)
     logger.info("Google Cloud TTS client initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize Google Cloud TTS client: {e}")
@@ -1756,7 +1759,6 @@ def cleanup_caches():
     logger.info(f"Cache cleanup completed. Removed {len(expired_keys)} expired entries")
 
 # Schedule cache cleanup every hour
-import threading
 def schedule_cleanup():
     cleanup_caches()
     threading.Timer(3600, schedule_cleanup).start()
