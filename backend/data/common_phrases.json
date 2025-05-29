@@ -2,68 +2,181 @@
   "phrases": {
     "en": [
       {
-        "text": "Hello, how are you?",
-        "translation": "A common greeting",
+        "phrase": "Hello, how are you?",
+        "translation": "Hola, ¿cómo estás?",
         "category": "greetings",
-        "formality": "neutral"
+        "difficulty": "beginner",
+        "pronunciation": "OH-lah, KOH-moh ehs-TAHS",
+        "usage_context": "Informal greeting between friends or acquaintances",
+        "cultural_notes": "Very common informal greeting in Spanish-speaking countries"
       },
       {
-        "text": "Thank you very much",
-        "translation": "Expression of gratitude",
-        "category": "courtesy",
-        "formality": "formal"
+        "phrase": "Could you please help me?",
+        "translation": "¿Podrías ayudarme, por favor?",
+        "category": "travel",
+        "difficulty": "intermediate",
+        "pronunciation": "poh-DREE-ahs ah-yoo-DAHR-meh, pohr fah-VOHR",
+        "usage_context": "Polite request for assistance",
+        "cultural_notes": "Adding 'por favor' shows good manners"
+      },
+      {
+        "phrase": "Where is the nearest hospital?",
+        "translation": "¿Dónde está el hospital más cercano?",
+        "category": "travel",
+        "difficulty": "intermediate",
+        "pronunciation": "DOHN-deh ehs-TAH ehl ohs-pee-TAHL mahs sehr-KAH-noh",
+        "usage_context": "Emergency or medical situations",
+        "cultural_notes": "Important phrase for travelers"
+      },
+      {
+        "phrase": "I would like to order...",
+        "translation": "Me gustaría pedir...",
+        "category": "food",
+        "difficulty": "beginner",
+        "pronunciation": "meh goos-tah-REE-ah peh-DEER",
+        "usage_context": "Ordering food at restaurants",
+        "cultural_notes": "Polite way to order food"
+      },
+      {
+        "phrase": "Thank you very much",
+        "translation": "Muchas gracias",
+        "category": "greetings",
+        "difficulty": "beginner",
+        "pronunciation": "MOO-chahs GRAH-see-ahs",
+        "usage_context": "Expressing gratitude",
+        "cultural_notes": "Essential phrase for showing appreciation"
       }
     ],
     "es": [
       {
-        "text": "¡Buenos días!",
-        "translation": "Good morning!",
+        "phrase": "Hola, ¿cómo estás?",
+        "translation": "Hello, how are you?",
         "category": "greetings",
-        "formality": "neutral"
+        "difficulty": "beginner",
+        "pronunciation": "heh-LOH, how AHR yoo",
+        "usage_context": "Informal greeting between friends or acquaintances",
+        "cultural_notes": "Standard informal greeting in English"
       },
       {
-        "text": "Muchas gracias",
-        "translation": "Thank you very much",
-        "category": "courtesy",
-        "formality": "formal"
+        "phrase": "¿Cuánto cuesta esto?",
+        "translation": "How much does this cost?",
+        "category": "travel",
+        "difficulty": "beginner",
+        "pronunciation": "how MUHCH duhz this KAWST",
+        "usage_context": "Shopping and bargaining",
+        "cultural_notes": "Essential for travelers and shoppers"
       }
     ],
     "fr": [
       {
-        "text": "Bonjour, comment allez-vous?",
+        "phrase": "Bonjour, comment allez-vous?",
         "translation": "Hello, how are you?",
         "category": "greetings",
-        "formality": "formal"
+        "difficulty": "beginner",
+        "pronunciation": "bone-ZHOOR, koh-mahn tah-lay VOO",
+        "usage_context": "Formal greeting",
+        "cultural_notes": "Formal way to greet someone in French"
       },
       {
-        "text": "Merci beaucoup",
-        "translation": "Thank you very much",
-        "category": "courtesy",
-        "formality": "formal"
+        "phrase": "Excusez-moi, où est la gare?",
+        "translation": "Excuse me, where is the train station?",
+        "category": "travel",
+        "difficulty": "intermediate",
+        "pronunciation": "ehk-skoo-zay MWAH, oo eh lah GAHR",
+        "usage_context": "Asking for directions",
+        "cultural_notes": "Polite way to ask for directions"
       }
     ],
     "de": [
       {
-        "text": "Wie geht's?",
-        "translation": "How are you?",
-        "category": "Greetings",
-        "formality": "informal",
-        "usage_notes": "Casual way to ask how someone is doing"
+        "phrase": "Guten Tag, wie geht es Ihnen?",
+        "translation": "Good day, how are you?",
+        "category": "greetings",
+        "difficulty": "beginner",
+        "pronunciation": "GOO-ten TAHK, vee gayt ehs EE-nen",
+        "usage_context": "Formal greeting during the day",
+        "cultural_notes": "Standard formal greeting in German"
+      }
+    ],
+    "ja": [
+      {
+        "phrase": "こんにちは",
+        "translation": "Hello",
+        "category": "greetings",
+        "difficulty": "beginner",
+        "pronunciation": "kon-nee-chee-wah",
+        "usage_context": "General greeting used during the day",
+        "cultural_notes": "Most common greeting in Japanese"
       },
       {
-        "text": "Guten Tag",
-        "translation": "Good day",
-        "category": "Greetings",
-        "formality": "formal",
-        "usage_notes": "Formal greeting used throughout the day"
+        "phrase": "すみません",
+        "translation": "Excuse me / I'm sorry",
+        "category": "greetings",
+        "difficulty": "beginner",
+        "pronunciation": "soo-mee-mah-sen",
+        "usage_context": "Apologizing or getting someone's attention",
+        "cultural_notes": "Very important phrase in Japanese culture"
+      }
+    ],
+    "zh": [
+      {
+        "phrase": "你好",
+        "translation": "Hello",
+        "category": "greetings",
+        "difficulty": "beginner",
+        "pronunciation": "nee-how",
+        "usage_context": "General greeting",
+        "cultural_notes": "Most basic greeting in Chinese"
       },
       {
-        "text": "Freut mich",
-        "translation": "Nice to meet you",
-        "category": "Introductions",
-        "formality": "neutral",
-        "usage_notes": "Literally means 'pleases me'"
+        "phrase": "谢谢",
+        "translation": "Thank you",
+        "category": "greetings",
+        "difficulty": "beginner",
+        "pronunciation": "sheh-sheh",
+        "usage_context": "Expressing gratitude",
+        "cultural_notes": "Essential polite expression"
+      }
+    ],
+    "ar": [
+      {
+        "phrase": "السلام عليكم",
+        "translation": "Peace be upon you",
+        "category": "greetings",
+        "difficulty": "beginner",
+        "pronunciation": "as-sa-laa-mu a-lay-kum",
+        "usage_context": "Traditional Islamic greeting",
+        "cultural_notes": "Common greeting in Arabic-speaking countries"
+      }
+    ],
+    "hi": [
+      {
+        "phrase": "नमस्ते",
+        "translation": "Hello / Goodbye",
+        "category": "greetings",
+        "difficulty": "beginner",
+        "pronunciation": "nah-mas-teh",
+        "usage_context": "General greeting and farewell",
+        "cultural_notes": "Traditional Hindi greeting with hands pressed together"
       }
     ]
-  }
+  },
+  "categories": [
+    "greetings",
+    "travel",
+    "food",
+    "business",
+    "casual",
+    "emergency",
+    "shopping",
+    "directions",
+    "transportation",
+    "accommodation"
+  ],
+  "difficulties": [
+    "beginner",
+    "intermediate",
+    "advanced"
+  ],
+  "last_updated": "2024-01-01T00:00:00Z"
 } 
