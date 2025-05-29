@@ -4,27 +4,52 @@
       {
         "word": "serendipity",
         "translation": "The occurrence and development of events by chance in a happy or beneficial way",
-        "example": "Finding this book in the library was pure serendipity",
+        "example_sentence": "Finding this book in the library was pure serendipity",
+        "example_translation": "Encontrar este libro en la biblioteca fue pura serendipia",
         "pronunciation": "ˌserənˈdipədi",
         "part_of_speech": "noun",
-        "difficulty": "advanced"
+        "difficulty": "advanced",
+        "etymology": "From the Persian fairy tale The Three Princes of Serendip",
+        "related_words": ["chance", "fortune", "luck"],
+        "cultural_note": "A word coined by Horace Walpole in 1754"
       },
       {
         "word": "ephemeral",
         "translation": "Lasting for a very short time",
-        "example": "The beauty of cherry blossoms is ephemeral",
+        "example_sentence": "The beauty of cherry blossoms is ephemeral",
+        "example_translation": "La belleza de los cerezos en flor es efímera",
         "pronunciation": "əˈfem(ə)rəl",
         "part_of_speech": "adjective",
-        "difficulty": "advanced"
+        "difficulty": "advanced",
+        "etymology": "From Greek ephēmeros 'lasting only one day'",
+        "related_words": ["temporary", "fleeting", "transient"],
+        "cultural_note": "Often used in art and nature contexts"
+      },
+      {
+        "word": "wanderlust",
+        "translation": "A strong desire to travel",
+        "example_sentence": "Her wanderlust led her to explore remote corners of the world",
+        "example_translation": "Su pasión por viajar la llevó a explorar rincones remotos del mundo",
+        "pronunciation": "ˈwɒndəlʌst",
+        "part_of_speech": "noun",
+        "difficulty": "intermediate",
+        "etymology": "From German 'wandern' (to hike) + 'lust' (desire)",
+        "related_words": ["travel", "exploration", "adventure"],
+        "cultural_note": "Reflects the human desire for exploration and discovery"
       }
     ],
     "es": [
       {
         "word": "mariposa",
         "translation": "butterfly",
+        "example_sentence": "La mariposa voló por el jardín",
+        "example_translation": "The butterfly flew through the garden",
+        "pronunciation": "mah-ree-POH-sah",
         "part_of_speech": "noun",
-        "example": "La mariposa voló por el jardín.",
-        "pronunciation": "mah-ree-POH-sah"
+        "difficulty": "beginner",
+        "etymology": "From 'María' and 'posa' (to land)",
+        "related_words": ["polilla", "insecto", "vuelo"],
+        "cultural_note": "Often symbolizes transformation in Latin American culture"
       },
       {
         "word": "alegría",
@@ -51,10 +76,26 @@
       {
         "word": "sobremesa",
         "translation": "time spent at the table after finishing a meal",
-        "example": "La sobremesa duró más que la cena",
+        "example_sentence": "La sobremesa duró más que la cena",
+        "example_translation": "The after-dinner conversation lasted longer than dinner",
         "pronunciation": "so.βɾeˈme.sa",
         "part_of_speech": "noun",
-        "difficulty": "intermediate"
+        "difficulty": "intermediate",
+        "etymology": "From 'sobre' (over) + 'mesa' (table)",
+        "related_words": ["charla", "conversación", "tertulia"],
+        "cultural_note": "An important social custom in Spanish-speaking countries"
+      },
+      {
+        "word": "duende",
+        "translation": "a quality of passion and inspiration",
+        "example_sentence": "El bailaor de flamenco tiene mucho duende",
+        "example_translation": "The flamenco dancer has great spirit and charm",
+        "pronunciation": "ˈdwen.de",
+        "part_of_speech": "noun",
+        "difficulty": "advanced",
+        "etymology": "From 'dueño' (owner), originally meaning a magical creature",
+        "related_words": ["alma", "espíritu", "pasión"],
+        "cultural_note": "Essential concept in flamenco and Spanish arts"
       }
     ],
     "fr": [
@@ -82,10 +123,14 @@
       {
         "word": "dépaysement",
         "translation": "the feeling of being in a foreign place",
-        "example": "Le dépaysement total lors de mon premier voyage à Tokyo",
+        "example_sentence": "Le dépaysement total lors de mon premier voyage à Tokyo",
+        "example_translation": "The complete feeling of displacement during my first trip to Tokyo",
         "pronunciation": "de.pɛiz.mɑ̃",
         "part_of_speech": "noun",
-        "difficulty": "advanced"
+        "difficulty": "advanced",
+        "etymology": "From 'dé-' (un-) + 'pays' (country)",
+        "related_words": ["voyage", "étranger", "expatriation"],
+        "cultural_note": "Unique French concept with no direct English equivalent"
       },
       {
         "word": "flâner",
@@ -117,6 +162,32 @@
         "part_of_speech": "noun",
         "example": "Die Morgendämmerung bricht an.",
         "pronunciation": "MOR-gen-dem-er-ung"
+      },
+      {
+        "word": "Fernweh",
+        "translation": "feeling homesick for a place you've never been to",
+        "example_sentence": "Sie hat Fernweh nach den Bergen",
+        "example_translation": "She longs for the mountains she's never visited",
+        "pronunciation": "FERN-vey",
+        "part_of_speech": "noun",
+        "difficulty": "intermediate",
+        "etymology": "From 'fern' (far) + 'Weh' (pain)",
+        "related_words": ["Heimweh", "Reisefieber", "Wanderlust"],
+        "cultural_note": "Reflects German romantic ideals of travel and exploration"
+      }
+    ],
+    "ja": [
+      {
+        "word": "木漏れ日",
+        "translation": "sunlight filtering through trees",
+        "example_sentence": "木漏れ日が森の中で踊っている",
+        "example_translation": "Sunlight is dancing through the trees in the forest",
+        "pronunciation": "ko-mo-re-bi",
+        "part_of_speech": "noun",
+        "difficulty": "intermediate",
+        "etymology": "From '木' (tree) + '漏れ' (leak) + '日' (sun)",
+        "related_words": ["日光", "森林", "陽射し"],
+        "cultural_note": "Reflects Japanese appreciation for subtle natural beauty"
       }
     ]
   }

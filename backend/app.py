@@ -353,6 +353,7 @@ WORD_OF_DAY_FILE = os.path.join(DATA_DIR, 'word_of_day.json')
 USER_PROGRESS_FILE = os.path.join(DATA_DIR, 'user_progress.json')
 USER_PREFERENCES_FILE = os.path.join(DATA_DIR, 'user_preferences.json')
 LEARNING_ANALYTICS_FILE = os.path.join(DATA_DIR, 'learning_analytics.json')
+QUIZZES_FILE = os.path.join(DATA_DIR, 'quizzes.json')
 
 def ensure_data_directory():
     """Ensure data directory exists"""
@@ -1890,6 +1891,166 @@ def conversation_practice():
     except Exception as e:
         logger.error(f"Error in conversation practice: {e}")
         return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/quizzes', methods=['GET'])
+@rate_limit
+def get_quizzes():
+    """Get available quizzes for a language and difficulty level"""
+    try:
+        language = request.args.get('language')
+        difficulty = request.args.get('difficulty', 'beginner')
+        
+        if not language:
+            return jsonify({'error': 'Language parameter required'}), 400
+            
+        quizzes_data = load_json_file(QUIZZES_FILE, {'quizzes': {}})
+        
+        if language not in quizzes_data.get('quizzes', {}):
+            return jsonify({'error': f'No quizzes available for language {language}'}), 404
+            
+        if difficulty not in quizzes_data['quizzes'][language]:
+            return jsonify({'error': f'No quizzes available for difficulty {difficulty}'}), 404
+            
+        quizzes = quizzes_data['quizzes'][language][difficulty]
+        
+        # Add metadata
+        response = {
+            'quizzes': quizzes,
+            'total_quizzes': len(quizzes),
+            'difficulty': difficulty,
+            'language': language,
+            'categories': quizzes_data.get('categories', []),
+            'available_difficulties': quizzes_data.get('difficulties', [])
+        }
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        logger.error(f"Error fetching quizzes: {e}")
+        return jsonify({'error': 'Failed to fetch quizzes'}), 500
+
+@app.route('/api/quiz/<quiz_id>', methods=['GET'])
+@rate_limit
+def get_quiz(quiz_id):
+    """Get a specific quiz by ID"""
+    try:
+        language = request.args.get('language')
+        if not language:
+            return jsonify({'error': 'Language parameter required'}), 400
+            
+        quizzes_data = load_json_file(QUIZZES_FILE, {'quizzes': {}})
+        
+        # Search for quiz in all difficulty levels
+        quiz = None
+        if language in quizzes_data.get('quizzes', {}):
+            for difficulty in quizzes_data['quizzes'][language]:
+                for q in quizzes_data['quizzes'][language][difficulty]:
+                    if q['id'] == quiz_id:
+                        quiz = q
+                        break
+                if quiz:
+                    break
+        
+        if not quiz:
+            return jsonify({'error': f'Quiz {quiz_id} not found'}), 404
+            
+        return jsonify(quiz)
+        
+    except Exception as e:
+        logger.error(f"Error fetching quiz {quiz_id}: {e}")
+        return jsonify({'error': f'Failed to fetch quiz {quiz_id}'}), 500
+
+@app.route('/api/quiz/submit', methods=['POST'])
+@rate_limit
+def submit_quiz():
+    """Submit quiz answers and get results"""
+    try:
+        data = request.get_json()
+        quiz_id = data.get('quiz_id')
+        user_id = data.get('user_id')
+        answers = data.get('answers', {})
+        
+        if not all([quiz_id, user_id, answers]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+            
+        # Get quiz data
+        quizzes_data = load_json_file(QUIZZES_FILE, {'quizzes': {}})
+        quiz = None
+        language = None
+        difficulty = None
+        
+        # Find the quiz
+        for lang in quizzes_data.get('quizzes', {}):
+            for diff in quizzes_data['quizzes'][lang]:
+                for q in quizzes_data['quizzes'][lang][diff]:
+                    if q['id'] == quiz_id:
+                        quiz = q
+                        language = lang
+                        difficulty = diff
+                        break
+                if quiz:
+                    break
+            if quiz:
+                break
+                
+        if not quiz:
+            return jsonify({'error': f'Quiz {quiz_id} not found'}), 404
+            
+        # Calculate results
+        total_questions = len(quiz['questions'])
+        correct_answers = 0
+        question_results = []
+        
+        for i, question in enumerate(quiz['questions']):
+            user_answer = answers.get(str(i))
+            is_correct = user_answer == question['correct_answer']
+            if is_correct:
+                correct_answers += 1
+                
+            question_results.append({
+                'question': question['question'],
+                'user_answer': user_answer,
+                'correct_answer': question['correct_answer'],
+                'is_correct': is_correct,
+                'explanation': question['explanation']
+            })
+            
+        score = (correct_answers / total_questions) * 100
+        
+        # Update user progress
+        progress_data = load_json_file(USER_PROGRESS_FILE, {'users': {}})
+        if user_id not in progress_data['users']:
+            progress_data['users'][user_id] = {'quiz_scores': []}
+            
+        quiz_result = {
+            'timestamp': datetime.now().isoformat(),
+            'quiz_id': quiz_id,
+            'score': score,
+            'total_questions': total_questions,
+            'correct_answers': correct_answers,
+            'difficulty': difficulty,
+            'language': language
+        }
+        
+        progress_data['users'][user_id]['quiz_scores'].append(quiz_result)
+        save_json_file(USER_PROGRESS_FILE, progress_data)
+        
+        # Prepare response
+        response = {
+            'score': score,
+            'total_questions': total_questions,
+            'correct_answers': correct_answers,
+            'question_results': question_results,
+            'quiz_id': quiz_id,
+            'difficulty': difficulty,
+            'language': language
+        }
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        logger.error(f"Error submitting quiz: {e}")
+        return jsonify({'error': 'Failed to submit quiz'}), 500
 
 if __name__ == '__main__':
     logger.info("Starting TTS AI Backend Server...")
