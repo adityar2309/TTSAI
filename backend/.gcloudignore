@@ -8,4 +8,5 @@
 !app.py
 !config.py
 !credentials/**
-!.dockerignore 
+!.dockerignore
+!data/** 

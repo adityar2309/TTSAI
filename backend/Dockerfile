@@ -16,6 +16,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+# Create data directory
+RUN mkdir -p /app/data
+
 # Copy the rest of the application
 COPY . .
 
