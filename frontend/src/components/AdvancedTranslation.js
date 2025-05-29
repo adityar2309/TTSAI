@@ -129,7 +129,7 @@ const AdvancedTranslation = ({ translation, onSaveFlashcard }) => {
               {translation.pronunciation.romanization && (
                 <>
                   <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
-                    Romanization: {translation.pronunciation.romanization}
+                    Romanization: <Box component="span" sx={{ fontStyle: 'italic', fontFamily: 'serif' }}>{translation.pronunciation.romanization}</Box>
                   </Typography>
                   {translation.pronunciation.romanization_system && (
                     <Typography variant="body2" color="text.secondary">

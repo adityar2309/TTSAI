@@ -1147,7 +1147,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                               </IconButton>
                             </Tooltip>
                           </Box>
-                          <Typography variant="body1" color="text.primary" sx={{ fontStyle: 'italic' }}>
+                          <Typography variant="body1" color="text.primary" sx={{ fontStyle: 'italic', fontFamily: 'serif' }}>
                             {romanizationData.romanization}
                           </Typography>
                           {romanizationData.romanization_system && (

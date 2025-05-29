@@ -776,7 +776,7 @@ def generate_vocabulary_questions(flashcards, difficulty, count):
         
         if question_type == 'translation':
             questions.append({
-                'type': 'translation',
+        'type': 'translation',
                 'text': card['word'],
                 'correct_answer': card['translation'],
                 'points': 10,
@@ -941,7 +941,7 @@ def submit_quiz_answer(quiz_id):
         elif question['type'] == 'grammar':
             is_correct = answer == question['correct_answer']
             points_earned = question['points'] if is_correct else 0
-            
+        
         # Record answer
         quiz['answers'].append({
             'question_index': question_index,
