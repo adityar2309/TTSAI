@@ -548,8 +548,8 @@ export const Translator = ({ initialMode = 'type' }) => {
         
         audio.onplay = () => recordAnalytics('tts_played', { language: langCode });
         audio.onerror = () => showNotification('Audio playback failed', 'error');
-        
-        await audio.play();
+      
+      await audio.play();
       }
     } catch (err) {
       console.error('TTS error:', err);
@@ -780,8 +780,8 @@ export const Translator = ({ initialMode = 'type' }) => {
 
       {/* Main Content */}
       <Box sx={{ mb: 3 }}>
-        <Tabs 
-          value={activeView} 
+        <Tabs
+          value={activeView}
           onChange={(e, newValue) => setActiveView(newValue)}
           variant="fullWidth"
           sx={{ mb: 3 }}
@@ -804,19 +804,19 @@ export const Translator = ({ initialMode = 'type' }) => {
         </Tabs>
 
         {/* Translation View */}
-        {activeView === 'translate' && (
-          <Stack spacing={3}>
-            {/* Language Selection */}
+      {activeView === 'translate' && (
+        <Stack spacing={3}>
+          {/* Language Selection */}
             <Card elevation={2}>
               <CardContent>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={5}>
                     <FormControl fullWidth>
-                      <InputLabel>From</InputLabel>
-                      <Select
-                        value={sourceLang}
-                        onChange={(e) => setSourceLang(e.target.value)}
-                        label="From"
+                <InputLabel>From</InputLabel>
+                <Select
+                  value={sourceLang}
+                  onChange={(e) => setSourceLang(e.target.value)}
+                  label="From"
                         startAdornment={
                           isDetecting && (
                             <CircularProgress size={16} sx={{ mr: 1 }} />
@@ -829,17 +829,17 @@ export const Translator = ({ initialMode = 'type' }) => {
                             Auto-detect
                           </Box>
                         </MenuItem>
-                        {languages.map((lang) => (
-                          <MenuItem key={lang.code} value={lang.code}>
+                  {languages.map((lang) => (
+                    <MenuItem key={lang.code} value={lang.code}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Typography>{lang.native_name || lang.name}</Typography>
                               {lang.tts_supported && <VolumeUpIcon fontSize="small" color="action" />}
                               {lang.speech_recognition_supported && <MicIcon fontSize="small" color="action" />}
                             </Box>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
                   </Grid>
 
                   <Grid item xs={12} sm={2} sx={{ textAlign: 'center' }}>
@@ -853,29 +853,29 @@ export const Translator = ({ initialMode = 'type' }) => {
                           '&:hover': { boxShadow: 2 }
                         }}
                       >
-                        <SwapHorizIcon />
-                      </IconButton>
+                <SwapHorizIcon />
+              </IconButton>
                     </Tooltip>
                   </Grid>
 
                   <Grid item xs={12} sm={5}>
                     <FormControl fullWidth>
-                      <InputLabel>To</InputLabel>
-                      <Select
-                        value={targetLang}
-                        onChange={(e) => setTargetLang(e.target.value)}
-                        label="To"
-                      >
-                        {languages.map((lang) => (
-                          <MenuItem key={lang.code} value={lang.code}>
+                <InputLabel>To</InputLabel>
+                <Select
+                  value={targetLang}
+                  onChange={(e) => setTargetLang(e.target.value)}
+                  label="To"
+                >
+                  {languages.map((lang) => (
+                    <MenuItem key={lang.code} value={lang.code}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Typography>{lang.native_name || lang.name}</Typography>
                               {lang.tts_supported && <VolumeUpIcon fontSize="small" color="action" />}
                             </Box>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
                   </Grid>
                 </Grid>
 
@@ -899,7 +899,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                                     <Typography variant="body2">{level.label}</Typography>
                                     <Typography variant="caption" color="text.secondary">
                                       {level.description}
-                                    </Typography>
+              </Typography>
                                   </Box>
                                 </Box>
                               </MenuItem>
@@ -995,8 +995,8 @@ export const Translator = ({ initialMode = 'type' }) => {
                         {inputText && (
                           <Tooltip title="Copy">
                             <IconButton size="small" onClick={() => handleCopyText(inputText)}>
-                              <ContentCopyIcon fontSize="small" />
-                            </IconButton>
+                <ContentCopyIcon fontSize="small" />
+              </IconButton>
                           </Tooltip>
                         )}
                         {speechSupported && (
@@ -1011,7 +1011,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                           </Tooltip>
                         )}
                       </Box>
-                    </Stack>
+            </Stack>
 
                     <TextField
                       multiline
@@ -1029,7 +1029,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
                       <Typography variant="caption" color="text.secondary">
                         {characterCount}/{characterLimit} characters
-                      </Typography>
+            </Typography>
                       
                       <Box sx={{ display: 'flex', gap: 1 }}>
                         <Button
@@ -1063,19 +1063,19 @@ export const Translator = ({ initialMode = 'type' }) => {
                     <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                       <Typography variant="h6">
                         {getLanguageName(targetLang)} Translation
-                      </Typography>
+              </Typography>
                       <Box sx={{ display: 'flex', gap: 1 }}>
                         {translatedText && (
                           <>
                             <Tooltip title="Copy translation">
-                              <IconButton size="small" onClick={() => handleCopyText(translatedText)}>
-                                <ContentCopyIcon fontSize="small" />
-                              </IconButton>
+                <IconButton size="small" onClick={() => handleCopyText(translatedText)}>
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
                             </Tooltip>
                             <Tooltip title="Play audio">
                               <IconButton size="small" onClick={() => playTranslatedAudio(translatedText)}>
                                 <VolumeUpIcon fontSize="small" />
-                              </IconButton>
+                  </IconButton>
                             </Tooltip>
                             <Tooltip title="Save as flashcard">
                               <IconButton size="small" onClick={saveAsFlashcard}>
@@ -1085,7 +1085,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                           </>
                         )}
                       </Box>
-                    </Stack>
+              </Stack>
 
                     <Box
                       sx={{
@@ -1118,7 +1118,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                 </Card>
               </Grid>
             </Grid>
-          </Stack>
+            </Stack>
         )}
 
         {/* Conversation View */}
@@ -1129,7 +1129,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                 <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                   <Typography variant="h6">
                     Conversation Mode
-                  </Typography>
+            </Typography>
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
                       size="small"
@@ -1153,24 +1153,24 @@ export const Translator = ({ initialMode = 'type' }) => {
                   {conversation.length === 0 ? (
                     <Typography color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
                       Start a conversation by typing a message
-                    </Typography>
+              </Typography>
                   ) : (
                     conversation.map((message) => (
                       <MessageBubble key={message.id} message={message} />
                     ))
-                  )}
+            )}
                 </Box>
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  <TextField
-                    fullWidth
-                    multiline
+              <TextField
+                fullWidth
+                multiline
                     maxRows={3}
-                    value={inputText}
+                value={inputText}
                     onChange={handleTextChange}
                     placeholder="Type your message..."
-                    variant="outlined"
-                    size="small"
+                variant="outlined"
+                size="small"
                   />
                   <Button
                     variant="contained"
@@ -1180,8 +1180,8 @@ export const Translator = ({ initialMode = 'type' }) => {
                     }}
                     disabled={!inputText.trim() || isTranslating}
                     sx={{ minWidth: 'auto', px: 2 }}
-                  >
-                    <SendIcon />
+                >
+                  <SendIcon />
                   </Button>
                 </Box>
               </CardContent>
@@ -1208,8 +1208,8 @@ export const Translator = ({ initialMode = 'type' }) => {
             Advanced Translation Analysis
             <IconButton onClick={() => setShowAdvanced(false)}>
               <DeleteIcon />
-            </IconButton>
-          </Stack>
+                </IconButton>
+              </Stack>
         </DialogTitle>
         <DialogContent>
           {translation && (

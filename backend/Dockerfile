@@ -11,12 +11,6 @@ RUN apt-get update && apt-get install -y python3-venv
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
-# Create credentials directory
-RUN mkdir -p /app/credentials
-
-# Copy credentials first
-COPY credentials/google-credentials.json /app/credentials/google-credentials.json
-
 # Copy requirements and install dependencies in venv
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
@@ -28,7 +22,6 @@ COPY . .
 # Set environment variables
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/google-credentials.json
 ENV VIRTUAL_ENV=/app/venv
 ENV PATH="/app/venv/bin:$PATH"
 

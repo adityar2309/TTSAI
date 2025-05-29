@@ -62,8 +62,8 @@ tts_cache = {}
 
 # Initialize Google Cloud clients with error handling
 try:
-    speech_client = SpeechClient()
-    tts_client = TextToSpeechClient()
+speech_client = SpeechClient()
+tts_client = TextToSpeechClient()
     logger.info("Google Cloud clients initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize Google Cloud clients: {e}")
@@ -78,9 +78,9 @@ if not api_key:
 
 try:
     logger.info(f"Configuring Gemini with API key: {api_key[:8]}...{api_key[-4:]}")
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel('gemini-1.5-flash')
+
     # Test Gemini connection
     test_response = model.generate_content("Test connection")
     logger.info("Gemini connection test successful")
@@ -308,7 +308,7 @@ def advanced_translate():
                 'details': 'Please try again'
             }), 500
             
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Gemini API error: {e}")
             return jsonify({
                 'error': 'Translation service error',
@@ -367,7 +367,7 @@ def save_json_file(file_path, data):
     temp_path = f"{file_path}.tmp"
     try:
         with open(temp_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(data, f, ensure_ascii=False, indent=2)
         
         # Atomic move
         if os.path.exists(file_path):
@@ -387,12 +387,12 @@ def save_json_file(file_path, data):
 def get_common_phrases():
     """Get common phrases for a language with enhanced categorization"""
     try:
-        language = request.args.get('language')
+    language = request.args.get('language')
         category = request.args.get('category', 'all')
         difficulty = request.args.get('difficulty', 'all')
         
-        if not language:
-            return jsonify({'error': 'Language parameter required'}), 400
+    if not language:
+        return jsonify({'error': 'Language parameter required'}), 400
         
         phrases_data = load_json_file(PHRASES_FILE, {
             'phrases': {},
@@ -425,19 +425,19 @@ def get_common_phrases():
 def get_word_of_day():
     """Enhanced word of the day with more details"""
     try:
-        language = request.args.get('language')
-        if not language:
-            return jsonify({'error': 'Language parameter required'}), 400
+    language = request.args.get('language')
+    if not language:
+        return jsonify({'error': 'Language parameter required'}), 400
         
         words_data = load_json_file(WORD_OF_DAY_FILE, {'words': {}})
-        
+    
         if language not in words_data.get('words', {}):
             return jsonify({'error': f'Language {language} not supported'}), 404
         
         word_list = words_data['words'][language]
         today = datetime.now().strftime('%Y-%m-%d')
         
-        # Use date as seed for consistent daily word
+    # Use date as seed for consistent daily word
         random.seed(today + language)
         word_data = random.choice(word_list)
         
@@ -508,7 +508,7 @@ def create_flashcard():
         
         # Generate unique ID
         flashcard_id = str(uuid.uuid4())
-        
+            
         flashcard = {
             'id': flashcard_id,
             'translation': translation,
@@ -684,7 +684,7 @@ def generate_quiz():
         
         if not all([user_id, language]):
             return jsonify({'error': 'Missing required parameters: userId, language'}), 400
-        
+            
         progress = load_json_file(USER_PROGRESS_FILE, {'users': {}})
         user_data = progress.get('users', {}).get(user_id, {})
         flashcards = user_data.get('flashcards', [])
@@ -867,7 +867,7 @@ def submit_quiz_answer(quiz_id):
         
         if not all([user_id, question_id, answer is not None]):
             return jsonify({'error': 'Missing required parameters'}), 400
-        
+            
         # Load quiz session
         quiz_sessions = load_json_file('data/quiz_sessions.json', {'sessions': {}})
         quiz_session = quiz_sessions.get('sessions', {}).get(quiz_id)
@@ -954,7 +954,7 @@ def submit_quiz_answer(quiz_id):
                 'completed_at': quiz_session['completed_at']
             })
             
-            save_json_file(USER_PROGRESS_FILE, progress)
+        save_json_file(USER_PROGRESS_FILE, progress)
         
         return jsonify({
             'correct': correct,
@@ -1360,7 +1360,7 @@ Return ONLY a valid JSON response with this exact structure:
 Use standard ISO 639-1 language codes (en, es, fr, de, etc.)."""
 
         try:
-            response = model.generate_content(prompt)
+        response = model.generate_content(prompt)
             if not response or not response.text:
                 raise Exception("Empty response from Gemini")
                 
@@ -1385,8 +1385,8 @@ Use standard ISO 639-1 language codes (en, es, fr, de, etc.)."""
             # Fallback to simple heuristic detection
             fallback_result = simple_language_detection(text)
             return jsonify(fallback_result)
-            
-        except Exception as e:
+        
+    except Exception as e:
             logger.error(f"Gemini language detection error: {e}")
             
             # Fallback to simple heuristic detection
@@ -1502,8 +1502,8 @@ Translation:"""
             
             logger.info(f"Basic translation completed: {text[:30]} -> {translation[:30]}")
             return jsonify(result)
-            
-        except Exception as e:
+    
+    except Exception as e:
             logger.error(f"Gemini basic translation error: {e}")
             return jsonify({'error': 'Translation failed'}), 503
             
@@ -1548,31 +1548,31 @@ def text_to_speech():
         
         try:
             # Configure voice
-            voice = tts.VoiceSelectionParams(
-                language_code=language_code,
+        voice = tts.VoiceSelectionParams(
+            language_code=language_code,
                 ssml_gender=getattr(tts.SsmlVoiceGender, voice_gender, tts.SsmlVoiceGender.NEUTRAL)
-            )
-            
+        )
+
             # Configure audio
-            audio_config = tts.AudioConfig(
-                audio_encoding=tts.AudioEncoding.MP3,
+        audio_config = tts.AudioConfig(
+            audio_encoding=tts.AudioEncoding.MP3,
                 speaking_rate=max(0.25, min(4.0, speed)),  # Clamp speed
                 pitch=max(-20.0, min(20.0, pitch))         # Clamp pitch
-            )
-            
+        )
+        
             # Synthesis input
             synthesis_input = tts.SynthesisInput(text=text)
             
             # Generate speech
-            response = tts_client.synthesize_speech(
-                input=synthesis_input,
-                voice=voice,
-                audio_config=audio_config
-            )
-            
+        response = tts_client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
+        )
+        
             # Encode audio content
-            audio_content = base64.b64encode(response.audio_content).decode('utf-8')
-            
+        audio_content = base64.b64encode(response.audio_content).decode('utf-8')
+        
             result = {
                 'audio_content': audio_content,
                 'text': text,
@@ -1590,8 +1590,8 @@ def text_to_speech():
             
             logger.info(f"TTS completed for: {text[:30]}")
             return jsonify(result)
-            
-        except Exception as e:
+    
+    except Exception as e:
             logger.error(f"Google TTS error: {e}")
             return jsonify({'error': 'TTS generation failed'}), 503
             
