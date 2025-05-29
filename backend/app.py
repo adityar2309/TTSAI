@@ -507,7 +507,7 @@ def create_flashcard():
             return jsonify({'error': 'Missing required parameters: userId, translation'}), 400
             
         # Validate translation structure
-        required_translation_fields = ['original', 'translated', 'sourceLang', 'targetLang']
+        required_translation_fields = ['originalText', 'translatedText', 'sourceLang', 'targetLang']
         missing_fields = [field for field in required_translation_fields if not translation.get(field)]
         if missing_fields:
             return jsonify({
@@ -555,7 +555,7 @@ def create_flashcard():
         
         save_json_file(USER_PROGRESS_FILE, progress)
         
-        logger.info(f"Created flashcard for user {user_id}: {translation['original']}")
+        logger.info(f"Created flashcard for user {user_id}: {translation['originalText']}")
         return jsonify({
             'success': True,
             'flashcard': flashcard,
@@ -606,11 +606,8 @@ def get_flashcards():
         # Apply limit
         flashcards = flashcards[:limit]
         
-        return jsonify({
-            'flashcards': flashcards,
-            'total': len(flashcards),
-            'stats': user_data.get('learning_stats', {})
-        })
+        # Return the flashcards array directly
+        return jsonify(flashcards)
         
     except Exception as e:
         logger.error(f"Error fetching flashcards: {e}")
@@ -695,6 +692,8 @@ def review_flashcard(flashcard_id):
         logger.error(f"Error reviewing flashcard: {e}", exc_info=True)
         return jsonify({'error': 'Failed to record review'}), 500
 
+@app.route('/api/quiz/generate', methods=['POST'])
+@rate_limit
 def generate_quiz():
     """Generate a dynamic quiz based on user's learning history and proficiency"""
     try:
@@ -707,11 +706,10 @@ def generate_quiz():
         if not all([user_id, language]):
             return jsonify({'error': 'Missing required fields'}), 400
             
-        # Load user data and flashcards
-        user_data_path = os.path.join('data', 'users', f'{user_id}.json')
-        user_data = load_json_file(user_data_path, default={})
+        # Load user progress data
+        progress = load_json_file(USER_PROGRESS_FILE, {'users': {}})
+        user_data = progress.get('users', {}).get(user_id, {'flashcards': []})
         flashcards = user_data.get('flashcards', [])
-        conversation_history = user_data.get('conversation_history', [])
         
         # Initialize quiz questions
         questions = []
@@ -726,17 +724,22 @@ def generate_quiz():
         if quiz_type == 'mixed' or quiz_type == 'grammar':
             # Grammar questions (30% of mixed quiz)
             num_grammar = total_questions if quiz_type == 'grammar' else 3
-            grammar_questions = generate_grammar_questions(flashcards, difficulty, num_grammar)
+            grammar_questions = generate_grammar_questions(language, difficulty, num_grammar)
             questions.extend(grammar_questions)
             
         if quiz_type == 'mixed' or quiz_type == 'conversation':
             # Conversation questions (30% of mixed quiz)
             num_conversation = total_questions if quiz_type == 'conversation' else 3
-            conversation_questions = generate_conversation_questions(conversation_history, difficulty, num_conversation)
+            conversation_questions = generate_conversation_questions(language, difficulty, num_conversation)
             questions.extend(conversation_questions)
             
-        # Shuffle questions
+        # Shuffle questions and ensure we have enough
         random.shuffle(questions)
+        questions = questions[:total_questions]
+        
+        # If we don't have enough questions, generate basic ones
+        while len(questions) < total_questions:
+            questions.append(generate_basic_question(language, difficulty))
         
         # Store quiz in user data
         quiz_id = str(uuid.uuid4())
@@ -748,10 +751,16 @@ def generate_quiz():
             'started_at': datetime.now().isoformat(),
             'completed': False,
             'score': 0,
-            'answers': []
+            'answers': [],
+            'current_question': 0
         }
         
-        save_json_file(user_data_path, user_data)
+        # Save updated user data
+        if user_id not in progress['users']:
+            progress['users'][user_id] = user_data
+        else:
+            progress['users'][user_id].update(user_data)
+        save_json_file(USER_PROGRESS_FILE, progress)
         
         return jsonify({
             'quiz_id': quiz_id,
@@ -761,142 +770,169 @@ def generate_quiz():
         
     except Exception as e:
         logger.error(f"Error generating quiz: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+        return jsonify({'error': 'Failed to generate quiz'}), 500
 
 def generate_vocabulary_questions(flashcards, difficulty, count):
     """Generate vocabulary-based questions"""
     questions = []
-    recent_flashcards = sorted(flashcards, key=lambda x: x.get('last_reviewed', ''), reverse=True)[:50]
     
-    for _ in range(count):
-        if not recent_flashcards:
-            break
-            
+    if not flashcards or len(flashcards) < 4:
+        return questions
+    
+    recent_flashcards = flashcards[:min(50, len(flashcards))]
+    
+    for _ in range(min(count, len(recent_flashcards))):
         card = random.choice(recent_flashcards)
-        question_type = random.choice(['translation', 'multiple_choice', 'fill_blank'])
+        question_type = random.choice(['multiple_choice', 'translation'])
         
         if question_type == 'translation':
             questions.append({
-        'type': 'translation',
-                'text': card['word'],
-                'correct_answer': card['translation'],
+                'id': str(uuid.uuid4()),
+                'type': 'translation',
+                'text': f"Translate: {card['translation']['originalText']}",
+                'correct_answer': card['translation']['translatedText'],
                 'points': 10,
-                'hint': card.get('pronunciation', '')
+                'hint': f"This is a {card.get('difficulty', 'beginner')} level word"
             })
-        elif question_type == 'multiple_choice':
+        else:  # multiple_choice
             # Generate distractors from other flashcards
-            distractors = [fc['translation'] for fc in random.sample(flashcards, 3) if fc['id'] != card['id']]
-            options = distractors + [card['translation']]
-            random.shuffle(options)
-            
-            questions.append({
-                'type': 'multiple_choice',
-                'text': f"What is the meaning of '{card['word']}'?",
-                'options': options,
-                'correct_answer': card['translation'],
-                'points': 8
-            })
-        else:  # fill_blank
-            context = card.get('example', '').replace(card['word'], '_____')
-            questions.append({
-                'type': 'fill_blank',
-                'text': context,
-                'correct_answer': card['word'],
-                'points': 12,
-                'hint': f"Translation: {card['translation']}"
-            })
+            other_cards = [fc for fc in flashcards if fc['id'] != card['id']]
+            if len(other_cards) >= 3:
+                distractors = random.sample(other_cards, 3)
+                options = [d['translation']['translatedText'] for d in distractors]
+                options.append(card['translation']['translatedText'])
+                random.shuffle(options)
+                
+                questions.append({
+                    'id': str(uuid.uuid4()),
+                    'type': 'multiple_choice',
+                    'text': f"What is the translation of '{card['translation']['originalText']}'?",
+                    'options': options,
+                    'correct_answer': card['translation']['translatedText'],
+                    'points': 8
+                })
             
     return questions
 
-def generate_grammar_questions(flashcards, difficulty, count):
-    """Generate grammar-based questions"""
+def generate_grammar_questions(language, difficulty, count):
+    """Generate grammar-based questions using Gemini AI"""
     questions = []
-    grammar_patterns = {
-        'beginner': [
-            {'pattern': 'simple_present', 'points': 8},
-            {'pattern': 'simple_past', 'points': 10},
-            {'pattern': 'basic_articles', 'points': 6}
-        ],
-        'intermediate': [
-            {'pattern': 'perfect_tenses', 'points': 12},
-            {'pattern': 'conditionals', 'points': 15},
-            {'pattern': 'passive_voice', 'points': 12}
-        ],
-        'advanced': [
-            {'pattern': 'subjunctive', 'points': 18},
-            {'pattern': 'complex_clauses', 'points': 20},
-            {'pattern': 'idiomatic_expressions', 'points': 15}
-        ]
+    
+    try:
+        for _ in range(count):
+            prompt = f"""
+            Generate a {difficulty} level grammar question for {language} language learning.
+            Return a JSON object with this exact structure:
+            {{
+                "question": "The grammar question text",
+                "options": ["option1", "option2", "option3", "option4"],
+                "correct_answer": "the correct option",
+                "explanation": "brief explanation of why this is correct"
+            }}
+            """
+            
+            response = model.generate_content(prompt)
+            try:
+                question_data = json.loads(response.text)
+                questions.append({
+                    'id': str(uuid.uuid4()),
+                    'type': 'multiple_choice',
+                    'text': question_data['question'],
+                    'options': question_data['options'],
+                    'correct_answer': question_data['correct_answer'],
+                    'explanation': question_data['explanation'],
+                    'points': 12
+                })
+            except json.JSONDecodeError:
+                # Fallback to basic question if AI response is invalid
+                questions.append(generate_basic_question(language, difficulty))
+                
+    except Exception as e:
+        logger.error(f"Error generating grammar questions: {e}")
+        # Generate fallback questions
+        for _ in range(count):
+            questions.append(generate_basic_question(language, difficulty))
+        
+    return questions
+
+def generate_conversation_questions(language, difficulty, count):
+    """Generate conversation-based questions using Gemini AI"""
+    questions = []
+    
+    try:
+        for _ in range(count):
+            prompt = f"""
+            Generate a {difficulty} level conversation question for {language} language learning.
+            Create a realistic scenario and ask how to respond appropriately.
+            Return a JSON object with this exact structure:
+            {{
+                "scenario": "Brief scenario description",
+                "question": "The question asking how to respond",
+                "options": ["response1", "response2", "response3", "response4"],
+                "correct_answer": "the most appropriate response",
+                "explanation": "why this response is most appropriate"
+            }}
+            """
+            
+            response = model.generate_content(prompt)
+            try:
+                question_data = json.loads(response.text)
+                questions.append({
+                    'id': str(uuid.uuid4()),
+                    'type': 'conversation',
+                    'scenario': question_data['scenario'],
+                    'text': question_data['question'],
+                    'options': question_data['options'],
+                    'correct_answer': question_data['correct_answer'],
+                    'explanation': question_data['explanation'],
+                    'points': 15
+                })
+            except json.JSONDecodeError:
+                # Fallback to basic question if AI response is invalid
+                questions.append(generate_basic_question(language, difficulty))
+                
+    except Exception as e:
+        logger.error(f"Error generating conversation questions: {e}")
+        # Generate fallback questions
+        for _ in range(count):
+            questions.append(generate_basic_question(language, difficulty))
+        
+    return questions
+
+def generate_basic_question(language, difficulty):
+    """Generate a basic fallback question"""
+    basic_questions = {
+        'en': {
+            'beginner': {
+                'question': 'Which greeting is most appropriate in formal situations?',
+                'options': ['Hey!', 'Hello', 'Yo!', 'What\'s up?'],
+                'correct_answer': 'Hello'
+            },
+            'intermediate': {
+                'question': 'Which sentence uses the present perfect correctly?',
+                'options': ['I have saw that movie', 'I have seen that movie', 'I has seen that movie', 'I seen that movie'],
+                'correct_answer': 'I have seen that movie'
+            },
+            'advanced': {
+                'question': 'Which sentence demonstrates proper use of the subjunctive mood?',
+                'options': ['If I was rich, I would travel', 'If I were rich, I would travel', 'If I am rich, I will travel', 'If I will be rich, I would travel'],
+                'correct_answer': 'If I were rich, I would travel'
+            }
+        }
     }
     
-    patterns = grammar_patterns.get(difficulty, grammar_patterns['beginner'])
+    lang_questions = basic_questions.get(language, basic_questions['en'])
+    question_data = lang_questions.get(difficulty, lang_questions['beginner'])
     
-    for _ in range(count):
-        pattern = random.choice(patterns)
-        
-        # Generate grammar question using Gemini
-        prompt = f"""
-        Generate a grammar question for {difficulty} level learners focusing on {pattern['pattern']}.
-        Include:
-        1. Question text
-        2. 4 possible answers
-        3. Correct answer
-        4. Explanation
-        Format as JSON.
-        """
-        
-        response = model.generate_content(prompt)
-        question_data = json.loads(response.text)
-        
-        questions.append({
-            'type': 'grammar',
-            'text': question_data['question'],
-            'options': question_data['options'],
-            'correct_answer': question_data['correct_answer'],
-            'explanation': question_data['explanation'],
-            'points': pattern['points']
-        })
-        
-    return questions
-
-def generate_conversation_questions(conversation_history, difficulty, count):
-    """Generate conversation-based questions"""
-    questions = []
-    recent_conversations = sorted(conversation_history, key=lambda x: x['timestamp'], reverse=True)[:20]
-    
-    for _ in range(count):
-        if not recent_conversations:
-            break
-            
-        conversation = random.choice(recent_conversations)
-        
-        # Generate conversation question using Gemini
-        prompt = f"""
-        Based on this conversation: "{conversation['user_input']}"
-        Generate a question that tests the learner's ability to respond appropriately in this context.
-        Include:
-        1. Scenario description
-        2. Question
-        3. 4 possible responses
-        4. Correct response
-        5. Explanation of why it's correct
-        Format as JSON.
-        """
-        
-        response = model.generate_content(prompt)
-        question_data = json.loads(response.text)
-        
-        questions.append({
-            'type': 'conversation',
-            'scenario': question_data['scenario'],
-            'text': question_data['question'],
-            'options': question_data['options'],
-            'correct_answer': question_data['correct_answer'],
-            'explanation': question_data['explanation'],
-            'points': 15
-        })
-        
-    return questions
+    return {
+        'id': str(uuid.uuid4()),
+        'type': 'multiple_choice',
+        'text': question_data['question'],
+        'options': question_data['options'],
+        'correct_answer': question_data['correct_answer'],
+        'explanation': 'This is the grammatically correct option.',
+        'points': 10
+    }
 
 @app.route('/api/quiz/<quiz_id>/submit', methods=['POST'])
 @rate_limit
@@ -993,6 +1029,9 @@ def get_user_progress():
     """Get comprehensive user progress and statistics"""
     try:
         user_id = request.args.get('userId')
+        language = request.args.get('language')
+        time_range = request.args.get('timeRange', 'all')
+        
         if not user_id:
             return jsonify({'error': 'UserId parameter required'}), 400
         
@@ -1002,22 +1041,49 @@ def get_user_progress():
         if not user_data:
             # Return default progress for new user
             return jsonify({
-                'flashcards_count': 0,
-                'quiz_scores': [],
-                'learning_stats': {
-                    'total_cards': 0,
-                    'mastered_cards': 0,
-                    'study_streak': 0,
-                    'last_study_date': None
-                },
+                'total_xp': 0,
+                'average_score': 0,
+                'quizzes_completed': 0,
+                'streak_days': 0,
+                'words_learned': 0,
+                'conversations': 0,
+                'study_time': 0,
+                'achievements': [],
                 'weekly_activity': [],
-                'skill_levels': {},
-                'achievements': []
+                'skill_levels': {}
             })
         
-        # Calculate additional statistics
+        # Calculate statistics
         flashcards = user_data.get('flashcards', [])
         quiz_scores = user_data.get('quiz_scores', [])
+        practice_sessions = user_data.get('practice_sessions', [])
+        
+        # Calculate total XP (10 XP per flashcard, 5 XP per correct quiz answer)
+        total_xp = len(flashcards) * 10
+        for quiz in quiz_scores:
+            total_xp += quiz.get('score', 0) * 5
+        
+        # Calculate average quiz score
+        if quiz_scores:
+            total_percentage = sum((quiz.get('score', 0) / quiz.get('total_questions', 1)) * 100 for quiz in quiz_scores)
+            average_score = total_percentage / len(quiz_scores)
+        else:
+            average_score = 0
+        
+        # Calculate study streak
+        streak_days = user_data.get('daily_streaks', {}).get('current_streak', 0)
+        
+        # Calculate words learned (unique flashcards)
+        words_learned = len(flashcards)
+        
+        # Calculate conversations
+        conversations = len(practice_sessions)
+        
+        # Calculate total study time
+        study_time = calculate_total_study_time(user_data) * 60  # Convert to seconds for frontend
+        
+        # Calculate achievements
+        achievements = calculate_achievements(user_data)
         
         # Weekly activity calculation
         weekly_activity = calculate_weekly_activity(user_data)
@@ -1025,17 +1091,17 @@ def get_user_progress():
         # Skill levels by language
         skill_levels = calculate_skill_levels(flashcards, quiz_scores)
         
-        # Achievement calculation
-        achievements = calculate_achievements(user_data)
-        
         return jsonify({
-            'flashcards_count': len(flashcards),
-            'quiz_scores': quiz_scores[-10:],  # Last 10 quiz scores
-            'learning_stats': user_data.get('learning_stats', {}),
-            'weekly_activity': weekly_activity,
-            'skill_levels': skill_levels,
+            'total_xp': total_xp,
+            'average_score': average_score,
+            'quizzes_completed': len(quiz_scores),
+            'streak_days': streak_days,
+            'words_learned': words_learned,
+            'conversations': conversations,
+            'study_time': study_time,
             'achievements': achievements,
-            'total_study_time': calculate_total_study_time(user_data)
+            'weekly_activity': weekly_activity,
+            'skill_levels': skill_levels
         })
         
     except Exception as e:
@@ -1839,58 +1905,96 @@ def conversation_practice():
 
         # Generate conversation prompt based on context and proficiency
         conversation_prompt = f"""
-        Act as a native {language} speaker having a conversation. 
+        Act as a helpful language tutor having a conversation in {language}. 
         The user's proficiency level is {proficiency}.
         Context: {context}
         
-        Respond to: "{user_input}"
+        User said: "{user_input}"
         
-        Provide a response that includes:
-        1. A natural response in {language}
-        2. The translation in English
-        3. Key vocabulary or phrases used
-        4. Grammar points demonstrated
-        5. Cultural context or notes
-        6. Suggested follow-up responses for the user
+        Respond naturally in {language} and provide a JSON response with these exact keys:
+        {{
+            "response": "Your natural response in {language}",
+            "translation": "English translation of your response",
+            "vocabulary": ["key", "vocabulary", "words"],
+            "grammar_notes": "Brief grammar explanation",
+            "cultural_note": "Cultural context if relevant",
+            "suggested_responses": ["suggestion1", "suggestion2", "suggestion3"]
+        }}
         
-        Format as JSON with these exact keys.
+        Keep responses appropriate for {proficiency} level learners.
         """
 
         # Generate response using Gemini
         response = model.generate_content(conversation_prompt)
         
+        try:
+            # Try to parse the JSON response
+            conversation_data = json.loads(response.text)
+        except json.JSONDecodeError:
+            # Fallback if AI doesn't return valid JSON
+            conversation_data = {
+                "response": "I understand. Can you tell me more?",
+                "translation": "I understand. Can you tell me more?",
+                "vocabulary": ["understand", "tell", "more"],
+                "grammar_notes": "Simple present tense",
+                "cultural_note": "This is a friendly way to continue conversation",
+                "suggested_responses": ["Yes, I can explain more", "What would you like to know?", "That's interesting"]
+            }
+        
         # Track user progress
-        user_data_path = os.path.join('data', 'users', f'{user_id}.json')
-        user_data = load_json_file(user_data_path, default={})
+        progress = load_json_file(USER_PROGRESS_FILE, {'users': {}})
         
-        if 'conversation_history' not in user_data:
-            user_data['conversation_history'] = []
+        if user_id not in progress['users']:
+            progress['users'][user_id] = {
+                'flashcards': [],
+                'quiz_scores': [],
+                'practice_sessions': [],
+                'learning_stats': {
+                    'total_cards': 0,
+                    'mastered_cards': 0,
+                    'study_streak': 0,
+                    'last_study_date': None
+                }
+            }
         
-        # Add conversation to history
-        user_data['conversation_history'].append({
+        user_data = progress['users'][user_id]
+        
+        # Add conversation to practice sessions
+        practice_session = {
             'timestamp': datetime.now().isoformat(),
+            'type': 'conversation',
             'user_input': user_input,
+            'ai_response': conversation_data['response'],
             'language': language,
             'context': context,
-            'response': response.text
-        })
+            'proficiency': proficiency,
+            'duration': 60,  # Estimate 1 minute per exchange
+            'performance': 0.8  # Default performance score
+        }
         
-        # Update user stats
-        if 'stats' not in user_data:
-            user_data['stats'] = {'conversations': 0, 'total_messages': 0}
-        user_data['stats']['conversations'] += 1
-        user_data['stats']['total_messages'] += 1
+        user_data['practice_sessions'].append(practice_session)
         
-        save_json_file(user_data_path, user_data)
+        # Update learning stats
+        user_data['learning_stats']['last_study_date'] = datetime.now().isoformat()
+        
+        save_json_file(USER_PROGRESS_FILE, progress)
         
         return jsonify({
-            'response': response.text,
-            'stats': user_data['stats']
+            'ai_response': conversation_data['response'],
+            'translation': conversation_data['translation'],
+            'vocabulary': conversation_data['vocabulary'],
+            'grammar_notes': conversation_data['grammar_notes'],
+            'cultural_note': conversation_data['cultural_note'],
+            'suggested_responses': conversation_data['suggested_responses'],
+            'stats': {
+                'total_conversations': len(user_data['practice_sessions']),
+                'session_count': len([s for s in user_data['practice_sessions'] if s['type'] == 'conversation'])
+            }
         })
         
     except Exception as e:
         logger.error(f"Error in conversation practice: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+        return jsonify({'error': 'Failed to generate conversation response'}), 500
 
 @app.route('/api/quizzes', methods=['GET'])
 @rate_limit

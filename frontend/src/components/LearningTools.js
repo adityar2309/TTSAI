@@ -224,7 +224,12 @@ const LearningTools = ({ userId, language }) => {
 
         const aiResponse = {
           type: 'ai',
-          ...JSON.parse(response.data.response),
+          response: response.data.ai_response,
+          translation: response.data.translation,
+          vocabulary: response.data.vocabulary,
+          grammar_notes: response.data.grammar_notes,
+          cultural_note: response.data.cultural_note,
+          suggested_responses: response.data.suggested_responses,
           timestamp: new Date().toISOString(),
         };
 
@@ -343,19 +348,19 @@ const LearningTools = ({ userId, language }) => {
                           />
                         ))}
                       </Box>
-                      {msg.grammar && (
+                      {msg.grammar_notes && (
                         <>
                           <Typography variant="caption" color="text.secondary">
                             Grammar Points:
                           </Typography>
                           <Typography variant="body2">
-                            {msg.grammar}
+                            {msg.grammar_notes}
                           </Typography>
                         </>
                       )}
-                      {msg.cultural_notes && (
+                      {msg.cultural_note && (
                         <Alert severity="info" sx={{ mt: 1 }}>
-                          {msg.cultural_notes}
+                          {msg.cultural_note}
                         </Alert>
                       )}
                     </Stack>
@@ -963,7 +968,7 @@ const LearningTools = ({ userId, language }) => {
                   </Typography>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 2 }}>
-                    "{wordOfDay.example}"
+                    "{wordOfDay.example_sentence}"
                   </Typography>
                   <Stack direction="row" spacing={1} justifyContent="center">
                     <Chip 

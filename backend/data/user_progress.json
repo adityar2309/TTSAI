@@ -3,18 +3,56 @@
     "user123": {
       "flashcards": [
         {
-          "id": 1,
+          "id": "fc-1",
           "translation": {
             "originalText": "Hello",
             "translatedText": "Hola",
             "sourceLang": "en",
-            "targetLang": "es",
-            "timestamp": "2024-03-15T10:30:00Z"
+            "targetLang": "es"
           },
+          "difficulty": "beginner",
+          "category": "greetings",
+          "notes": "",
+          "created_at": "2024-03-15T10:30:00Z",
+          "updated_at": "2024-03-15T10:30:00Z",
           "review_count": 3,
           "mastery_level": 2,
-          "last_reviewed": "2024-03-15T10:30:00Z",
-          "next_review": "2024-03-16T10:30:00Z"
+          "next_review": "2024-03-16T10:30:00Z",
+          "last_review": "2024-03-15T10:30:00Z",
+          "success_rate": 80.0,
+          "review_history": [
+            {
+              "timestamp": "2024-03-15T10:30:00Z",
+              "correct": true,
+              "time_taken": 5
+            }
+          ]
+        },
+        {
+          "id": "fc-2",
+          "translation": {
+            "originalText": "Thank you",
+            "translatedText": "Gracias",
+            "sourceLang": "en",
+            "targetLang": "es"
+          },
+          "difficulty": "beginner",
+          "category": "greetings",
+          "notes": "",
+          "created_at": "2024-03-15T11:00:00Z",
+          "updated_at": "2024-03-15T11:00:00Z",
+          "review_count": 2,
+          "mastery_level": 1,
+          "next_review": "2024-03-17T11:00:00Z",
+          "last_review": "2024-03-15T11:00:00Z",
+          "success_rate": 100.0,
+          "review_history": [
+            {
+              "timestamp": "2024-03-15T11:00:00Z",
+              "correct": true,
+              "time_taken": 3
+            }
+          ]
         }
       ],
       "quiz_scores": [
@@ -23,16 +61,21 @@
           "score": 8,
           "total_questions": 10,
           "difficulty": "beginner",
-          "language": "es"
+          "language": "es",
+          "percentage": 80
         }
       ],
       "practice_sessions": [
         {
           "timestamp": "2024-03-15T11:30:00Z",
-          "duration": 900,
-          "type": "pronunciation",
-          "performance": 0.85,
-          "language": "es"
+          "type": "conversation",
+          "user_input": "Hello, how are you?",
+          "ai_response": "Hola, ¿cómo estás?",
+          "language": "es",
+          "context": "general",
+          "proficiency": "beginner",
+          "duration": 60,
+          "performance": 0.85
         }
       ],
       "daily_streaks": {
@@ -40,13 +83,11 @@
         "longest_streak": 5,
         "last_practice": "2024-03-15T00:00:00Z"
       },
-      "language_levels": {
-        "es": {
-          "level": "beginner",
-          "xp": 150,
-          "words_learned": 25,
-          "accuracy": 0.8
-        }
+      "learning_stats": {
+        "total_cards": 2,
+        "mastered_cards": 0,
+        "study_streak": 3,
+        "last_study_date": "2024-03-15T11:30:00Z"
       }
     }
   }

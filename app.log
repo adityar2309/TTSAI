@@ -1,0 +1,13 @@
+2025-05-29 17:27:52,046 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-05-29 17:27:52,049 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-05-29 17:27:52,049 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-05-29 17:27:52,049 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-05-29 17:27:52,055 - google.auth._default - WARNING - Authentication failed using Compute Engine authentication due to unavailable metadata server.
+2025-05-29 17:27:52,055 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+2025-05-29 17:27:52,056 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-05-29 17:27:52,056 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-05-29 17:27:52,057 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-05-29 17:27:52,078 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-05-29 17:27:52,079 - google.auth._default - WARNING - Authentication failed using Compute Engine authentication due to unavailable metadata server.
+2025-05-29 17:27:52,080 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+2025-05-29 17:27:52,080 - __main__ - ERROR - GEMINI_API_KEY not found in environment variables
