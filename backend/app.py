@@ -62,12 +62,20 @@ tts_cache = {}
 
 # Initialize Google Cloud clients with error handling
 try:
+    # Initialize clients - they should automatically use the service account attached to Cloud Run
+    logger.info("Initializing Google Cloud Speech client...")
     speech_client = SpeechClient()
-    tts_client = TextToSpeechClient()
-    logger.info("Google Cloud clients initialized successfully")
+    logger.info("Google Cloud Speech client initialized successfully")
 except Exception as e:
-    logger.error(f"Failed to initialize Google Cloud clients: {e}")
+    logger.error(f"Failed to initialize Google Cloud Speech client: {e}")
     speech_client = None
+
+try:
+    logger.info("Initializing Google Cloud TTS client...")
+    tts_client = TextToSpeechClient()
+    logger.info("Google Cloud TTS client initialized successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize Google Cloud TTS client: {e}")
     tts_client = None
 
 # Configure Gemini with enhanced error handling
