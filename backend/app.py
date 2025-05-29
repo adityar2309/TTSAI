@@ -20,6 +20,7 @@ import hashlib
 import uuid
 from google.auth import default
 from fuzzywuzzy import fuzz
+import re
 
 # Configure comprehensive logging
 logging.basicConfig(
@@ -1589,8 +1590,9 @@ Translation:"""
             
             if needs_romanization:
                 try:
-                    # Parse JSON response for non-Latin languages
-                    translation_data = json.loads(response.text)
+                    # Extract and parse JSON response for non-Latin languages
+                    cleaned_response = extract_json_from_response(response.text)
+                    translation_data = json.loads(cleaned_response)
                     translation = translation_data.get('translation', '').strip()
                     romanization = translation_data.get('romanization', '').strip()
                     romanization_system = translation_data.get('romanization_system', '').strip()
@@ -1605,8 +1607,9 @@ Translation:"""
                         'timestamp': datetime.now().isoformat(),
                         'cached': False
                     }
-                except json.JSONDecodeError:
-                    # Fallback if JSON parsing fails
+                except json.JSONDecodeError as e:
+                    # Fallback if JSON parsing fails - log the raw response for debugging
+                    logger.warning(f"JSON parsing failed for response: {response.text}")
                     translation = response.text.strip()
                     result = {
                         'translation': translation,
@@ -1643,6 +1646,19 @@ Translation:"""
     except Exception as e:
         logger.error(f"Basic translation error: {e}", exc_info=True)
         return jsonify({'error': 'Internal server error'}), 500
+
+def extract_json_from_response(response_text):
+    """Extract JSON from response text, handling markdown code blocks if present"""
+    response_text = response_text.strip()
+    
+    # Try to extract JSON from markdown code blocks
+    json_pattern = r'```(?:json)?\s*(\{.*?\})\s*```'
+    match = re.search(json_pattern, response_text, re.DOTALL)
+    if match:
+        return match.group(1)
+    
+    # If no markdown blocks, return the original text
+    return response_text
 
 @app.route('/api/text-to-speech', methods=['POST'])
 @rate_limit
