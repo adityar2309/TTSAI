@@ -121,6 +121,23 @@ const AdvancedTranslation = ({ translation, onSaveFlashcard }) => {
               <Typography variant="subtitle1">
                 Stress: {translation.pronunciation.stress}
               </Typography>
+              {translation.pronunciation.phonetic && (
+                <Typography variant="subtitle1" gutterBottom>
+                  Phonetic: {translation.pronunciation.phonetic}
+                </Typography>
+              )}
+              {translation.pronunciation.romanization && (
+                <>
+                  <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
+                    Romanization: {translation.pronunciation.romanization}
+                  </Typography>
+                  {translation.pronunciation.romanization_system && (
+                    <Typography variant="body2" color="text.secondary">
+                      System: {translation.pronunciation.romanization_system}
+                    </Typography>
+                  )}
+                </>
+              )}
             </Box>
           )}
 

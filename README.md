@@ -9,6 +9,7 @@ A powerful real-time speech translation application with advanced learning tools
 - Support for multiple languages with dialect selection
 - Formality level control (formal, neutral, informal)
 - Text-to-speech playback of translations
+- **Romanization support for non-Latin scripts** (Chinese, Japanese, Arabic, Hindi, etc.)
 - Conversation mode for bilingual chats
 - Translation history with favorites
 - Advanced translation details including:

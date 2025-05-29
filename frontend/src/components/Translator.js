@@ -175,6 +175,9 @@ export const Translator = ({ initialMode = 'type' }) => {
   const [translatedText, setTranslatedText] = useState('');
   const [translation, setTranslation] = useState(null);
   
+  // Romanization state
+  const [romanizationData, setRomanizationData] = useState(null);
+  
   // UI state
   const [activeView, setActiveView] = useState('translate');
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -463,9 +466,27 @@ export const Translator = ({ initialMode = 'type' }) => {
         setTranslation(data);
         setShowAdvanced(true);
         setTranslatedText(data.main_translation);
+        // Store romanization from advanced translation
+        if (data.pronunciation && data.pronunciation.romanization) {
+          setRomanizationData({
+            romanization: data.pronunciation.romanization,
+            romanization_system: data.pronunciation.romanization_system
+          });
+        } else {
+          setRomanizationData(null);
+        }
       } else {
         setTranslatedText(data.translation);
         setTranslation(null);
+        // Store romanization from basic translation
+        if (data.romanization) {
+          setRomanizationData({
+            romanization: data.romanization,
+            romanization_system: data.romanization_system
+          });
+        } else {
+          setRomanizationData(null);
+        }
       }
 
       // Add to history
@@ -574,6 +595,9 @@ export const Translator = ({ initialMode = 'type' }) => {
       setTranslatedText(tempText);
     }
     
+    // Clear romanization data when swapping
+    setRomanizationData(null);
+    
     recordAnalytics('languages_swapped');
   };
 
@@ -635,6 +659,11 @@ export const Translator = ({ initialMode = 'type' }) => {
     if (text.length <= characterLimit) {
       setInputText(text);
       setCharacterCount(text.length);
+      
+      // Clear romanization when input text is cleared or changed significantly
+      if (text.length === 0 || Math.abs(text.length - inputText.length) > 10) {
+        setRomanizationData(null);
+      }
       
       // Auto-detect language for longer text
       if (text.length > 20 && sourceLang === 'auto') {
@@ -1101,6 +1130,33 @@ export const Translator = ({ initialMode = 'type' }) => {
                       <Typography variant="body1" color={translatedText ? 'text.primary' : 'text.secondary'}>
                         {translatedText || 'Translation will appear here...'}
                       </Typography>
+                      
+                      {/* Display romanization if available */}
+                      {romanizationData && romanizationData.romanization && (
+                        <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Romanization:
+                            </Typography>
+                            <Tooltip title="Copy romanization">
+                              <IconButton 
+                                size="small" 
+                                onClick={() => handleCopyText(romanizationData.romanization)}
+                              >
+                                <ContentCopyIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                          <Typography variant="body1" color="text.primary" sx={{ fontStyle: 'italic' }}>
+                            {romanizationData.romanization}
+                          </Typography>
+                          {romanizationData.romanization_system && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                              System: {romanizationData.romanization_system}
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
                     </Box>
 
                     {translation && (

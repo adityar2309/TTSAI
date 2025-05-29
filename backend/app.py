@@ -149,6 +149,16 @@ def get_advanced_translation_prompt(text, source_lang, target_lang, formality="n
     context_instruction = f"\nContext: {context}" if context else ""
     dialect_instruction = f"\n- Target dialect: {dialect}" if dialect else ""
     
+    # Check if target language uses non-Latin script for romanization
+    non_latin_languages = ['ar', 'zh', 'zh-CN', 'zh-TW', 'ja', 'ko', 'hi', 'ru', 'th', 'he', 'ur', 'fa', 'bn', 'ta', 'te', 'ml', 'kn', 'gu', 'pa', 'ne', 'si', 'my', 'km', 'lo', 'ka', 'am', 'ti', 'dv']
+    needs_romanization = any(lang in target_lang.lower() for lang in non_latin_languages)
+    
+    romanization_instruction = ""
+    if needs_romanization:
+        romanization_instruction = """
+   - Romanization: Latin script representation for easy reading
+   - Romanization system: Standard system used (e.g., Pinyin for Chinese, Hepburn for Japanese, etc.)"""
+    
     return f"""Provide a comprehensive translation analysis with the following components:
 
 1. Main Translation:
@@ -166,7 +176,7 @@ def get_advanced_translation_prompt(text, source_lang, target_lang, formality="n
    - IPA notation for the main translation
    - Syllable breakdown with hyphens
    - Stress markers and tone information (if applicable)
-   - Phonetic spelling for easy pronunciation
+   - Phonetic spelling for easy pronunciation{romanization_instruction}
 
 4. Grammar Analysis:
    - Part of speech tags for key words
@@ -200,7 +210,9 @@ Return ONLY a valid JSON response with these exact keys:
         "ipa": "",
         "syllables": "",
         "stress": "",
-        "phonetic": ""
+        "phonetic": "",
+        "romanization": "",
+        "romanization_system": ""
     }},
     "grammar": {{
         "parts_of_speech": [],
@@ -1484,8 +1496,26 @@ def translate():
         if not model:
             return jsonify({'error': 'Translation service temporarily unavailable'}), 503
         
-        # Simple translation prompt
-        prompt = f"""Translate the following text from {source_lang} to {target_lang}.
+        # Check if target language uses non-Latin script for romanization
+        non_latin_languages = ['ar', 'zh', 'zh-CN', 'zh-TW', 'ja', 'ko', 'hi', 'ru', 'th', 'he', 'ur', 'fa', 'bn', 'ta', 'te', 'ml', 'kn', 'gu', 'pa', 'ne', 'si', 'my', 'km', 'lo', 'ka', 'am', 'ti', 'dv']
+        needs_romanization = any(lang in target_lang.lower() for lang in non_latin_languages)
+        
+        if needs_romanization:
+            # Enhanced translation prompt with romanization
+            prompt = f"""Translate the following text from {source_lang} to {target_lang}.
+Provide the response in JSON format with the translation and romanization.
+
+Text: {text}
+
+Return JSON with these exact keys:
+{{
+    "translation": "translated text in original script",
+    "romanization": "romanized version in Latin script",
+    "romanization_system": "name of romanization system used"
+}}"""
+        else:
+            # Simple translation prompt for Latin script languages
+            prompt = f"""Translate the following text from {source_lang} to {target_lang}.
 Provide only the translation, no explanations.
 
 Text: {text}
@@ -1497,21 +1527,53 @@ Translation:"""
             if not response or not response.text:
                 raise Exception("Empty response from Gemini")
             
-            translation = response.text.strip()
-            
-            result = {
-                'translation': translation,
-                'source_lang': source_lang,
-                'target_lang': target_lang,
-                'original_text': text,
-                'timestamp': datetime.now().isoformat(),
-                'cached': False
-            }
+            if needs_romanization:
+                try:
+                    # Parse JSON response for non-Latin languages
+                    translation_data = json.loads(response.text)
+                    translation = translation_data.get('translation', '').strip()
+                    romanization = translation_data.get('romanization', '').strip()
+                    romanization_system = translation_data.get('romanization_system', '').strip()
+                    
+                    result = {
+                        'translation': translation,
+                        'romanization': romanization,
+                        'romanization_system': romanization_system,
+                        'source_lang': source_lang,
+                        'target_lang': target_lang,
+                        'original_text': text,
+                        'timestamp': datetime.now().isoformat(),
+                        'cached': False
+                    }
+                except json.JSONDecodeError:
+                    # Fallback if JSON parsing fails
+                    translation = response.text.strip()
+                    result = {
+                        'translation': translation,
+                        'romanization': '',
+                        'romanization_system': '',
+                        'source_lang': source_lang,
+                        'target_lang': target_lang,
+                        'original_text': text,
+                        'timestamp': datetime.now().isoformat(),
+                        'cached': False
+                    }
+            else:
+                # Standard response for Latin script languages
+                translation = response.text.strip()
+                result = {
+                    'translation': translation,
+                    'source_lang': source_lang,
+                    'target_lang': target_lang,
+                    'original_text': text,
+                    'timestamp': datetime.now().isoformat(),
+                    'cached': False
+                }
             
             # Cache the result
             cache_result(translation_cache, cache_key, result)
             
-            logger.info(f"Basic translation completed: {text[:30]} -> {translation[:30]}")
+            logger.info(f"Basic translation completed: {text[:30]} -> {result['translation'][:30]}")
             return jsonify(result)
     
         except Exception as e:
