@@ -22,6 +22,10 @@ from google.auth import default
 from fuzzywuzzy import fuzz
 import re
 
+# Import database service
+from models import create_tables
+from db_service import db_service
+
 # Configure comprehensive logging
 logging.basicConfig(
     level=logging.INFO,
@@ -512,259 +516,97 @@ def get_word_of_day():
         if not language:
             return jsonify({'error': 'Language parameter required'}), 400
         
-        logger.info(f"Loading word of day for language: {language}")
-        words_data = load_json_file(WORD_OF_DAY_FILE, {'words': {}})
+        logger.info(f"Getting word of day for language: {language}")
         
-        # Debug logging
-        logger.info(f"Word data file loaded, available languages: {list(words_data.get('words', {}).keys())}")
-        logger.info(f"Checking if language '{language}' exists in data")
-    
-        if language not in words_data.get('words', {}):
-            logger.error(f"Language {language} not found in available languages: {list(words_data.get('words', {}).keys())}")
-            return jsonify({
-                'error': f'Language {language} not supported',
-                'available_languages': list(words_data.get('words', {}).keys())
-            }), 404
+        # Use database service to get word of day
+        word_data = db_service.get_word_of_day(language)
         
-        word_list = words_data['words'][language]
-        logger.info(f"Found {len(word_list)} words for language {language}")
+        if not word_data:
+            logger.error(f"No words available for language: {language}")
+            return jsonify({'error': f'No words available for language: {language}'}), 404
         
-        if not word_list:
-            logger.error(f"No words available for language {language}")
-            return jsonify({'error': f'No words available for language {language}'}), 404
-        
-        today = datetime.now().strftime('%Y-%m-%d')
-        
-        # Use date as seed for consistent daily word
-        random.seed(today + language)
-        word_data = random.choice(word_list)
-        
-        # Enhanced word data structure
-        enhanced_word = {
-            'word': word_data.get('word', ''),
-            'translation': word_data.get('translation', ''),
-            'pronunciation': word_data.get('pronunciation', ''),
-            'part_of_speech': word_data.get('part_of_speech', ''),
-            'difficulty': word_data.get('difficulty', 'beginner'),
-            'example_sentence': word_data.get('example_sentence', ''),
-            'example_translation': word_data.get('example_translation', ''),
-            'etymology': word_data.get('etymology', ''),
-            'related_words': word_data.get('related_words', []),
-            'cultural_note': word_data.get('cultural_note', ''),
-            'date': today,
-            'language': language
-        }
-        
-        logger.info(f"Successfully returning word of day for {language}: {enhanced_word['word']}")
-        return jsonify(enhanced_word)
+        logger.info(f"Successfully retrieved word of day for {language}")
+        return jsonify(word_data)
         
     except Exception as e:
-        logger.error(f"Error fetching word of day: {e}", exc_info=True)
-        return jsonify({'error': 'Failed to fetch word of the day'}), 500
+        logger.error(f"Error getting word of day: {e}")
+        return jsonify({'error': 'Failed to get word of the day'}), 500
 
 @app.route('/api/flashcards', methods=['POST'])
 @rate_limit
 def create_flashcard():
-    """Enhanced flashcard creation with validation and analytics"""
+    """Enhanced flashcard creation with comprehensive validation"""
     try:
-        data = request.json
-        if not data:
-            return jsonify({'error': 'No JSON data provided'}), 400
-            
-        user_id = data.get('userId')
-        translation = data.get('translation')
-        difficulty = data.get('difficulty', 'beginner')
-        category = data.get('category', 'general')
-        notes = data.get('notes', '')
-        
-        if not all([user_id, translation]):
-            return jsonify({'error': 'Missing required parameters: userId, translation'}), 400
-            
-        # Validate translation structure
-        required_translation_fields = ['originalText', 'translatedText', 'sourceLang', 'targetLang']
-        missing_fields = [field for field in required_translation_fields if not translation.get(field)]
-        if missing_fields:
-            return jsonify({
-                'error': f'Invalid translation data. Missing: {", ".join(missing_fields)}'
-            }), 400
-            
-        progress = load_json_file(USER_PROGRESS_FILE, {'users': {}})
-        
-        if user_id not in progress['users']:
-            progress['users'][user_id] = {
-                'flashcards': [],
-                'quiz_scores': [],
-                'practice_sessions': [],
-                'learning_stats': {
-                    'total_cards': 0,
-                    'mastered_cards': 0,
-                    'study_streak': 0,
-                    'last_study_date': None
-                }
-            }
-            
-        user_data = progress['users'][user_id]
-        
-        # Generate unique ID
-        flashcard_id = str(uuid.uuid4())
-            
-        flashcard = {
-            'id': flashcard_id,
-            'translation': translation,
-            'difficulty': difficulty,
-            'category': category,
-            'notes': notes,
-            'created_at': datetime.now().isoformat(),
-            'updated_at': datetime.now().isoformat(),
-            'review_count': 0,
-            'mastery_level': 0,
-            'next_review': datetime.now().isoformat(),
-            'last_review': None,
-            'success_rate': 0.0,
-            'review_history': []
-        }
-        
-        user_data['flashcards'].append(flashcard)
-        user_data['learning_stats']['total_cards'] += 1
-        
-        save_json_file(USER_PROGRESS_FILE, progress)
-        
-        logger.info(f"Created flashcard for user {user_id}: {translation['originalText']}")
-        return jsonify({
-            'success': True,
-            'flashcard': flashcard,
-            'stats': user_data['learning_stats']
-        })
-        
+        if not request.json:
+            return jsonify({'error': 'No data provided'}), 400
+
+        user_id = request.json.get('userId')
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+
+        flashcard_data = request.json.get('flashcard', {})
+        if not flashcard_data:
+            return jsonify({'error': 'Flashcard data required'}), 400
+
+        # Use database service to save flashcard
+        if db_service.save_flashcard(user_id, flashcard_data):
+            return jsonify({'success': True, 'message': 'Flashcard saved successfully'})
+        else:
+            return jsonify({'error': 'Failed to save flashcard'}), 500
+
     except Exception as e:
-        logger.error(f"Error creating flashcard: {e}", exc_info=True)
+        logger.error(f"Error creating flashcard: {e}")
         return jsonify({'error': 'Failed to create flashcard'}), 500
 
 @app.route('/api/flashcards', methods=['GET'])
 @rate_limit
 def get_flashcards():
-    """Get user's flashcards with filtering and sorting options"""
+    """Enhanced flashcard retrieval with comprehensive filtering"""
     try:
         user_id = request.args.get('userId')
-        category = request.args.get('category', 'all')
-        difficulty = request.args.get('difficulty', 'all')
-        sort_by = request.args.get('sortBy', 'created_at')
-        order = request.args.get('order', 'desc')
-        limit = int(request.args.get('limit', 50))
-        
         if not user_id:
-            return jsonify({'error': 'UserId parameter required'}), 400
-            
-        progress = load_json_file(USER_PROGRESS_FILE, {'users': {}})
-        user_data = progress.get('users', {}).get(user_id, {'flashcards': []})
-        flashcards = user_data.get('flashcards', [])
+            return jsonify({'error': 'User ID required'}), 400
+
+        language = request.args.get('language')
         
-        # Apply filters
-        if category != 'all':
-            flashcards = [f for f in flashcards if f.get('category') == category]
+        # Use database service to get flashcards
+        flashcards = db_service.get_flashcards(user_id, language)
         
-        if difficulty != 'all':
-            flashcards = [f for f in flashcards if f.get('difficulty') == difficulty]
-        
-        # Sort flashcards
-        reverse = order == 'desc'
-        if sort_by == 'mastery_level':
-            flashcards.sort(key=lambda x: x.get('mastery_level', 0), reverse=reverse)
-        elif sort_by == 'review_count':
-            flashcards.sort(key=lambda x: x.get('review_count', 0), reverse=reverse)
-        elif sort_by == 'next_review':
-            flashcards.sort(key=lambda x: x.get('next_review', ''), reverse=reverse)
-        else:  # created_at
-            flashcards.sort(key=lambda x: x.get('created_at', ''), reverse=reverse)
-        
-        # Apply limit
-        flashcards = flashcards[:limit]
-        
-        # Return the flashcards array directly
-        return jsonify(flashcards)
-        
+        return jsonify({
+            'flashcards': flashcards,
+            'total': len(flashcards),
+            'language': language
+        })
+
     except Exception as e:
-        logger.error(f"Error fetching flashcards: {e}")
-        return jsonify({'error': 'Failed to fetch flashcards'}), 500
+        logger.error(f"Error getting flashcards: {e}")
+        return jsonify({'error': 'Failed to get flashcards'}), 500
 
 @app.route('/api/flashcards/<flashcard_id>/review', methods=['POST'])
 @rate_limit
 def review_flashcard(flashcard_id):
-    """Record flashcard review with spaced repetition algorithm"""
+    """Enhanced flashcard review with spaced repetition"""
     try:
         data = request.json
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+
         user_id = data.get('userId')
         correct = data.get('correct', False)
-        time_taken = data.get('timeTaken', 0)  # in seconds
-        
+        time_taken = data.get('timeTaken', 0)
+
         if not user_id:
-            return jsonify({'error': 'UserId required'}), 400
-            
-        progress = load_json_file(USER_PROGRESS_FILE, {'users': {}})
-        user_data = progress.get('users', {}).get(user_id)
-        
-        if not user_data:
-            return jsonify({'error': 'User not found'}), 404
-        
-        # Find the flashcard
-        flashcard = None
-        for card in user_data.get('flashcards', []):
-            if card.get('id') == flashcard_id:
-                flashcard = card
-                break
-        
-        if not flashcard:
-            return jsonify({'error': 'Flashcard not found'}), 404
-        
-        # Update flashcard with spaced repetition
-        flashcard['review_count'] += 1
-        flashcard['last_review'] = datetime.now().isoformat()
-        
-        # Update success rate
-        review_history = flashcard.get('review_history', [])
-        review_history.append({
-            'timestamp': datetime.now().isoformat(),
-            'correct': correct,
-            'time_taken': time_taken
-        })
-        flashcard['review_history'] = review_history[-20:]  # Keep last 20 reviews
-        
-        correct_reviews = sum(1 for r in review_history if r['correct'])
-        flashcard['success_rate'] = correct_reviews / len(review_history) * 100
-        
-        # Spaced repetition algorithm
-        if correct:
-            flashcard['mastery_level'] = min(5, flashcard['mastery_level'] + 1)
-            # Increase interval: 1 day, 3 days, 7 days, 14 days, 30 days
-            intervals = [1, 3, 7, 14, 30]
-            interval = intervals[min(flashcard['mastery_level'], len(intervals) - 1)]
+            return jsonify({'error': 'User ID required'}), 400
+
+        # Use database service to record review
+        if db_service.review_flashcard(user_id, flashcard_id, correct, time_taken):
+            return jsonify({'success': True, 'message': 'Review recorded successfully'})
         else:
-            flashcard['mastery_level'] = max(0, flashcard['mastery_level'] - 1)
-            interval = 1  # Reset to 1 day if incorrect
-        
-        next_review = datetime.now() + timedelta(days=interval)
-        flashcard['next_review'] = next_review.isoformat()
-        flashcard['updated_at'] = datetime.now().isoformat()
-        
-        # Update user stats
-        stats = user_data.get('learning_stats', {})
-        if flashcard['mastery_level'] >= 4 and correct:
-            stats['mastered_cards'] = len([c for c in user_data['flashcards'] if c.get('mastery_level', 0) >= 4])
-        
-        stats['last_study_date'] = datetime.now().isoformat()
-        
-        save_json_file(USER_PROGRESS_FILE, progress)
-        
-        return jsonify({
-            'success': True,
-            'flashcard': flashcard,
-            'next_interval_days': interval,
-            'stats': stats
-        })
-        
+            return jsonify({'error': 'Failed to record review or flashcard not found'}), 404
+
     except Exception as e:
-        logger.error(f"Error reviewing flashcard: {e}", exc_info=True)
-        return jsonify({'error': 'Failed to record review'}), 500
+        logger.error(f"Error reviewing flashcard: {e}")
+        return jsonify({'error': 'Failed to review flashcard'}), 500
 
 @app.route('/api/quiz/generate', methods=['POST'])
 @rate_limit
@@ -1100,792 +942,55 @@ def submit_quiz_answer(quiz_id):
 @app.route('/api/progress', methods=['GET'])
 @rate_limit
 def get_user_progress():
-    """Get comprehensive user progress and statistics"""
+    """Enhanced progress tracking with comprehensive analytics"""
     try:
         user_id = request.args.get('userId')
-        language = request.args.get('language')
-        time_range = request.args.get('timeRange', 'all')
-        
         if not user_id:
-            return jsonify({'error': 'UserId parameter required'}), 400
+            return jsonify({'error': 'User ID required'}), 400
+
+        # Use database service to get comprehensive progress
+        progress_data = db_service.get_user_progress(user_id)
         
-        progress = load_json_file(USER_PROGRESS_FILE, {'users': {}})
-        user_data = progress.get('users', {}).get(user_id, {})
-        
-        if not user_data:
-            # Return default progress for new user
-            return jsonify({
-                'total_xp': 0,
-                'average_score': 0,
-                'quizzes_completed': 0,
-                'streak_days': 0,
-                'words_learned': 0,
-                'conversations': 0,
-                'study_time': 0,
-                'achievements': [],
-                'weekly_activity': [],
-                'skill_levels': {}
-            })
-        
-        # Calculate statistics
-        flashcards = user_data.get('flashcards', [])
-        quiz_scores = user_data.get('quiz_scores', [])
-        practice_sessions = user_data.get('practice_sessions', [])
-        
-        # Calculate total XP (10 XP per flashcard, 5 XP per correct quiz answer)
-        total_xp = len(flashcards) * 10
-        for quiz in quiz_scores:
-            total_xp += quiz.get('score', 0) * 5
-        
-        # Calculate average quiz score
-        if quiz_scores:
-            total_percentage = sum((quiz.get('score', 0) / quiz.get('total_questions', 1)) * 100 for quiz in quiz_scores)
-            average_score = total_percentage / len(quiz_scores)
-        else:
-            average_score = 0
-        
-        # Calculate study streak
-        streak_days = user_data.get('daily_streaks', {}).get('current_streak', 0)
-        
-        # Calculate words learned (unique flashcards)
-        words_learned = len(flashcards)
-        
-        # Calculate conversations
-        conversations = len(practice_sessions)
-        
-        # Calculate total study time
-        study_time = calculate_total_study_time(user_data) * 60  # Convert to seconds for frontend
-        
-        # Calculate achievements
-        achievements = calculate_achievements(user_data)
-        
-        # Weekly activity calculation
-        weekly_activity = calculate_weekly_activity(user_data)
-        
-        # Skill levels by language
-        skill_levels = calculate_skill_levels(flashcards, quiz_scores)
-        
-        return jsonify({
-            'total_xp': total_xp,
-            'average_score': average_score,
-            'quizzes_completed': len(quiz_scores),
-            'streak_days': streak_days,
-            'words_learned': words_learned,
-            'conversations': conversations,
-            'study_time': study_time,
-            'achievements': achievements,
-            'weekly_activity': weekly_activity,
-            'skill_levels': skill_levels
-        })
-        
+        if not progress_data:
+            return jsonify({'error': 'No progress data found'}), 404
+
+        return jsonify(progress_data)
+
     except Exception as e:
-        logger.error(f"Error fetching user progress: {e}")
-        return jsonify({'error': 'Failed to fetch progress'}), 500
-
-def calculate_weekly_activity(user_data):
-    """Calculate activity for the past 7 days"""
-    activity = []
-    today = datetime.now()
-    
-    for i in range(7):
-        date = today - timedelta(days=i)
-        date_str = date.strftime('%Y-%m-%d')
-        
-        # Count reviews for this date
-        reviews = 0
-        for card in user_data.get('flashcards', []):
-            for review in card.get('review_history', []):
-                review_date = datetime.fromisoformat(review['timestamp']).strftime('%Y-%m-%d')
-                if review_date == date_str:
-                    reviews += 1
-        
-        activity.append({
-            'date': date_str,
-            'reviews': reviews,
-            'day_name': date.strftime('%A')
-        })
-    
-    return list(reversed(activity))
-
-def calculate_skill_levels(flashcards, quiz_scores):
-    """Calculate skill levels by language"""
-    skill_levels = {}
-    
-    # Analyze flashcards by language
-    for card in flashcards:
-        translation = card.get('translation', {})
-        source_lang = translation.get('sourceLang')
-        target_lang = translation.get('targetLang')
-        
-        for lang in [source_lang, target_lang]:
-            if lang and lang not in skill_levels:
-                skill_levels[lang] = {
-                    'level': 'beginner',
-                    'progress': 0,
-                    'cards_count': 0,
-                    'mastered_count': 0
-                }
-        
-        for lang in [source_lang, target_lang]:
-            if lang:
-                skill_levels[lang]['cards_count'] += 1
-                if card.get('mastery_level', 0) >= 4:
-                    skill_levels[lang]['mastered_count'] += 1
-    
-    # Calculate progress and levels
-    for lang, data in skill_levels.items():
-        if data['cards_count'] > 0:
-            mastery_ratio = data['mastered_count'] / data['cards_count']
-            if mastery_ratio >= 0.8:
-                data['level'] = 'advanced'
-                data['progress'] = min(100, mastery_ratio * 100)
-            elif mastery_ratio >= 0.5:
-                data['level'] = 'intermediate'
-                data['progress'] = mastery_ratio * 100
-            else:
-                data['level'] = 'beginner'
-                data['progress'] = mastery_ratio * 100
-    
-    return skill_levels
-
-def calculate_achievements(user_data):
-    """Calculate user achievements"""
-    achievements = []
-    
-    flashcards = user_data.get('flashcards', [])
-    quiz_scores = user_data.get('quiz_scores', [])
-    stats = user_data.get('learning_stats', {})
-    
-    # Achievement: First Flashcard
-    if len(flashcards) >= 1:
-        achievements.append({
-            'id': 'first_flashcard',
-            'title': 'First Steps',
-            'description': 'Created your first flashcard',
-            'icon': '📚',
-            'unlocked': True
-        })
-    
-    # Achievement: 10 Flashcards
-    if len(flashcards) >= 10:
-        achievements.append({
-            'id': 'ten_flashcards',
-            'title': 'Getting Started',
-            'description': 'Created 10 flashcards',
-            'icon': '📖',
-            'unlocked': True
-        })
-    
-    # Achievement: First Quiz
-    if len(quiz_scores) >= 1:
-        achievements.append({
-            'id': 'first_quiz',
-            'title': 'Quiz Master',
-            'description': 'Completed your first quiz',
-            'icon': '🎯',
-            'unlocked': True
-        })
-    
-    # Achievement: Perfect Quiz Score
-    perfect_quizzes = [q for q in quiz_scores if q.get('percentage', 0) == 100]
-    if perfect_quizzes:
-        achievements.append({
-            'id': 'perfect_score',
-            'title': 'Perfectionist',
-            'description': 'Scored 100% on a quiz',
-            'icon': '🌟',
-            'unlocked': True
-        })
-    
-    # Achievement: Mastered Cards
-    mastered_count = stats.get('mastered_cards', 0)
-    if mastered_count >= 5:
-        achievements.append({
-            'id': 'master_five',
-            'title': 'Card Master',
-            'description': 'Mastered 5 flashcards',
-            'icon': '🏆',
-            'unlocked': True
-        })
-    
-    return achievements
-
-def calculate_total_study_time(user_data):
-    """Calculate total study time in minutes"""
-    total_time = 0
-    
-    # Time from flashcard reviews
-    for card in user_data.get('flashcards', []):
-        for review in card.get('review_history', []):
-            total_time += review.get('time_taken', 0)
-    
-    # Time from quiz sessions (estimate 30 seconds per question)
-    for score in user_data.get('quiz_scores', []):
-        total_time += score.get('total_questions', 0) * 30
-    
-    return round(total_time / 60, 1)  # Convert to minutes
-
-# List of supported languages with their codes and names
-SUPPORTED_LANGUAGES = [
-    {'code': 'en', 'name': 'English', 'native_name': 'English'},
-    {'code': 'es', 'name': 'Spanish', 'native_name': 'Español'},
-    {'code': 'fr', 'name': 'French', 'native_name': 'Français'},
-    {'code': 'de', 'name': 'German', 'native_name': 'Deutsch'},
-    {'code': 'it', 'name': 'Italian', 'native_name': 'Italiano'},
-    {'code': 'pt', 'name': 'Portuguese', 'native_name': 'Português'},
-    {'code': 'ru', 'name': 'Russian', 'native_name': 'Русский'},
-    {'code': 'ja', 'name': 'Japanese', 'native_name': '日本語'},
-    {'code': 'ko', 'name': 'Korean', 'native_name': '한국어'},
-    {'code': 'zh', 'name': 'Chinese (Simplified)', 'native_name': '中文 (简体)'},
-    {'code': 'zh-TW', 'name': 'Chinese (Traditional)', 'native_name': '中文 (繁體)'},
-    {'code': 'ar', 'name': 'Arabic', 'native_name': 'العربية'},
-    {'code': 'hi', 'name': 'Hindi', 'native_name': 'हिन्दी'},
-    {'code': 'th', 'name': 'Thai', 'native_name': 'ไทย'},
-    {'code': 'vi', 'name': 'Vietnamese', 'native_name': 'Tiếng Việt'},
-    {'code': 'nl', 'name': 'Dutch', 'native_name': 'Nederlands'},
-    {'code': 'pl', 'name': 'Polish', 'native_name': 'Polski'},
-    {'code': 'tr', 'name': 'Turkish', 'native_name': 'Türkçe'},
-    {'code': 'sv', 'name': 'Swedish', 'native_name': 'Svenska'},
-    {'code': 'da', 'name': 'Danish', 'native_name': 'Dansk'},
-    {'code': 'no', 'name': 'Norwegian', 'native_name': 'Norsk'},
-    {'code': 'fi', 'name': 'Finnish', 'native_name': 'Suomi'},
-    {'code': 'he', 'name': 'Hebrew', 'native_name': 'עברית'},
-    {'code': 'cs', 'name': 'Czech', 'native_name': 'Čeština'},
-    {'code': 'sk', 'name': 'Slovak', 'native_name': 'Slovenčina'},
-    {'code': 'hu', 'name': 'Hungarian', 'native_name': 'Magyar'},
-    {'code': 'ro', 'name': 'Romanian', 'native_name': 'Română'},
-    {'code': 'bg', 'name': 'Bulgarian', 'native_name': 'Български'},
-    {'code': 'hr', 'name': 'Croatian', 'native_name': 'Hrvatski'},
-    {'code': 'sr', 'name': 'Serbian', 'native_name': 'Српски'},
-    {'code': 'sl', 'name': 'Slovenian', 'native_name': 'Slovenščina'},
-    {'code': 'et', 'name': 'Estonian', 'native_name': 'Eesti'},
-    {'code': 'lv', 'name': 'Latvian', 'native_name': 'Latviešu'},
-    {'code': 'lt', 'name': 'Lithuanian', 'native_name': 'Lietuvių'},
-    {'code': 'mt', 'name': 'Maltese', 'native_name': 'Malti'},
-    {'code': 'ga', 'name': 'Irish', 'native_name': 'Gaeilge'},
-    {'code': 'cy', 'name': 'Welsh', 'native_name': 'Cymraeg'},
-    {'code': 'eu', 'name': 'Basque', 'native_name': 'Euskera'},
-    {'code': 'ca', 'name': 'Catalan', 'native_name': 'Català'},
-    {'code': 'gl', 'name': 'Galician', 'native_name': 'Galego'},
-    {'code': 'is', 'name': 'Icelandic', 'native_name': 'Íslenska'},
-    {'code': 'mk', 'name': 'Macedonian', 'native_name': 'Македонски'},
-    {'code': 'sq', 'name': 'Albanian', 'native_name': 'Shqip'},
-    {'code': 'sw', 'name': 'Swahili', 'native_name': 'Kiswahili'},
-    {'code': 'am', 'name': 'Amharic', 'native_name': 'አማርኛ'},
-    {'code': 'id', 'name': 'Indonesian', 'native_name': 'Bahasa Indonesia'},
-    {'code': 'ms', 'name': 'Malay', 'native_name': 'Bahasa Melayu'},
-    {'code': 'tl', 'name': 'Filipino', 'native_name': 'Filipino'},
-    {'code': 'ur', 'name': 'Urdu', 'native_name': 'اردو'},
-    {'code': 'bn', 'name': 'Bengali', 'native_name': 'বাংলা'},
-    {'code': 'ta', 'name': 'Tamil', 'native_name': 'தமிழ்'},
-    {'code': 'te', 'name': 'Telugu', 'native_name': 'తెలుగు'},
-    {'code': 'ml', 'name': 'Malayalam', 'native_name': 'മലയാളം'},
-    {'code': 'kn', 'name': 'Kannada', 'native_name': 'ಕನ್ನಡ'},
-    {'code': 'gu', 'name': 'Gujarati', 'native_name': 'ગુજરાતી'},
-    {'code': 'mr', 'name': 'Marathi', 'native_name': 'मराठी'},
-    {'code': 'pa', 'name': 'Punjabi', 'native_name': 'ਪੰਜਾਬੀ'},
-    {'code': 'ne', 'name': 'Nepali', 'native_name': 'नेपाली'},
-    {'code': 'si', 'name': 'Sinhala', 'native_name': 'සිංහල'},
-    {'code': 'my', 'name': 'Myanmar (Burmese)', 'native_name': 'မြန်မာ'},
-    {'code': 'km', 'name': 'Khmer', 'native_name': 'ខ្មែរ'},
-    {'code': 'lo', 'name': 'Lao', 'native_name': 'ລາວ'},
-    {'code': 'ka', 'name': 'Georgian', 'native_name': 'ქართული'},
-    {'code': 'hy', 'name': 'Armenian', 'native_name': 'Հայերեն'},
-    {'code': 'az', 'name': 'Azerbaijani', 'native_name': 'Azərbaycan'},
-    {'code': 'kk', 'name': 'Kazakh', 'native_name': 'Қазақша'},
-    {'code': 'ky', 'name': 'Kyrgyz', 'native_name': 'Кыргызча'},
-    {'code': 'uz', 'name': 'Uzbek', 'native_name': 'O\'zbek'},
-    {'code': 'tg', 'name': 'Tajik', 'native_name': 'Тоҷикӣ'},
-    {'code': 'mn', 'name': 'Mongolian', 'native_name': 'Монгол'},
-    {'code': 'bo', 'name': 'Tibetan', 'native_name': 'བོད་ཡིག'},
-    {'code': 'dz', 'name': 'Dzongkha', 'native_name': 'རྫོང་ཁ'}
-]
-
-@app.route('/api/supported-languages', methods=['GET'])
-@rate_limit
-def get_supported_languages():
-    """Get list of supported languages with enhanced information"""
-    try:
-        # Add popularity and region information
-        enhanced_languages = []
-        for lang in SUPPORTED_LANGUAGES:
-            enhanced_lang = {
-                **lang,
-                'popularity': get_language_popularity(lang['code']),
-                'region': get_language_region(lang['code']),
-                'writing_system': get_writing_system(lang['code']),
-                'tts_supported': is_tts_supported(lang['code']),
-                'speech_recognition_supported': is_speech_recognition_supported(lang['code'])
-            }
-            enhanced_languages.append(enhanced_lang)
-        
-        # Sort by popularity
-        enhanced_languages.sort(key=lambda x: x['popularity'], reverse=True)
-        
-        return jsonify({
-            'languages': enhanced_languages,
-            'total': len(enhanced_languages),
-            'last_updated': datetime.now().isoformat()
-        })
-        
-    except Exception as e:
-        logger.error(f"Error fetching supported languages: {e}")
-        return jsonify({'error': 'Failed to fetch supported languages'}), 500
-
-def get_language_popularity(code):
-    """Get language popularity score (1-10)"""
-    popular_languages = {
-        'en': 10, 'es': 9, 'fr': 8, 'de': 8, 'it': 7, 'pt': 7,
-        'ru': 7, 'ja': 8, 'ko': 7, 'zh': 9, 'ar': 8, 'hi': 8
-    }
-    return popular_languages.get(code, 5)
-
-def get_language_region(code):
-    """Get language region"""
-    regions = {
-        'en': 'Global', 'es': 'Americas/Europe', 'fr': 'Europe/Africa',
-        'de': 'Europe', 'it': 'Europe', 'pt': 'Americas/Europe',
-        'ru': 'Europe/Asia', 'ja': 'East Asia', 'ko': 'East Asia',
-        'zh': 'East Asia', 'ar': 'Middle East/North Africa', 'hi': 'South Asia'
-    }
-    return regions.get(code, 'Regional')
-
-def get_writing_system(code):
-    """Get writing system type"""
-    systems = {
-        'en': 'Latin', 'es': 'Latin', 'fr': 'Latin', 'de': 'Latin',
-        'it': 'Latin', 'pt': 'Latin', 'ru': 'Cyrillic', 'ja': 'Hiragana/Katakana/Kanji',
-        'ko': 'Hangul', 'zh': 'Chinese Characters', 'ar': 'Arabic', 'hi': 'Devanagari'
-    }
-    return systems.get(code, 'Latin')
-
-def is_tts_supported(code):
-    """Check if TTS is supported for language"""
-    # In a real implementation, check with TTS service
-    return code in ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ja', 'ko', 'zh', 'ar', 'hi']
-
-def is_speech_recognition_supported(code):
-    """Check if speech recognition is supported for language"""
-    # In a real implementation, check with speech service
-    return code in ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ja', 'ko', 'zh', 'ar', 'hi']
-
-@app.route('/api/detect-language', methods=['POST'])
-@rate_limit
-def detect_language():
-    """Enhanced language detection with confidence scoring"""
-    try:
-        data = request.json
-        if not data:
-            return jsonify({'error': 'No JSON data provided'}), 400
-            
-        text = data.get('text', '').strip()
-        
-        if not text:
-            return jsonify({'error': 'Text parameter required'}), 400
-            
-        if len(text) > 500:
-            return jsonify({'error': 'Text too long (max 500 characters)'}), 400
-        
-        # Check cache first
-        cache_key = get_cache_key({'text': text, 'operation': 'detect_language'})
-        cached_result = get_cached_result(translation_cache, cache_key)
-        if cached_result:
-            logger.info(f"Returning cached language detection for: {text[:30]}...")
-            return jsonify(cached_result)
-        
-        if not model:
-            return jsonify({'error': 'Language detection service temporarily unavailable'}), 503
-        
-        # Use Gemini for language detection
-        prompt = f"""Detect the language of this text and provide confidence scores for top 3 most likely languages.
-
-Text: "{text}"
-
-Return ONLY a valid JSON response with this exact structure:
-{{
-    "detected_language": "language_code",
-    "confidence": confidence_percentage,
-    "alternatives": [
-        {{"language": "code", "confidence": percentage, "name": "Language Name"}},
-        {{"language": "code", "confidence": percentage, "name": "Language Name"}},
-        {{"language": "code", "confidence": percentage, "name": "Language Name"}}
-    ],
-    "text_length": number_of_characters,
-    "is_mixed_language": boolean
-}}
-
-Use standard ISO 639-1 language codes (en, es, fr, de, etc.)."""
-
-        try:
-            response = model.generate_content(prompt)
-            if not response or not response.text:
-                raise Exception("Empty response from Gemini")
-                
-            detection_data = json.loads(response.text)
-            
-            # Add metadata
-            detection_data['metadata'] = {
-                'timestamp': datetime.now().isoformat(),
-                'cached': False,
-                'method': 'gemini_ai'
-            }
-            
-            # Cache the result
-            cache_result(translation_cache, cache_key, detection_data)
-            
-            logger.info(f"Language detection completed: {detection_data.get('detected_language')} ({detection_data.get('confidence')}%)")
-            return jsonify(detection_data)
-            
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON decode error in language detection: {e}")
-            
-            # Fallback to simple heuristic detection
-            fallback_result = simple_language_detection(text)
-            return jsonify(fallback_result)
-        
-    except Exception as e:
-            logger.error(f"Gemini language detection error: {e}")
-            
-            # Fallback to simple heuristic detection
-            fallback_result = simple_language_detection(text)
-            return jsonify(fallback_result)
-            
-    except Exception as e:
-        logger.error(f"Language detection error: {e}", exc_info=True)
-        return jsonify({'error': 'Failed to detect language'}), 500
-
-def simple_language_detection(text):
-    """Simple fallback language detection using character analysis"""
-    char_counts = {}
-    
-    # Count character types
-    for char in text:
-        if '\u4e00' <= char <= '\u9fff':  # Chinese characters
-            char_counts['zh'] = char_counts.get('zh', 0) + 1
-        elif '\u3040' <= char <= '\u309f' or '\u30a0' <= char <= '\u30ff':  # Japanese
-            char_counts['ja'] = char_counts.get('ja', 0) + 1
-        elif '\uac00' <= char <= '\ud7af':  # Korean
-            char_counts['ko'] = char_counts.get('ko', 0) + 1
-        elif '\u0600' <= char <= '\u06ff':  # Arabic
-            char_counts['ar'] = char_counts.get('ar', 0) + 1
-        elif '\u0900' <= char <= '\u097f':  # Devanagari (Hindi)
-            char_counts['hi'] = char_counts.get('hi', 0) + 1
-        elif '\u0400' <= char <= '\u04ff':  # Cyrillic (Russian)
-            char_counts['ru'] = char_counts.get('ru', 0) + 1
-    
-    if char_counts:
-        detected_lang = max(char_counts, key=char_counts.get)
-        confidence = min(95, (char_counts[detected_lang] / len(text)) * 100)
-    else:
-        # Default to English for Latin script
-        detected_lang = 'en'
-        confidence = 60
-    
-    return {
-        'detected_language': detected_lang,
-        'confidence': confidence,
-        'alternatives': [
-            {'language': detected_lang, 'confidence': confidence, 'name': 'Detected Language'},
-            {'language': 'en', 'confidence': 40, 'name': 'English'},
-            {'language': 'es', 'confidence': 30, 'name': 'Spanish'}
-        ],
-        'text_length': len(text),
-        'is_mixed_language': len(char_counts) > 1,
-        'metadata': {
-            'timestamp': datetime.now().isoformat(),
-            'cached': False,
-            'method': 'character_analysis'
-        }
-    }
-
-@app.route('/api/translate', methods=['POST'])
-@rate_limit
-def translate():
-    """Enhanced basic translation endpoint with caching"""
-    try:
-        data = request.json
-        if not data:
-            return jsonify({'error': 'No JSON data provided'}), 400
-            
-        text = data.get('text', '').strip()
-        source_lang = data.get('sourceLang')
-        target_lang = data.get('targetLang')
-        
-        if not all([text, source_lang, target_lang]):
-            return jsonify({'error': 'Missing required parameters: text, sourceLang, targetLang'}), 400
-        
-        if len(text) > 1000:
-            return jsonify({'error': 'Text too long (max 1000 characters)'}), 400
-        
-        # Check cache first
-        cache_key = get_cache_key({
-            'text': text, 'source': source_lang, 'target': target_lang, 'type': 'basic'
-        })
-        
-        cached_result = get_cached_result(translation_cache, cache_key)
-        if cached_result:
-            logger.info(f"Returning cached basic translation for: {text[:50]}...")
-            return jsonify(cached_result)
-        
-        if not model:
-            return jsonify({'error': 'Translation service temporarily unavailable'}), 503
-        
-        # Check if target language uses non-Latin script for romanization
-        non_latin_languages = ['ar', 'zh', 'zh-CN', 'zh-TW', 'ja', 'ko', 'hi', 'ru', 'th', 'he', 'ur', 'fa', 'bn', 'ta', 'te', 'ml', 'kn', 'gu', 'pa', 'ne', 'si', 'my', 'km', 'lo', 'ka', 'am', 'ti', 'dv']
-        needs_romanization = any(lang in target_lang.lower() for lang in non_latin_languages)
-        
-        if needs_romanization:
-            # Enhanced translation prompt with romanization
-            prompt = f"""Translate the following text from {source_lang} to {target_lang}.
-Provide the response in JSON format with the translation and romanization.
-
-Text: {text}
-
-Return JSON with these exact keys:
-{{
-    "translation": "translated text in original script",
-    "romanization": "romanized version in Latin script",
-    "romanization_system": "name of romanization system used"
-}}"""
-        else:
-            # Simple translation prompt for Latin script languages
-            prompt = f"""Translate the following text from {source_lang} to {target_lang}.
-Provide only the translation, no explanations.
-
-Text: {text}
-
-Translation:"""
-        
-        try:
-            response = model.generate_content(prompt)
-            if not response or not response.text:
-                raise Exception("Empty response from Gemini")
-            
-            if needs_romanization:
-                try:
-                    # Extract and parse JSON response for non-Latin languages
-                    cleaned_response = extract_json_from_response(response.text)
-                    translation_data = json.loads(cleaned_response)
-                    translation = translation_data.get('translation', '').strip()
-                    romanization = translation_data.get('romanization', '').strip()
-                    romanization_system = translation_data.get('romanization_system', '').strip()
-                    
-                    result = {
-                        'translation': translation,
-                        'romanization': romanization,
-                        'romanization_system': romanization_system,
-                        'source_lang': source_lang,
-                        'target_lang': target_lang,
-                        'original_text': text,
-                        'timestamp': datetime.now().isoformat(),
-                        'cached': False
-                    }
-                except json.JSONDecodeError as e:
-                    # Fallback if JSON parsing fails - log the raw response for debugging
-                    logger.warning(f"JSON parsing failed for response: {response.text}")
-                    translation = response.text.strip()
-                    result = {
-                        'translation': translation,
-                        'romanization': '',
-                        'romanization_system': '',
-                        'source_lang': source_lang,
-                        'target_lang': target_lang,
-                        'original_text': text,
-                        'timestamp': datetime.now().isoformat(),
-                        'cached': False
-                    }
-            else:
-                # Standard response for Latin script languages
-                translation = response.text.strip()
-                result = {
-                    'translation': translation,
-                    'source_lang': source_lang,
-                    'target_lang': target_lang,
-                    'original_text': text,
-                    'timestamp': datetime.now().isoformat(),
-                    'cached': False
-                }
-            
-            # Cache the result
-            cache_result(translation_cache, cache_key, result)
-            
-            logger.info(f"Basic translation completed: {text[:30]} -> {result['translation'][:30]}")
-            return jsonify(result)
-    
-        except Exception as e:
-            logger.error(f"Gemini basic translation error: {e}")
-            return jsonify({'error': 'Translation failed'}), 503
-            
-    except Exception as e:
-        logger.error(f"Basic translation error: {e}", exc_info=True)
-        return jsonify({'error': 'Internal server error'}), 500
-
-def extract_json_from_response(response_text):
-    """Extract JSON from response text, handling markdown code blocks if present"""
-    response_text = response_text.strip()
-    
-    # Try to extract JSON from markdown code blocks
-    json_pattern = r'```(?:json)?\s*(\{.*?\})\s*```'
-    match = re.search(json_pattern, response_text, re.DOTALL)
-    if match:
-        return match.group(1)
-    
-    # If no markdown blocks, return the original text
-    return response_text
-
-@app.route('/api/text-to-speech', methods=['POST'])
-@rate_limit
-def text_to_speech():
-    """Enhanced text-to-speech with caching and voice options"""
-    try:
-        data = request.json
-        if not data:
-            return jsonify({'error': 'No JSON data provided'}), 400
-            
-        text = data.get('text', '').strip()
-        language_code = data.get('languageCode', 'en')
-        voice_gender = data.get('voiceGender', 'NEUTRAL')
-        speed = data.get('speed', 1.0)
-        pitch = data.get('pitch', 0.0)
-        
-        if not text:
-            return jsonify({'error': 'Text parameter required'}), 400
-            
-        if len(text) > 500:
-            return jsonify({'error': 'Text too long for TTS (max 500 characters)'}), 400
-        
-        # Check cache first
-        cache_key = get_cache_key({
-            'text': text, 'lang': language_code, 'gender': voice_gender,
-            'speed': speed, 'pitch': pitch
-        })
-        
-        cached_result = get_cached_result(tts_cache, cache_key)
-        if cached_result:
-            logger.info(f"Returning cached TTS for: {text[:30]}...")
-            return jsonify(cached_result)
-        
-        if not tts_client:
-            return jsonify({'error': 'Text-to-speech service temporarily unavailable'}), 503
-        
-        try:
-            # Configure voice
-            voice = tts.VoiceSelectionParams(
-                language_code=language_code,
-                ssml_gender=getattr(tts.SsmlVoiceGender, voice_gender, tts.SsmlVoiceGender.NEUTRAL)
-            )
-
-            # Configure audio
-            audio_config = tts.AudioConfig(
-                audio_encoding=tts.AudioEncoding.MP3,
-                speaking_rate=max(0.25, min(4.0, speed)),  # Clamp speed
-                pitch=max(-20.0, min(20.0, pitch))         # Clamp pitch
-            )
-        
-            # Synthesis input
-            synthesis_input = tts.SynthesisInput(text=text)
-            
-            # Generate speech
-            response = tts_client.synthesize_speech(
-                input=synthesis_input,
-                voice=voice,
-                audio_config=audio_config
-            )
-        
-            # Encode audio content
-            audio_content = base64.b64encode(response.audio_content).decode('utf-8')
-        
-            result = {
-                'audio_content': audio_content,
-                'text': text,
-                'language_code': language_code,
-                'voice_gender': voice_gender,
-                'speed': speed,
-                'pitch': pitch,
-                'duration_estimate': estimate_audio_duration(text, speed),
-                'timestamp': datetime.now().isoformat(),
-                'cached': False
-            }
-            
-            # Cache the result
-            cache_result(tts_cache, cache_key, result)
-            
-            logger.info(f"TTS completed for: {text[:30]}")
-            return jsonify(result)
-    
-        except Exception as e:
-            logger.error(f"Google TTS error: {e}")
-            return jsonify({'error': 'TTS generation failed'}), 503
-            
-    except Exception as e:
-        logger.error(f"Text-to-speech error: {e}", exc_info=True)
-        return jsonify({'error': 'Internal server error'}), 500
-
-def estimate_audio_duration(text, speed):
-    """Estimate audio duration in seconds"""
-    # Average reading speed: 200 words per minute
-    words = len(text.split())
-    base_duration = (words / 200) * 60  # seconds
-    adjusted_duration = base_duration / speed
-    return round(adjusted_duration, 1)
+        logger.error(f"Error getting user progress: {e}")
+        return jsonify({'error': 'Failed to get progress data'}), 500
 
 @app.route('/api/user/preferences', methods=['GET', 'POST'])
 @rate_limit
 def user_preferences():
     """Handle user preferences"""
     try:
-        user_id = request.args.get('userId') or request.json.get('userId')
+        user_id = request.args.get('userId') or (request.json and request.json.get('userId'))
         if not user_id:
             return jsonify({'error': 'UserId parameter required'}), 400
         
-        preferences_data = load_json_file(USER_PREFERENCES_FILE, {'users': {}})
-        
         if request.method == 'GET':
-            user_prefs = preferences_data.get('users', {}).get(user_id, {
-                'default_source_lang': 'en',
-                'default_target_lang': 'es',
-                'voice_gender': 'NEUTRAL',
-                'speech_speed': 1.0,
-                'auto_play_translations': True,
-                'save_history': True,
-                'theme': 'light',
-                'notifications_enabled': True,
-                'study_reminders': True,
-                'daily_goal': 10,
-                'preferred_difficulty': 'beginner'
-            })
-            
-            return jsonify(user_prefs)
+            # Use database service to get preferences
+            preferences = db_service.get_user_preferences(user_id)
+            return jsonify(preferences)
         
         elif request.method == 'POST':
             data = request.json
-            if user_id not in preferences_data['users']:
-                preferences_data['users'][user_id] = {}
+            if not data:
+                return jsonify({'error': 'No data provided'}), 400
             
-            # Update preferences
-            user_prefs = preferences_data['users'][user_id]
-            allowed_preferences = [
-                'default_source_lang', 'default_target_lang', 'voice_gender',
-                'speech_speed', 'auto_play_translations', 'save_history',
-                'theme', 'notifications_enabled', 'study_reminders',
-                'daily_goal', 'preferred_difficulty'
-            ]
-            
-            for key, value in data.items():
-                if key in allowed_preferences:
-                    user_prefs[key] = value
-            
-            user_prefs['updated_at'] = datetime.now().isoformat()
-            
-            save_json_file(USER_PREFERENCES_FILE, preferences_data)
-            
-            return jsonify({
-                'success': True,
-                'preferences': user_prefs
-            })
+            # Use database service to save preferences
+            if db_service.save_user_preferences(user_id, data):
+                updated_preferences = db_service.get_user_preferences(user_id)
+                return jsonify({
+                    'success': True,
+                    'preferences': updated_preferences
+                })
+            else:
+                return jsonify({'error': 'Failed to save preferences'}), 500
             
     except Exception as e:
-        logger.error(f"User preferences error: {e}", exc_info=True)
+        logger.error(f"User preferences error: {e}")
         return jsonify({'error': 'Failed to handle preferences'}), 500
 
 @app.route('/api/analytics', methods=['POST'])
@@ -1894,6 +999,9 @@ def record_analytics():
     """Record user analytics for learning insights"""
     try:
         data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+            
         user_id = data.get('userId')
         event_type = data.get('eventType')
         event_data = data.get('eventData', {})
@@ -1901,28 +1009,21 @@ def record_analytics():
         if not all([user_id, event_type]):
             return jsonify({'error': 'Missing required parameters: userId, eventType'}), 400
         
-        analytics_data = load_json_file(LEARNING_ANALYTICS_FILE, {'events': []})
-        
-        event = {
-            'id': str(uuid.uuid4()),
+        # Prepare analytics event
+        analytics_event = {
             'user_id': user_id,
             'event_type': event_type,
             'event_data': event_data,
-            'timestamp': datetime.now().isoformat(),
             'session_id': data.get('sessionId'),
             'user_agent': request.headers.get('User-Agent', ''),
             'ip_address': request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         }
         
-        analytics_data['events'].append(event)
-        
-        # Keep only last 10000 events to prevent file from growing too large
-        if len(analytics_data['events']) > 10000:
-            analytics_data['events'] = analytics_data['events'][-10000:]
-        
-        save_json_file(LEARNING_ANALYTICS_FILE, analytics_data)
-        
-        return jsonify({'success': True})
+        # Use database service to track event
+        if db_service.track_event(analytics_event):
+            return jsonify({'success': True})
+        else:
+            return jsonify({'error': 'Failed to record analytics'}), 500
         
     except Exception as e:
         logger.error(f"Analytics recording error: {e}")
@@ -2248,57 +1349,72 @@ def submit_quiz():
 # Initialize data directory and files on startup
 def initialize_data_files():
     """Initialize data directory and create default files if they don't exist"""
-    logger.info("Initializing data files...")
-    ensure_data_directory()
+    logger.info("Initializing database...")
     
-    # Initialize word of day file with default structure if it doesn't exist
-    if not os.path.exists(WORD_OF_DAY_FILE):
-        logger.info(f"Creating default {WORD_OF_DAY_FILE}")
-        default_word_data = {
-            "words": {
-                "en": [
-                    {
-                        "word": "hello",
-                        "translation": "a greeting",
-                        "example_sentence": "Hello, how are you?",
-                        "pronunciation": "hə-ˈlō",
-                        "part_of_speech": "interjection",
-                        "difficulty": "beginner"
-                    }
-                ]
-            }
-        }
-        save_json_file(WORD_OF_DAY_FILE, default_word_data)
+    # Create database tables
+    create_tables()
+    logger.info("Database tables created successfully")
     
-    # Initialize other files with default structures
-    file_defaults = {
-        PHRASES_FILE: {
-            'phrases': {},
-            'categories': ['greetings', 'travel', 'food', 'business', 'casual'],
-            'difficulties': ['beginner', 'intermediate', 'advanced']
-        },
-        USER_PROGRESS_FILE: {'users': {}},
-        USER_PREFERENCES_FILE: {'preferences': {}},
-        LEARNING_ANALYTICS_FILE: {'analytics': {}},
-        QUIZZES_FILE: {'quizzes': {}}
-    }
-    
-    for file_path, default_data in file_defaults.items():
-        if not os.path.exists(file_path):
-            logger.info(f"Creating default {file_path}")
-            save_json_file(file_path, default_data)
-    
-    logger.info("Data files initialization complete")
-
-# Initialize data files when the module is loaded
-initialize_data_files()
+    # Check if we need to populate initial data
+    try:
+        # Check if word of day data exists
+        word_data = db_service.get_word_of_day('en')
+        if not word_data:
+            logger.info("No word data found, creating default entries...")
+            # Add some default words for English
+            default_words = [
+                {
+                    'word': 'hello',
+                    'translation': 'a greeting or expression of goodwill',
+                    'pronunciation': 'həˈloʊ',
+                    'part_of_speech': 'interjection',
+                    'difficulty': 'beginner',
+                    'example_sentence': 'Hello, how are you?',
+                    'example_translation': 'A common greeting used when meeting someone.',
+                    'etymology': 'From Old English hæl (whole, healthy)',
+                    'related_words': ['hi', 'greetings', 'salutation'],
+                    'cultural_note': 'The most common greeting in English-speaking countries.'
+                },
+                {
+                    'word': 'thank you',
+                    'translation': 'expression of gratitude',
+                    'pronunciation': 'θæŋk juː',
+                    'part_of_speech': 'phrase',
+                    'difficulty': 'beginner',
+                    'example_sentence': 'Thank you for your help.',
+                    'example_translation': 'Used to express appreciation.',
+                    'etymology': 'From Old English þancian (to give thanks)',
+                    'related_words': ['thanks', 'gratitude', 'appreciation'],
+                    'cultural_note': 'Essential politeness expression in English.'
+                }
+            ]
+            
+            for word_data in default_words:
+                db_service.add_word_of_day('en', word_data)
+            
+            logger.info("Default word data created")
+        
+        logger.info("Database initialization completed successfully")
+        
+    except Exception as e:
+        logger.error(f"Error during database initialization: {e}")
 
 if __name__ == '__main__':
-    logger.info("Starting TTS AI Backend Server...")
-    logger.info(f"Environment: {os.getenv('FLASK_ENV', 'production')}")
-    logger.info(f"Services available: Gemini={model is not None}, TTS={tts_client is not None}, Speech={speech_client is not None}")
-    
-    port = int(os.environ.get('PORT', 5000))
-    debug = os.environ.get('FLASK_ENV') == 'development'
-    
-    app.run(host='0.0.0.0', port=port, debug=debug) 
+    try:
+        logger.info("Starting TTSAI Backend Server...")
+        
+        # Initialize database
+        initialize_data_files()
+        
+        # Get port from environment variable for production
+        port = int(os.environ.get('PORT', 5000))
+        
+        logger.info(f"Server starting on port {port}")
+        app.run(
+            host='0.0.0.0',
+            port=port,
+            debug=os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+        )
+    except Exception as e:
+        logger.critical(f"Failed to start server: {e}")
+        raise 
