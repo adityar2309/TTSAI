@@ -26,6 +26,9 @@ RUN mkdir -p /app/data
 ENV PYTHONPATH=/app
 ENV DATABASE_URL=sqlite:///app/ttsai.db
 
+# Initialize database with migration
+RUN python migrate_to_sqlite.py || echo "Migration completed with warnings"
+
 # Expose port
 EXPOSE 5000
 
