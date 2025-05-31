@@ -57,7 +57,7 @@ const LearningTools = ({ userId, language }) => {
   const [progress, setProgress] = useState(null);
 
   useEffect(() => {
-    if (language) {
+    if (language && language.trim() !== '') {
       fetchWordOfDay();
       fetchFlashcards();
       fetchProgress();
@@ -66,6 +66,11 @@ const LearningTools = ({ userId, language }) => {
 
   const fetchWordOfDay = async () => {
     try {
+      if (!language || language.trim() === '') {
+        console.warn('Language not set, skipping word of day fetch');
+        return;
+      }
+
       const response = await axios.get(`${API_URL}/word-of-day`, {
         params: { language }
       });
@@ -78,6 +83,11 @@ const LearningTools = ({ userId, language }) => {
 
   const fetchFlashcards = async () => {
     try {
+      if (!language || language.trim() === '') {
+        console.warn('Language not set, skipping flashcards fetch');
+        return;
+      }
+
       const response = await axios.get(`${API_URL}/flashcards`, {
         params: { userId, language }
       });
@@ -90,6 +100,11 @@ const LearningTools = ({ userId, language }) => {
 
   const fetchProgress = async () => {
     try {
+      if (!language || language.trim() === '') {
+        console.warn('Language not set, skipping progress fetch');
+        return;
+      }
+
       const response = await axios.get(`${API_URL}/progress`, {
         params: { userId, language }
       });
