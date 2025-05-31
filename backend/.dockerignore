@@ -19,7 +19,6 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-!data/**
 
 # Virtual Environment
 venv/
@@ -35,7 +34,6 @@ ENV/
 .env
 .env.local
 *.log
-data/
 
 # Git
 .git

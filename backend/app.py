@@ -238,16 +238,73 @@ Return ONLY a valid JSON response with these exact keys:
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """Health check endpoint for monitoring"""
-    return jsonify({
-        'status': 'healthy',
-        'timestamp': datetime.now().isoformat(),
-        'services': {
-            'gemini': model is not None,
-            'speech_client': speech_client is not None,
-            'tts_client': tts_client is not None
+    """Enhanced health check endpoint"""
+    try:
+        health_status = {
+            'status': 'healthy',
+            'timestamp': datetime.now().isoformat(),
+            'services': {
+                'gemini': bool(genai.api_key),
+                'speech_client': bool(speech_client),
+                'tts_client': bool(tts_client)
+            }
         }
-    })
+        return jsonify(health_status)
+    except Exception as e:
+        return jsonify({'status': 'unhealthy', 'error': str(e)}), 500
+
+@app.route('/api/debug/data-status', methods=['GET'])
+def debug_data_status():
+    """Debug endpoint to check data files status"""
+    try:
+        import os
+        
+        data_files_status = {
+            'data_directory_exists': os.path.exists(DATA_DIR),
+            'current_working_directory': os.getcwd(),
+            'data_directory_path': os.path.abspath(DATA_DIR),
+            'files': {}
+        }
+        
+        # Check each data file
+        data_files = {
+            'word_of_day': WORD_OF_DAY_FILE,
+            'common_phrases': PHRASES_FILE,
+            'user_progress': USER_PROGRESS_FILE,
+            'user_preferences': USER_PREFERENCES_FILE,
+            'learning_analytics': LEARNING_ANALYTICS_FILE,
+            'quizzes': QUIZZES_FILE
+        }
+        
+        for name, file_path in data_files.items():
+            file_exists = os.path.exists(file_path)
+            file_size = os.path.getsize(file_path) if file_exists else 0
+            
+            status = {
+                'exists': file_exists,
+                'path': os.path.abspath(file_path),
+                'size_bytes': file_size
+            }
+            
+            # Try to load the file if it exists
+            if file_exists and name == 'word_of_day':
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        status['languages'] = list(data.get('words', {}).keys())
+                        status['total_words'] = sum(len(words) for words in data.get('words', {}).values())
+                except Exception as e:
+                    status['load_error'] = str(e)
+            
+            data_files_status['files'][name] = status
+        
+        # List directory contents
+        if os.path.exists(DATA_DIR):
+            data_files_status['directory_contents'] = os.listdir(DATA_DIR)
+        
+        return jsonify(data_files_status)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/advanced-translate', methods=['POST'])
 @rate_limit
@@ -455,12 +512,27 @@ def get_word_of_day():
         if not language:
             return jsonify({'error': 'Language parameter required'}), 400
         
+        logger.info(f"Loading word of day for language: {language}")
         words_data = load_json_file(WORD_OF_DAY_FILE, {'words': {}})
+        
+        # Debug logging
+        logger.info(f"Word data file loaded, available languages: {list(words_data.get('words', {}).keys())}")
+        logger.info(f"Checking if language '{language}' exists in data")
     
         if language not in words_data.get('words', {}):
-            return jsonify({'error': f'Language {language} not supported'}), 404
+            logger.error(f"Language {language} not found in available languages: {list(words_data.get('words', {}).keys())}")
+            return jsonify({
+                'error': f'Language {language} not supported',
+                'available_languages': list(words_data.get('words', {}).keys())
+            }), 404
         
         word_list = words_data['words'][language]
+        logger.info(f"Found {len(word_list)} words for language {language}")
+        
+        if not word_list:
+            logger.error(f"No words available for language {language}")
+            return jsonify({'error': f'No words available for language {language}'}), 404
+        
         today = datetime.now().strftime('%Y-%m-%d')
         
         # Use date as seed for consistent daily word
@@ -483,10 +555,11 @@ def get_word_of_day():
             'language': language
         }
         
+        logger.info(f"Successfully returning word of day for {language}: {enhanced_word['word']}")
         return jsonify(enhanced_word)
         
     except Exception as e:
-        logger.error(f"Error fetching word of day: {e}")
+        logger.error(f"Error fetching word of day: {e}", exc_info=True)
         return jsonify({'error': 'Failed to fetch word of the day'}), 500
 
 @app.route('/api/flashcards', methods=['POST'])
