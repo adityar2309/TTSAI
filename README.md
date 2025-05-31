@@ -2,6 +2,10 @@
 
 A powerful real-time speech translation application with advanced learning tools, built with React, Flask, and Google's AI services.
 
+## 🚀 Live Demo
+
+Try the app here: [https://ttsai.netlify.app/](https://ttsai.netlify.app/)
+
 ## Features
 
 ### Translation
