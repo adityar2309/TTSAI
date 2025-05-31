@@ -938,164 +938,183 @@ const LearningTools = ({ userId, language }) => {
 
   return (
     <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
-      <Tabs 
-        value={activeTab} 
-        onChange={(e, newValue) => setActiveTab(newValue)}
-        variant="fullWidth"
-        sx={{ mb: 3 }}
-      >
-        <Tab icon={<FlashOnIcon />} label="Practice" />
-        <Tab icon={<QuizIcon />} label="Quiz" />
-        <Tab icon={<TimelineIcon />} label="Progress" />
-      </Tabs>
+      {/* Show message if language is not set */}
+      {(!language || language.trim() === '') ? (
+        <Card elevation={3}>
+          <CardContent>
+            <Box display="flex" flexDirection="column" alignItems="center" p={4}>
+              <SchoolIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Select a Language to Start Learning
+              </Typography>
+              <Typography variant="body2" color="text.secondary" align="center">
+                Please select a target language in the translator to access learning tools.
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          <Tabs 
+            value={activeTab} 
+            onChange={(e, newValue) => setActiveTab(newValue)}
+            variant="fullWidth"
+            sx={{ mb: 3 }}
+          >
+            <Tab icon={<FlashOnIcon />} label="Practice" />
+            <Tab icon={<QuizIcon />} label="Quiz" />
+            <Tab icon={<TimelineIcon />} label="Progress" />
+          </Tabs>
 
-      {/* Practice Tab */}
-      {activeTab === 0 && (
-        <Stack spacing={3}>
-          {/* Word of the Day Card */}
-          <Card elevation={3}>
-            <CardContent>
-              <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                <SchoolIcon color="primary" />
-                <Typography variant="h6">Word of the Day</Typography>
-              </Stack>
-              {wordOfDay ? (
-                <Box
-                  sx={{
-                    textAlign: 'center',
-                    py: 3,
-                  }}
-                >
-                  <Typography variant="h4" color="primary" gutterBottom>
-                    {wordOfDay.word}
-                  </Typography>
-                  <IconButton 
-                    onClick={() => playAudio(wordOfDay.word)}
-                    sx={{ mb: 2 }}
-                  >
-                    <VolumeUpIcon />
-                  </IconButton>
-                  <Typography variant="h6" gutterBottom>
-                    {wordOfDay.translation}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {wordOfDay.pronunciation}
-                  </Typography>
-                  <Divider sx={{ my: 2 }} />
-                  <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 2 }}>
-                    "{wordOfDay.example_sentence}"
-                  </Typography>
-                  <Stack direction="row" spacing={1} justifyContent="center">
-                    <Chip 
-                      label={wordOfDay.part_of_speech} 
-                      color="primary" 
-                      variant="outlined" 
-                      size="small" 
-                    />
-                    <Chip 
-                      label={wordOfDay.difficulty} 
-                      color="secondary" 
-                      variant="outlined" 
-                      size="small" 
-                    />
+          {/* Practice Tab */}
+          {activeTab === 0 && (
+            <Stack spacing={3}>
+              {/* Word of the Day Card */}
+              <Card elevation={3}>
+                <CardContent>
+                  <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                    <SchoolIcon color="primary" />
+                    <Typography variant="h6">Word of the Day</Typography>
                   </Stack>
-                </Box>
-              ) : (
-                <Box display="flex" justifyContent="center" p={4}>
-                  <CircularProgress />
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Conversation Mode */}
-          <ConversationMode language={language} userId={userId} />
-
-          {/* Flashcards */}
-          {flashcards.length > 0 && (
-            <Card elevation={3}>
-              <CardContent>
-                <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                  <FlashOnIcon color="primary" />
-                  <Typography variant="h6">Flashcards</Typography>
-                </Stack>
-                <Box
-                  onClick={() => setShowAnswer(!showAnswer)}
-                  sx={{
-                    minHeight: 200,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    bgcolor: 'background.paper',
-                    borderRadius: 1,
-                    p: 4,
-                    transition: 'transform 0.3s ease',
-                    '&:hover': {
-                      transform: 'scale(1.02)',
-                    },
-                  }}
-                >
-                  <Typography variant="h4" align="center" gutterBottom>
-                    {showAnswer 
-                      ? flashcards[currentFlashcardIndex].translation.translatedText
-                      : flashcards[currentFlashcardIndex].translation.originalText
-                    }
-                  </Typography>
-                  {showAnswer && (
-                    <IconButton 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        playAudio(flashcards[currentFlashcardIndex].translation.translatedText);
+                  {wordOfDay ? (
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        py: 3,
                       }}
-                      sx={{ mt: 2 }}
                     >
-                      <VolumeUpIcon />
-                    </IconButton>
+                      <Typography variant="h4" color="primary" gutterBottom>
+                        {wordOfDay.word}
+                      </Typography>
+                      <IconButton 
+                        onClick={() => playAudio(wordOfDay.word)}
+                        sx={{ mb: 2 }}
+                      >
+                        <VolumeUpIcon />
+                      </IconButton>
+                      <Typography variant="h6" gutterBottom>
+                        {wordOfDay.translation}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        {wordOfDay.pronunciation}
+                      </Typography>
+                      <Divider sx={{ my: 2 }} />
+                      <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 2 }}>
+                        "{wordOfDay.example_sentence}"
+                      </Typography>
+                      <Stack direction="row" spacing={1} justifyContent="center">
+                        <Chip 
+                          label={wordOfDay.part_of_speech} 
+                          color="primary" 
+                          variant="outlined" 
+                          size="small" 
+                        />
+                        <Chip 
+                          label={wordOfDay.difficulty} 
+                          color="secondary" 
+                          variant="outlined" 
+                          size="small" 
+                        />
+                      </Stack>
+                    </Box>
+                  ) : (
+                    <Box display="flex" justifyContent="center" p={4}>
+                      <CircularProgress />
+                    </Box>
                   )}
-                </Box>
-                <Stack 
-                  direction="row" 
-                  justifyContent="space-between" 
-                  alignItems="center"
-                  mt={2}
-                >
-                  <IconButton onClick={() => handleFlashcardNavigation('prev')}>
-                    <ArrowBackIcon />
-                  </IconButton>
-                  <Typography>
-                    {currentFlashcardIndex + 1} / {flashcards.length}
-                  </Typography>
-                  <IconButton onClick={() => handleFlashcardNavigation('next')}>
-                    <ArrowForwardIcon />
-                  </IconButton>
-                </Stack>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              {/* Conversation Mode */}
+              <ConversationMode language={language} userId={userId} />
+
+              {/* Flashcards */}
+              {flashcards.length > 0 && (
+                <Card elevation={3}>
+                  <CardContent>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                      <FlashOnIcon color="primary" />
+                      <Typography variant="h6">Flashcards</Typography>
+                    </Stack>
+                    <Box
+                      onClick={() => setShowAnswer(!showAnswer)}
+                      sx={{
+                        minHeight: 200,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        bgcolor: 'background.paper',
+                        borderRadius: 1,
+                        p: 4,
+                        transition: 'transform 0.3s ease',
+                        '&:hover': {
+                          transform: 'scale(1.02)',
+                        },
+                      }}
+                    >
+                      <Typography variant="h4" align="center" gutterBottom>
+                        {showAnswer 
+                          ? flashcards[currentFlashcardIndex].translation.translatedText
+                          : flashcards[currentFlashcardIndex].translation.originalText
+                        }
+                      </Typography>
+                      {showAnswer && (
+                        <IconButton 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            playAudio(flashcards[currentFlashcardIndex].translation.translatedText);
+                          }}
+                          sx={{ mt: 2 }}
+                        >
+                          <VolumeUpIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                    <Stack 
+                      direction="row" 
+                      justifyContent="space-between" 
+                      alignItems="center"
+                      mt={2}
+                    >
+                      <IconButton onClick={() => handleFlashcardNavigation('prev')}>
+                        <ArrowBackIcon />
+                      </IconButton>
+                      <Typography>
+                        {currentFlashcardIndex + 1} / {flashcards.length}
+                      </Typography>
+                      <IconButton onClick={() => handleFlashcardNavigation('next')}>
+                        <ArrowForwardIcon />
+                      </IconButton>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              )}
+            </Stack>
           )}
-        </Stack>
-      )}
 
-      {/* Quiz Tab */}
-      {activeTab === 1 && (
-        <QuizMode language={language} userId={userId} />
-      )}
+          {/* Quiz Tab */}
+          {activeTab === 1 && (
+            <QuizMode language={language} userId={userId} />
+          )}
 
-      {/* Progress Tab */}
-      {activeTab === 2 && (
-        <ProgressMode language={language} userId={userId} />
-      )}
+          {/* Progress Tab */}
+          {activeTab === 2 && (
+            <ProgressMode language={language} userId={userId} />
+          )}
 
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={3000}
-        onClose={() => setNotification({ ...notification, open: false })}
-      >
-        <Alert severity={notification.severity}>
-          {notification.message}
-        </Alert>
-      </Snackbar>
+          <Snackbar
+            open={notification.open}
+            autoHideDuration={3000}
+            onClose={() => setNotification({ ...notification, open: false })}
+          >
+            <Alert severity={notification.severity}>
+              {notification.message}
+            </Alert>
+          </Snackbar>
+        </>
+      )}
     </Box>
   );
 };
