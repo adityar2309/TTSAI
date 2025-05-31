@@ -2245,6 +2245,54 @@ def submit_quiz():
         logger.error(f"Error submitting quiz: {e}")
         return jsonify({'error': 'Failed to submit quiz'}), 500
 
+# Initialize data directory and files on startup
+def initialize_data_files():
+    """Initialize data directory and create default files if they don't exist"""
+    logger.info("Initializing data files...")
+    ensure_data_directory()
+    
+    # Initialize word of day file with default structure if it doesn't exist
+    if not os.path.exists(WORD_OF_DAY_FILE):
+        logger.info(f"Creating default {WORD_OF_DAY_FILE}")
+        default_word_data = {
+            "words": {
+                "en": [
+                    {
+                        "word": "hello",
+                        "translation": "a greeting",
+                        "example_sentence": "Hello, how are you?",
+                        "pronunciation": "hə-ˈlō",
+                        "part_of_speech": "interjection",
+                        "difficulty": "beginner"
+                    }
+                ]
+            }
+        }
+        save_json_file(WORD_OF_DAY_FILE, default_word_data)
+    
+    # Initialize other files with default structures
+    file_defaults = {
+        PHRASES_FILE: {
+            'phrases': {},
+            'categories': ['greetings', 'travel', 'food', 'business', 'casual'],
+            'difficulties': ['beginner', 'intermediate', 'advanced']
+        },
+        USER_PROGRESS_FILE: {'users': {}},
+        USER_PREFERENCES_FILE: {'preferences': {}},
+        LEARNING_ANALYTICS_FILE: {'analytics': {}},
+        QUIZZES_FILE: {'quizzes': {}}
+    }
+    
+    for file_path, default_data in file_defaults.items():
+        if not os.path.exists(file_path):
+            logger.info(f"Creating default {file_path}")
+            save_json_file(file_path, default_data)
+    
+    logger.info("Data files initialization complete")
+
+# Initialize data files when the module is loaded
+initialize_data_files()
+
 if __name__ == '__main__':
     logger.info("Starting TTS AI Backend Server...")
     logger.info(f"Environment: {os.getenv('FLASK_ENV', 'production')}")
