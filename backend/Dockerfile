@@ -4,32 +4,34 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install python-venv
-RUN apt-get update && apt-get install -y python3-venv
+# Install system dependencies including sqlite3
+RUN apt-get update && apt-get install -y \
+    sqlite3 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create and activate virtual environment
-RUN python -m venv /app/venv
-ENV PATH="/app/venv/bin:$PATH"
-
-# Copy requirements and install dependencies in venv
+# Copy requirements first for better caching
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
 
-# Create data directory
-RUN mkdir -p /app/data
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
+# Copy application code
 COPY . .
 
+# Create data directory for SQLite database
+RUN mkdir -p /app/data
+
 # Set environment variables
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
-ENV VIRTUAL_ENV=/app/venv
-ENV PATH="/app/venv/bin:$PATH"
+ENV PYTHONPATH=/app
+ENV DATABASE_URL=sqlite:///app/ttsai.db
 
 # Expose port
-EXPOSE 8080
+EXPOSE 5000
 
-# Run the application with the virtual environment's Python
-CMD exec gunicorn --bind :8080 --workers 1 --threads 8 --timeout 0 app:app 
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:5000/api/health || exit 1
+
+# Run the application
+CMD ["python", "app.py"] 
