@@ -43,6 +43,9 @@ ENV/
 Dockerfile
 .dockerignore
 
+# Allow important scripts
+!entrypoint.sh
+
 # Allow credentials
 !credentials/
 !credentials/google-credentials.json 

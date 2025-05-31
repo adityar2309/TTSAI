@@ -1355,6 +1355,19 @@ def initialize_data_files():
     create_tables()
     logger.info("Database tables created successfully")
     
+    # Run migration to populate database
+    try:
+        logger.info("Running database migration...")
+        import subprocess
+        result = subprocess.run(['python', 'migrate_to_sqlite.py'], 
+                              capture_output=True, text=True, timeout=60)
+        if result.returncode == 0:
+            logger.info("Database migration completed successfully")
+        else:
+            logger.warning(f"Migration completed with warnings: {result.stderr}")
+    except Exception as e:
+        logger.warning(f"Migration script not found or failed: {e}")
+    
     # Check if we need to populate initial data
     try:
         # Check if word of day data exists
