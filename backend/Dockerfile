@@ -22,9 +22,6 @@ COPY . .
 # Create data directory for SQLite database
 RUN mkdir -p /app/data
 
-# Make entrypoint script executable
-RUN chmod +x entrypoint.sh
-
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV DATABASE_URL=sqlite:///app/ttsai.db
@@ -36,5 +33,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/api/health || exit 1
 
-# Use entrypoint script
-CMD ["./entrypoint.sh"] 
+# Run the application
+CMD ["python", "app.py"] 
