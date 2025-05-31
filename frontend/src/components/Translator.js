@@ -726,21 +726,23 @@ export const Translator = ({ initialMode = 'type' }) => {
   // Advanced features
   const saveAsFlashcard = async () => {
     if (!inputText || !translatedText) {
-      showNotification('Need both original and translated text', 'warning');
+      showNotification('No translation to save', 'warning');
       return;
     }
 
     try {
       const response = await axios.post(`${API_URL}/flashcards`, {
         userId,
-        translation: {
-          original: inputText,
-          translated: translatedText,
-          sourceLang,
-          targetLang
-        },
-        difficulty: 'beginner',
-        category: 'general'
+        flashcard: {
+          translation: {
+            originalText: inputText,
+            translatedText: translatedText,
+            sourceLang,
+            targetLang
+          },
+          difficulty: 'beginner',
+          category: 'general'
+        }
       });
 
       if (response.data.success) {

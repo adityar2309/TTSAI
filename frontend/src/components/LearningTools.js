@@ -91,7 +91,10 @@ const LearningTools = ({ userId, language }) => {
       const response = await axios.get(`${API_URL}/flashcards`, {
         params: { userId, language }
       });
-      setFlashcards(response.data);
+      
+      // Handle new response format from SQLite backend
+      const flashcardsData = response.data.flashcards || response.data || [];
+      setFlashcards(flashcardsData);
     } catch (err) {
       console.error('Error fetching flashcards:', err);
       setError('Failed to fetch flashcards');
