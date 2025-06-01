@@ -83,3 +83,33 @@
 2025-06-02 01:43:09,710 - __main__ - INFO - Database migration completed successfully
 2025-06-02 01:43:09,727 - __main__ - INFO - Database initialization completed successfully
 2025-06-02 01:43:09,727 - __main__ - INFO - Server starting on port 5000
+2025-06-02 01:43:10,595 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.8:5000
+2025-06-02 01:43:10,596 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-02 01:43:10,597 - werkzeug - INFO -  * Restarting with stat
+2025-06-02 01:43:11,302 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-02 01:43:11,303 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-02 01:43:11,303 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-02 01:43:11,304 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-02 01:43:11,304 - __main__ - INFO - Configuring Gemini with API key: AIzaSyCZ...f-OM
+2025-06-02 01:43:12,963 - __main__ - INFO - Gemini connection test successful
+2025-06-02 01:43:12,967 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-02 01:43:12,969 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-06-02 01:43:12,969 - __main__ - INFO - Initializing database...
+2025-06-02 01:43:12,971 - __main__ - INFO - Database tables created successfully
+2025-06-02 01:43:12,972 - __main__ - INFO - Running database migration...
+2025-06-02 01:43:13,392 - __main__ - INFO - Database migration completed successfully
+2025-06-02 01:43:13,409 - __main__ - INFO - Database initialization completed successfully
+2025-06-02 01:43:13,409 - __main__ - INFO - Server starting on port 5000
+2025-06-02 01:43:13,422 - werkzeug - WARNING -  * Debugger is active!
+2025-06-02 01:43:13,424 - werkzeug - INFO -  * Debugger PIN: 226-016-043
+2025-06-02 01:43:17,939 - __main__ - INFO - Getting word of day for language: en
+2025-06-02 01:43:17,941 - __main__ - INFO - Successfully retrieved word of day for en
+2025-06-02 01:43:17,942 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:17] "GET /api/word-of-day?language=en HTTP/1.1" 200 -
+2025-06-02 01:43:19,997 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:19] "GET /api/flashcards?userId=user123 HTTP/1.1" 200 -
+2025-06-02 01:43:22,043 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:22] "POST /api/flashcards HTTP/1.1" 200 -
+2025-06-02 01:43:33,145 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:33] "POST /api/quiz/generate HTTP/1.1" 200 -
+2025-06-02 01:43:35,217 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:35] "GET /api/progress?userId=user123 HTTP/1.1" 200 -
+2025-06-02 01:43:39,408 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:39] "POST /api/conversation HTTP/1.1" 200 -
