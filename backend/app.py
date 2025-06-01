@@ -1618,6 +1618,112 @@ def initialize_data_files():
         logger.error(f"Error during database initialization: {e}")
         # Don't fail startup, just log the error
 
+@app.route('/api/debug/populate-words', methods=['POST'])
+def populate_word_data():
+    """Debug endpoint to manually populate word-of-day data"""
+    try:
+        logger.info("Manually populating word-of-day data...")
+        
+        # Ensure database tables exist
+        create_tables()
+        
+        # Add comprehensive default words for English
+        default_words = [
+            {
+                'word': 'hello',
+                'translation': 'a greeting or expression of goodwill',
+                'pronunciation': 'həˈloʊ',
+                'part_of_speech': 'interjection',
+                'difficulty': 'beginner',
+                'example_sentence': 'Hello, how are you?',
+                'example_translation': 'A common greeting used when meeting someone.',
+                'etymology': 'From Old English hæl (whole, healthy)',
+                'related_words': ['hi', 'greetings', 'salutation'],
+                'cultural_note': 'The most common greeting in English-speaking countries.'
+            },
+            {
+                'word': 'thank you',
+                'translation': 'expression of gratitude',
+                'pronunciation': 'θæŋk juː',
+                'part_of_speech': 'phrase',
+                'difficulty': 'beginner',
+                'example_sentence': 'Thank you for your help.',
+                'example_translation': 'Used to express appreciation.',
+                'etymology': 'From Old English þancian (to give thanks)',
+                'related_words': ['thanks', 'gratitude', 'appreciation'],
+                'cultural_note': 'Essential politeness expression in English.'
+            },
+            {
+                'word': 'wonderful',
+                'translation': 'inspiring delight, pleasure, or admiration; extremely good',
+                'pronunciation': 'ˈwʌn.də.fəl',
+                'part_of_speech': 'adjective',
+                'difficulty': 'intermediate',
+                'example_sentence': 'What a wonderful day!',
+                'example_translation': 'Used to express that something is very good or pleasant.',
+                'etymology': 'From wonder + -ful',
+                'related_words': ['amazing', 'fantastic', 'marvelous'],
+                'cultural_note': 'Often used to express enthusiasm and positivity.'
+            },
+            {
+                'word': 'serendipity',
+                'translation': 'the occurrence of events by chance in a happy way',
+                'pronunciation': 'ˌser.ənˈdɪp.ə.ti',
+                'part_of_speech': 'noun',
+                'difficulty': 'advanced',
+                'example_sentence': 'It was pure serendipity that we met at the coffee shop.',
+                'example_translation': 'Describes pleasant surprises or fortunate accidents.',
+                'etymology': 'Coined by Horace Walpole in 1754',
+                'related_words': ['chance', 'fortune', 'luck'],
+                'cultural_note': 'A beloved word expressing life\'s pleasant surprises.'
+            },
+            {
+                'word': 'friend',
+                'translation': 'a person you know well and regard with affection and trust',
+                'pronunciation': 'frɛnd',
+                'part_of_speech': 'noun',
+                'difficulty': 'beginner',
+                'example_sentence': 'She is my best friend.',
+                'example_translation': 'Used to describe a close relationship.',
+                'etymology': 'From Old English freond (lover, friend)',
+                'related_words': ['buddy', 'companion', 'pal'],
+                'cultural_note': 'Friendship is valued across all cultures.'
+            }
+        ]
+        
+        added_count = 0
+        failed_count = 0
+        
+        for word_data in default_words:
+            success = db_service.add_word_of_day('en', word_data)
+            if success:
+                added_count += 1
+                logger.info(f"Added word: {word_data['word']}")
+            else:
+                failed_count += 1
+                logger.warning(f"Failed to add word: {word_data['word']}")
+        
+        # Verify words were added
+        test_word = db_service.get_word_of_day('en')
+        
+        return jsonify({
+            'success': True,
+            'message': f'Populated word-of-day data for English',
+            'added_count': added_count,
+            'failed_count': failed_count,
+            'total_words': len(default_words),
+            'test_word': test_word.get('word') if test_word else None,
+            'verification': 'SUCCESS' if test_word else 'FAILED'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error populating word data: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Failed to populate word-of-day data'
+        }), 500
+
 if __name__ == '__main__':
     try:
         logger.info("Starting TTSAI Backend Server...")
