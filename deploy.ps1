@@ -184,7 +184,9 @@ try {
         if (Test-Path $testFile) {
             try {
                 $content = Get-Content $testFile -Raw
-                $newContent = $content -replace "API_BASE = '[^']*'", "API_BASE = '$serviceUrl/api'"
+                $pattern = "API_BASE = '[^']*'"
+                $replacement = "API_BASE = '$serviceUrl/api'"
+                $newContent = $content -replace $pattern, $replacement
                 Set-Content $testFile -Value $newContent -NoNewline
                 Write-Host "✓ Updated test_learning_tools_deployed.py with new API URL" -ForegroundColor Green
             }
