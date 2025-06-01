@@ -33,7 +33,18 @@ def test_flashcards():
         response = requests.get(f'{API_BASE}/flashcards', params={'userId': 'user123'})
         if response.status_code == 200:
             data = response.json()
-            print(f"✅ Fetched {data.get('total', 0)} flashcards")
+            
+            # Handle both response formats: dict with total or direct list
+            if isinstance(data, dict):
+                # New format: {"flashcards": [...], "total": N}
+                total = data.get('total', 0)
+                flashcards = data.get('flashcards', [])
+            else:
+                # Legacy format: [flashcard1, flashcard2, ...]
+                total = len(data)
+                flashcards = data
+                
+            print(f"✅ Fetched {total} flashcards")
             
             # Test POST new flashcard
             new_flashcard = {
