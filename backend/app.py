@@ -635,27 +635,63 @@ def get_common_phrases():
 @app.route('/api/word-of-day', methods=['GET'])
 @rate_limit
 def get_word_of_day():
-    """Enhanced word of the day with more details"""
+    """Get a random word of the day for the specified language"""
     try:
-        language = request.args.get('language')
-        if not language:
-            return jsonify({'error': 'Language parameter required'}), 400
-        
+        language = request.args.get('language', 'en').lower()
         logger.info(f"Getting word of day for language: {language}")
         
-        # Use database service to get word of day
+        # Check if we have any words for this language
         word_data = db_service.get_word_of_day(language)
         
         if not word_data:
-            logger.error(f"No words available for language: {language}")
-            return jsonify({'error': f'No words available for language: {language}'}), 404
+            logger.warning(f"No word-of-day data found for language: {language}")
+            
+            # Try to populate some default data if language is 'en'
+            if language == 'en':
+                logger.info("Attempting to populate default English words...")
+                
+                default_word = {
+                    'word': 'hello',
+                    'translation': 'a greeting or expression of goodwill',
+                    'pronunciation': 'həˈloʊ',
+                    'part_of_speech': 'interjection',
+                    'difficulty': 'beginner',
+                    'example_sentence': 'Hello, how are you?',
+                    'example_translation': 'A common greeting used when meeting someone.',
+                    'etymology': 'From Old English hæl (whole, healthy)',
+                    'related_words': ['hi', 'greetings', 'salutation'],
+                    'cultural_note': 'The most common greeting in English-speaking countries.'
+                }
+                
+                success = db_service.add_word_of_day('en', default_word)
+                if success:
+                    logger.info("Successfully added default English word")
+                    # Try to get it again
+                    word_data = db_service.get_word_of_day(language)
+                else:
+                    logger.error("Failed to add default English word")
+            
+            # If still no data, return error with more details
+            if not word_data:
+                return jsonify({
+                    'error': f'Language {language} not supported',
+                    'available_languages': ['en'],  # We know we should have at least English
+                    'debug_info': {
+                        'attempted_language': language,
+                        'database_initialized': True,
+                        'fallback_attempted': language == 'en'
+                    }
+                }), 404
         
-        logger.info(f"Successfully retrieved word of day for {language}")
+        logger.info(f"Successfully retrieved word of day: {word_data.get('word', 'Unknown')}")
         return jsonify(word_data)
         
     except Exception as e:
-        logger.error(f"Error getting word of day: {e}")
-        return jsonify({'error': 'Failed to get word of the day'}), 500
+        logger.error(f"Error getting word of day: {e}", exc_info=True)
+        return jsonify({
+            'error': 'Internal server error',
+            'debug_info': str(e)
+        }), 500
 
 @app.route('/api/flashcards', methods=['POST'])
 @rate_limit
