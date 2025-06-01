@@ -178,22 +178,9 @@ try {
         Write-Host "1. Update frontend API_BASE_URL to: $serviceUrl/api"
         Write-Host "2. Test the learning tools with: python test_learning_tools_deployed.py"
         Write-Host "3. Redeploy frontend if needed"
-        
-        # Update the test file automatically
-        $testFile = Join-Path $PSScriptRoot "test_learning_tools_deployed.py"
-        if (Test-Path $testFile) {
-            try {
-                $content = Get-Content $testFile -Raw
-                $pattern = "API_BASE = '[^']*'"
-                $replacement = "API_BASE = '" + $serviceUrl + "/api'"
-                $newContent = $content -replace $pattern, $replacement
-                Set-Content $testFile -Value $newContent -NoNewline
-                Write-Host "✓ Updated test_learning_tools_deployed.py with new API URL" -ForegroundColor Green
-            }
-            catch {
-                Write-Host "⚠️  Could not update test file automatically" -ForegroundColor Yellow
-            }
-        }
+        Write-Host ""
+        Write-Host "Manual update needed:"
+        Write-Host "Edit test_learning_tools_deployed.py and change API_BASE to: $serviceUrl/api"
         
     } else {
         Write-Host "⚠️  Could not retrieve service URL. Check deployment manually." -ForegroundColor Yellow
