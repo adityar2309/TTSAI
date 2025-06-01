@@ -113,3 +113,10 @@
 2025-06-02 01:43:33,145 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:33] "POST /api/quiz/generate HTTP/1.1" 200 -
 2025-06-02 01:43:35,217 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:35] "GET /api/progress?userId=user123 HTTP/1.1" 200 -
 2025-06-02 01:43:39,408 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:43:39] "POST /api/conversation HTTP/1.1" 200 -
+2025-06-02 01:55:16,271 - __main__ - INFO - Getting word of day for language: en
+2025-06-02 01:55:16,273 - __main__ - INFO - Successfully retrieved word of day for en
+2025-06-02 01:55:16,273 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:55:16] "GET /api/word-of-day?language=en HTTP/1.1" 200 -
+2025-06-02 01:55:18,302 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:55:18] "GET /api/flashcards?userId=user123 HTTP/1.1" 200 -
+2025-06-02 01:55:20,342 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:55:20] "POST /api/flashcards HTTP/1.1" 200 -
+2025-06-02 01:55:31,718 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:55:31] "POST /api/quiz/generate HTTP/1.1" 200 -
+2025-06-02 01:59:25,789 - werkzeug - INFO -  * Detected change in 'C:\\Users\\qatty\\Downloads\\New folder (49)\\TTSAI\\backend\\app.py', reloading

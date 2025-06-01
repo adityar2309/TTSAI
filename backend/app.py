@@ -1504,26 +1504,28 @@ def initialize_data_files():
     create_tables()
     logger.info("Database tables created successfully")
     
-    # Run migration to populate database
+    # Try to run migration but don't fail if it doesn't work
     try:
-        logger.info("Running database migration...")
+        logger.info("Attempting database migration...")
         import subprocess
-        result = subprocess.run(['python', 'migrate_to_sqlite.py'], 
-                              capture_output=True, text=True, timeout=60)
+        import sys
+        result = subprocess.run([sys.executable, 'migrate_to_sqlite.py'], 
+                              capture_output=True, text=True, timeout=30,
+                              cwd=os.path.dirname(os.path.abspath(__file__)))
         if result.returncode == 0:
             logger.info("Database migration completed successfully")
         else:
             logger.warning(f"Migration completed with warnings: {result.stderr}")
     except Exception as e:
-        logger.warning(f"Migration script not found or failed: {e}")
+        logger.warning(f"Migration script not found or failed, continuing without it: {e}")
     
-    # Check if we need to populate initial data
+    # Always ensure we have basic word-of-day data
     try:
-        # Check if word of day data exists
+        logger.info("Checking word-of-day data...")
         word_data = db_service.get_word_of_day('en')
         if not word_data:
-            logger.info("No word data found, creating default entries...")
-            # Add some default words for English
+            logger.info("No word data found for 'en', creating default entries...")
+            # Add comprehensive default words for English
             default_words = [
                 {
                     'word': 'hello',
@@ -1548,18 +1550,73 @@ def initialize_data_files():
                     'etymology': 'From Old English þancian (to give thanks)',
                     'related_words': ['thanks', 'gratitude', 'appreciation'],
                     'cultural_note': 'Essential politeness expression in English.'
+                },
+                {
+                    'word': 'wonderful',
+                    'translation': 'inspiring delight, pleasure, or admiration; extremely good',
+                    'pronunciation': 'ˈwʌn.də.fəl',
+                    'part_of_speech': 'adjective',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'What a wonderful day!',
+                    'example_translation': 'Used to express that something is very good or pleasant.',
+                    'etymology': 'From wonder + -ful',
+                    'related_words': ['amazing', 'fantastic', 'marvelous'],
+                    'cultural_note': 'Often used to express enthusiasm and positivity.'
+                },
+                {
+                    'word': 'serendipity',
+                    'translation': 'the occurrence of events by chance in a happy way',
+                    'pronunciation': 'ˌser.ənˈdɪp.ə.ti',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': 'It was pure serendipity that we met at the coffee shop.',
+                    'example_translation': 'Describes pleasant surprises or fortunate accidents.',
+                    'etymology': 'Coined by Horace Walpole in 1754',
+                    'related_words': ['chance', 'fortune', 'luck'],
+                    'cultural_note': 'A beloved word expressing life\'s pleasant surprises.'
                 }
             ]
             
             for word_data in default_words:
-                db_service.add_word_of_day('en', word_data)
+                success = db_service.add_word_of_day('en', word_data)
+                if success:
+                    logger.info(f"Added word: {word_data['word']}")
+                else:
+                    logger.warning(f"Failed to add word: {word_data['word']}")
             
-            logger.info("Default word data created")
+            # Verify words were added
+            final_check = db_service.get_word_of_day('en')
+            if final_check:
+                logger.info("✅ Word-of-day data successfully created")
+            else:
+                logger.error("❌ Failed to create word-of-day data")
+        else:
+            logger.info(f"✅ Word-of-day data exists: {word_data.get('word', 'Unknown')}")
+            
+        # Check for other languages too
+        for lang in ['es', 'fr', 'de', 'it', 'pt']:
+            lang_word = db_service.get_word_of_day(lang)
+            if not lang_word:
+                logger.info(f"Adding basic word for {lang}...")
+                basic_word = {
+                    'word': 'hello' if lang == 'es' else 'bonjour' if lang == 'fr' else 'hallo' if lang == 'de' else 'ciao' if lang == 'it' else 'olá',
+                    'translation': 'greeting',
+                    'pronunciation': '',
+                    'part_of_speech': 'interjection',
+                    'difficulty': 'beginner',
+                    'example_sentence': '',
+                    'example_translation': '',
+                    'etymology': '',
+                    'related_words': [],
+                    'cultural_note': 'Basic greeting'
+                }
+                db_service.add_word_of_day(lang, basic_word)
         
         logger.info("Database initialization completed successfully")
         
     except Exception as e:
         logger.error(f"Error during database initialization: {e}")
+        # Don't fail startup, just log the error
 
 if __name__ == '__main__':
     try:
