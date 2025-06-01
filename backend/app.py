@@ -90,20 +90,21 @@ except Exception as e:
 # Configure Gemini with enhanced error handling
 api_key = os.getenv('GEMINI_API_KEY')
 if not api_key:
-    logger.error("GEMINI_API_KEY not found in environment variables")
-    raise ValueError("GEMINI_API_KEY must be set in environment variables")
-
-try:
-    logger.info(f"Configuring Gemini with API key: {api_key[:8]}...{api_key[-4:]}")
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-
-    # Test Gemini connection
-    test_response = model.generate_content("Test connection")
-    logger.info("Gemini connection test successful")
-except Exception as e:
-    logger.error(f"Failed to configure Gemini: {e}")
+    logger.warning("GEMINI_API_KEY not found in environment variables")
+    logger.warning("Translation services will be limited. Set GEMINI_API_KEY for full functionality.")
     model = None
+else:
+    try:
+        logger.info(f"Configuring Gemini with API key: {api_key[:8]}...{api_key[-4:]}")
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+
+        # Test Gemini connection
+        test_response = model.generate_content("Test connection")
+        logger.info("Gemini connection test successful")
+    except Exception as e:
+        logger.error(f"Failed to configure Gemini: {e}")
+        model = None
 
 # Enhanced rate limiting decorator
 def rate_limit(func):
@@ -309,6 +310,130 @@ def debug_data_status():
         return jsonify(data_files_status)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/translate', methods=['POST'])
+@rate_limit
+def basic_translate():
+    """
+    Basic translation endpoint for simple translation requests.
+    
+    Returns:
+        dict: Translation result with romanization for non-Latin scripts
+    """
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+            
+        # Validate required fields
+        required_fields = ['text', 'sourceLang', 'targetLang']
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        if missing_fields:
+            return jsonify({
+                'error': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+        
+        text = data.get('text').strip()
+        source_lang = data.get('sourceLang')
+        target_lang = data.get('targetLang')
+        
+        # Input validation
+        if len(text) > 1000:
+            return jsonify({'error': 'Text too long (max 1000 characters)'}), 400
+        
+        if not text:
+            return jsonify({'error': 'Text cannot be empty'}), 400
+        
+        # Check cache first
+        cache_key = get_cache_key({
+            'text': text, 'source': source_lang, 'target': target_lang, 'type': 'basic'
+        })
+        
+        cached_result = get_cached_result(translation_cache, cache_key)
+        if cached_result:
+            logger.info(f"Returning cached basic translation for: {text[:50]}...")
+            return jsonify(cached_result)
+        
+        if not model:
+            return jsonify({'error': 'Translation service temporarily unavailable'}), 503
+        
+        # Generate basic translation prompt with romanization
+        non_latin_languages = ['ar', 'zh', 'zh-CN', 'zh-TW', 'ja', 'ko', 'hi', 'ru', 'th', 'he', 'ur', 'fa', 'bn', 'ta', 'te', 'ml', 'kn', 'gu', 'pa', 'ne', 'si', 'my', 'km', 'lo', 'ka', 'am', 'ti', 'dv']
+        needs_romanization = any(lang in target_lang.lower() for lang in non_latin_languages)
+        
+        if needs_romanization:
+            prompt = f"""Translate the following text from {source_lang} to {target_lang}. Return only a clean translation without any formatting. Also provide romanization for non-Latin scripts.
+
+Text to translate: "{text}"
+
+Return your response as a JSON object with this exact structure:
+{{
+    "translation": "the translated text",
+    "romanization": "romanized version using standard system",
+    "romanization_system": "name of romanization system used (e.g., Pinyin, Hepburn, IAST)",
+    "source_lang": "{source_lang}",
+    "target_lang": "{target_lang}"
+}}"""
+        else:
+            prompt = f"""Translate the following text from {source_lang} to {target_lang}. Return only a clean translation without any formatting.
+
+Text to translate: "{text}"
+
+Return your response as a JSON object with this exact structure:
+{{
+    "translation": "the translated text",
+    "source_lang": "{source_lang}",
+    "target_lang": "{target_lang}"
+}}"""
+        
+        logger.info(f"Basic translating: '{text}' from {source_lang} to {target_lang}")
+        
+        try:
+            response = model.generate_content(prompt)
+            if not response or not response.text:
+                raise Exception("Empty response from Gemini")
+            
+            # Clean up response text - remove markdown formatting if present
+            response_text = response.text.strip()
+            if response_text.startswith('```json'):
+                response_text = response_text[7:]
+            if response_text.endswith('```'):
+                response_text = response_text[:-3]
+            response_text = response_text.strip()
+            
+            # Parse JSON response
+            try:
+                translation_data = json.loads(response_text)
+            except json.JSONDecodeError:
+                # Fallback: extract translation from plain text
+                translation_data = {
+                    "translation": response_text,
+                    "source_lang": source_lang,
+                    "target_lang": target_lang
+                }
+            
+            # Add timestamp
+            translation_data['timestamp'] = datetime.now().isoformat()
+            
+            # Cache the result
+            cache_result(translation_cache, cache_key, translation_data)
+            
+            logger.info(f"Basic translation completed successfully for: {text[:50]}...")
+            return jsonify(translation_data)
+            
+        except Exception as e:
+            logger.error(f"Gemini API error in basic translate: {e}")
+            return jsonify({
+                'error': 'Translation service error',
+                'details': 'Please try again later'
+            }), 503
+            
+    except Exception as e:
+        logger.error(f"Basic translation error: {e}", exc_info=True)
+        return jsonify({
+            'error': 'Internal server error',
+            'details': 'An unexpected error occurred'
+        }), 500
 
 @app.route('/api/advanced-translate', methods=['POST'])
 @rate_limit
@@ -535,7 +660,13 @@ def get_word_of_day():
 @app.route('/api/flashcards', methods=['POST'])
 @rate_limit
 def create_flashcard():
-    """Enhanced flashcard creation with comprehensive validation"""
+    """
+    Enhanced flashcard creation with comprehensive validation.
+    
+    Accepts both nested and flat data structures:
+    - Nested: {"userId": "...", "flashcard": {...}}
+    - Flat: {"userId": "...", "translation": {...}, "difficulty": "..."}
+    """
     try:
         if not request.json:
             return jsonify({'error': 'No data provided'}), 400
@@ -544,9 +675,27 @@ def create_flashcard():
         if not user_id:
             return jsonify({'error': 'User ID required'}), 400
 
-        flashcard_data = request.json.get('flashcard', {})
+        # Support both nested and flat data structures
+        flashcard_data = request.json.get('flashcard')
+        if not flashcard_data:
+            # Try flat structure - extract flashcard data from root level
+            flashcard_data = {k: v for k, v in request.json.items() if k != 'userId'}
+            
         if not flashcard_data:
             return jsonify({'error': 'Flashcard data required'}), 400
+
+        # Validate required flashcard fields
+        translation = flashcard_data.get('translation', {})
+        if not translation or not isinstance(translation, dict):
+            return jsonify({'error': 'Translation data required'}), 400
+            
+        required_translation_fields = ['originalText', 'translatedText']
+        missing_fields = [field for field in required_translation_fields 
+                         if not translation.get(field)]
+        if missing_fields:
+            return jsonify({
+                'error': f'Missing translation fields: {", ".join(missing_fields)}'
+            }), 400
 
         # Use database service to save flashcard
         if db_service.save_flashcard(user_id, flashcard_data):

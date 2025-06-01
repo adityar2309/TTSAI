@@ -87,17 +87,6 @@
           "proficiency": "beginner",
           "duration": 60,
           "performance": 0.8
-        },
-        {
-          "timestamp": "2025-06-02T01:43:39.406546",
-          "type": "conversation",
-          "user_input": "Hello, how are you?",
-          "ai_response": "I understand. Can you tell me more?",
-          "language": "es",
-          "context": "general",
-          "proficiency": "beginner",
-          "duration": 60,
-          "performance": 0.8
         }
       ],
       "daily_streaks": {
@@ -109,7 +98,7 @@
         "total_cards": 2,
         "mastered_cards": 0,
         "study_streak": 3,
-        "last_study_date": "2025-06-02T01:43:39.406546"
+        "last_study_date": "2025-06-02T01:41:37.556584"
       },
       "quizzes": {
         "dc04ae3c-e4fa-4b10-8125-8a871ff920bf": {

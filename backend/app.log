@@ -1,0 +1,85 @@
+2025-06-02 01:38:17,076 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-02 01:38:17,081 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:17,082 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:17,082 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:17,082 - google.auth._default - WARNING - Authentication failed using Compute Engine authentication due to unavailable metadata server.
+2025-06-02 01:38:17,083 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+2025-06-02 01:38:17,083 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-02 01:38:17,083 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:17,083 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:17,084 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:17,084 - google.auth._default - WARNING - Authentication failed using Compute Engine authentication due to unavailable metadata server.
+2025-06-02 01:38:17,084 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+2025-06-02 01:38:17,084 - __main__ - ERROR - GEMINI_API_KEY not found in environment variables
+2025-06-02 01:38:45,448 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-02 01:38:45,451 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:45,451 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:45,470 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:45,470 - google.auth._default - WARNING - Authentication failed using Compute Engine authentication due to unavailable metadata server.
+2025-06-02 01:38:45,471 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+2025-06-02 01:38:45,471 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-02 01:38:45,471 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:45,472 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:45,472 - google.auth.compute_engine._metadata - WARNING - Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-06-02 01:38:45,472 - google.auth._default - WARNING - Authentication failed using Compute Engine authentication due to unavailable metadata server.
+2025-06-02 01:38:45,473 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+2025-06-02 01:38:45,473 - __main__ - ERROR - GEMINI_API_KEY not found in environment variables
+2025-06-02 01:40:59,531 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-02 01:40:59,531 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-02 01:40:59,531 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-02 01:40:59,532 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-02 01:40:59,532 - __main__ - INFO - Configuring Gemini with API key: AIzaSyCZ...f-OM
+2025-06-02 01:41:01,057 - __main__ - INFO - Gemini connection test successful
+2025-06-02 01:41:01,060 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-02 01:41:01,062 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-06-02 01:41:01,062 - __main__ - INFO - Initializing database...
+2025-06-02 01:41:01,072 - __main__ - INFO - Database tables created successfully
+2025-06-02 01:41:01,072 - __main__ - INFO - Running database migration...
+2025-06-02 01:41:01,464 - __main__ - INFO - Database migration completed successfully
+2025-06-02 01:41:01,481 - __main__ - INFO - Database initialization completed successfully
+2025-06-02 01:41:01,481 - __main__ - INFO - Server starting on port 5000
+2025-06-02 01:41:02,361 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.8:5000
+2025-06-02 01:41:02,361 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-02 01:41:02,363 - werkzeug - INFO -  * Restarting with stat
+2025-06-02 01:41:03,106 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-02 01:41:03,107 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-02 01:41:03,107 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-02 01:41:03,107 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-02 01:41:03,107 - __main__ - INFO - Configuring Gemini with API key: AIzaSyCZ...f-OM
+2025-06-02 01:41:03,728 - __main__ - INFO - Gemini connection test successful
+2025-06-02 01:41:03,733 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-02 01:41:03,734 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-06-02 01:41:03,735 - __main__ - INFO - Initializing database...
+2025-06-02 01:41:03,738 - __main__ - INFO - Database tables created successfully
+2025-06-02 01:41:03,738 - __main__ - INFO - Running database migration...
+2025-06-02 01:41:04,166 - __main__ - INFO - Database migration completed successfully
+2025-06-02 01:41:04,183 - __main__ - INFO - Database initialization completed successfully
+2025-06-02 01:41:04,183 - __main__ - INFO - Server starting on port 5000
+2025-06-02 01:41:04,195 - werkzeug - WARNING -  * Debugger is active!
+2025-06-02 01:41:04,198 - werkzeug - INFO -  * Debugger PIN: 226-016-043
+2025-06-02 01:41:15,887 - __main__ - INFO - Getting word of day for language: en
+2025-06-02 01:41:15,889 - __main__ - INFO - Successfully retrieved word of day for en
+2025-06-02 01:41:15,890 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:41:15] "GET /api/word-of-day?language=en HTTP/1.1" 200 -
+2025-06-02 01:41:17,942 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:41:17] "GET /api/flashcards?userId=user123 HTTP/1.1" 200 -
+2025-06-02 01:41:19,982 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:41:19] "[31m[1mPOST /api/flashcards HTTP/1.1[0m" 400 -
+2025-06-02 01:41:30,988 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:41:30] "POST /api/quiz/generate HTTP/1.1" 200 -
+2025-06-02 01:41:33,046 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:41:33] "GET /api/progress?userId=user123 HTTP/1.1" 200 -
+2025-06-02 01:41:37,558 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:41:37] "POST /api/conversation HTTP/1.1" 200 -
+2025-06-02 01:42:21,467 - werkzeug - INFO -  * Detected change in 'C:\\Users\\qatty\\Downloads\\New folder (49)\\TTSAI\\backend\\app.py', reloading
+2025-06-02 01:43:07,415 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-02 01:43:07,416 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-02 01:43:07,416 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-02 01:43:07,416 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-02 01:43:07,416 - __main__ - INFO - Configuring Gemini with API key: AIzaSyCZ...f-OM
+2025-06-02 01:43:09,291 - __main__ - INFO - Gemini connection test successful
+2025-06-02 01:43:09,295 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-02 01:43:09,297 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-06-02 01:43:09,297 - __main__ - INFO - Initializing database...
+2025-06-02 01:43:09,300 - __main__ - INFO - Database tables created successfully
+2025-06-02 01:43:09,300 - __main__ - INFO - Running database migration...
+2025-06-02 01:43:09,710 - __main__ - INFO - Database migration completed successfully
+2025-06-02 01:43:09,727 - __main__ - INFO - Database initialization completed successfully
+2025-06-02 01:43:09,727 - __main__ - INFO - Server starting on port 5000
