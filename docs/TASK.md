@@ -1,5 +1,28 @@
 # TTSAI Tasks
 
+## 🚨 **CURRENT URGENT ISSUE - 2024-12-14**
+
+### 404 Errors in Production
+- [ ] **CRITICAL**: Backend deployment is missing recent endpoints 
+- [x] **FIXED**: Missing logo192.png manifest error - removed from manifest.json
+- [ ] **HIGH**: Word-of-day endpoint returning 404 for Spanish language
+- [ ] **HIGH**: Quiz submit endpoints not matching frontend calls
+- [ ] **MEDIUM**: Backend authentication issues preventing gcloud deployment
+
+#### Frontend API Endpoint Mismatches Found:
+1. **Word of Day**: Frontend calls `/api/word-of-day?language=es` → Backend expects language parameter but has database seeding issues
+2. **Quiz Submit**: Frontend calls `/api/quiz/${quiz_id}/submit` → Backend has this endpoint but deployment is outdated
+3. **Conversation**: Frontend calls `/api/conversation` → Backend has this endpoint but deployment is outdated
+
+#### Backend Deployment Issues:
+- Current deployment URL: `https://ttsai-backend-321805997355.us-central1.run.app`
+- Missing endpoints in deployed version (returns "Endpoint not found")
+- Need to authenticate with gcloud and redeploy
+
+#### Immediate Fixes Applied:
+- ✅ Removed missing logo references from manifest.json
+- ⚠️ Backend needs full redeployment with current code
+
 ## ✅ Completed Tasks
 
 ### 2024-12-02 - **DEPLOYMENT SUCCESSFUL!** 🎉
@@ -17,6 +40,87 @@
 - [x] **ROBUST**: Enhanced database initialization with fallback data creation
 - [x] **SUCCESS**: **5/6 Learning Tools Tests Now Pass on Production!**
 - [x] **VERIFIED**: All core backend functionality working (3/3 tests pass)
+
+## 🎯 **UPDATED STATUS: BACKEND DEPLOYMENT NEEDED**
+
+### ⚠️ **Production Status: Backend Out of Date**
+
+#### Core Backend (1/3 Tests ✅)
+- ✅ **Health Check**: All services active and healthy
+- ❌ **Learning Tools**: Missing endpoints (404 errors)
+- ❌ **Database**: Word-of-day data not properly seeded
+
+#### Learning Tools (0/6 Tests ✅ - All Failing)  
+- ❌ **Word-of-day**: "Language en not supported" database issue
+- ❌ **Flashcards**: 500 error on creation
+- ❌ **Quiz Generation**: Working locally but failing in deployment
+- ❌ **Progress Tracking**: Missing in deployment
+- ❌ **Conversation Practice**: Missing in deployment
+- ❌ **Quiz Submit**: Endpoint mismatch in deployment
+
+## 🔧 Current Issues
+
+### Backend Issues (Production)
+- [ ] **CRITICAL**: Backend deployment is missing most recent endpoints
+- [ ] **HIGH**: Database not properly initialized with word-of-day data
+- [ ] **HIGH**: Authentication required for gcloud deployment
+- [ ] **MEDIUM**: Need to run database migration/seeding
+
+### Frontend Issues  
+- [x] **FIXED**: Missing manifest icons causing console errors
+- [ ] **LOW**: Could add better error handling for missing backend endpoints
+
+### Deployment Issues
+- [ ] **CRITICAL**: Need `gcloud auth login` before deployment
+- [ ] **HIGH**: PowerShell deploy script has syntax errors
+- [ ] **MEDIUM**: Batch deploy script incomplete execution
+
+## 🚀 **NEXT STEPS TO FIX 404 ERRORS**
+
+### 1. Backend Redeployment (Required)
+```bash
+# Authenticate with Google Cloud
+gcloud auth login
+
+# Set project
+gcloud config set project ttsai-backend
+
+# Deploy from backend directory
+cd backend
+gcloud run deploy ttsai-backend \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --memory 2Gi \
+  --cpu 2 \
+  --set-env-vars=ENVIRONMENT=production \
+  --port 8080
+```
+
+### 2. Database Initialization (After Deployment)
+```bash
+# Populate word-of-day data
+curl -X POST "https://ttsai-backend-321805997355.us-central1.run.app/api/debug/populate-words"
+
+# Test endpoints
+python3 test_learning_tools_deployed.py
+```
+
+### 3. Frontend Environment (Optional)
+- Update REACT_APP_API_URL if backend URL changes
+- Rebuild and redeploy frontend if needed
+
+## 🎯 **Current Priority: Fix Backend Deployment**
+
+The main issue is that the backend deployment is missing the latest code that includes all the learning tools endpoints. The user needs to:
+
+1. **Authenticate with gcloud** (`gcloud auth login`)
+2. **Redeploy backend** with current code
+3. **Test endpoints** to verify fix
+4. **Populate database** with word-of-day data
+
+Once this is done, all the 404 errors should be resolved.
 
 ## 🎯 **FINAL STATUS: DEPLOYMENT SUCCESSFUL!**
 
