@@ -1,38 +1,14 @@
-# Python bytecode only
+# Only exclude what we really don't need
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-# Virtual Environment
-venv/
-ENV/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Local development
-.env
+.git/
 .env.local
-
-# Git
-.git
-
-# Test files (but allow essential ones)
-test_*.py
-*_test.py
-
-# Allow all essential files
-!models.py
-!db_service.py
-!app.py
-!config.py
-!requirements.txt
-!entrypoint.sh
-
-# Allow credentials
-!credentials/
-!credentials/google-credentials.json 
+.pytest_cache/
+*.log
+.vscode/
+.idea/
+node_modules/
+.DS_Store
+Thumbs.db 
