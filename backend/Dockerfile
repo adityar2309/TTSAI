@@ -23,8 +23,9 @@ COPY . .
 RUN mkdir -p /app/data
 
 # Set environment variables
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app:/app/backend
 ENV DATABASE_URL=sqlite:///app/ttsai.db
+ENV PYTHONUNBUFFERED=1
 
 # Expose port
 EXPOSE 5000
@@ -34,4 +35,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/api/health || exit 1
 
 # Run the application
-CMD ["python", "app.py"] 
+CMD ["python", "-u", "app.py"] 

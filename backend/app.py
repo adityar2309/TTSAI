@@ -22,11 +22,7 @@ from google.auth import default
 from fuzzywuzzy import fuzz
 import re
 
-# Import database service
-from models import create_tables
-from db_service import db_service
-
-# Configure comprehensive logging
+# Configure comprehensive logging first
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -36,6 +32,21 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+# Import database service
+try:
+    from models import create_tables
+    from db_service import db_service
+    logger.info("Successfully imported models and db_service")
+except ImportError as e:
+    logger.error(f"Failed to import models or db_service: {e}")
+    logger.error("Current working directory and Python path:")
+    import sys
+    import os
+    logger.error(f"Current directory: {os.getcwd()}")
+    logger.error(f"Python path: {sys.path}")
+    logger.error(f"Files in current directory: {os.listdir('.')}")
+    raise
 
 # Load environment variables
 load_dotenv()

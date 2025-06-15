@@ -46,6 +46,11 @@ Dockerfile
 # Allow important scripts
 !entrypoint.sh
 
+# Allow important Python modules
+!models.py
+!db_service.py
+!app.py
+
 # Allow credentials
 !credentials/
 !credentials/google-credentials.json 
