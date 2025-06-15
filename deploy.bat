@@ -27,11 +27,11 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Check if GEMINI_API_KEY is set
+REM Check if OPENROUTER_API_KEY is set
 echo [3/6] Checking environment variables...
-if "%GEMINI_API_KEY%"=="" (
-    echo WARNING: GEMINI_API_KEY is not set. The backend will run with limited functionality.
-    echo Set it with: set GEMINI_API_KEY=your_api_key_here
+if "%OPENROUTER_API_KEY%"=="" (
+    echo WARNING: OPENROUTER_API_KEY is not set. The backend will run with limited functionality.
+    echo Set it with: set OPENROUTER_API_KEY=your_api_key_here
     set /p continue="Continue deployment anyway? (y/N): "
     if /i not "!continue!"=="y" (
         echo Deployment cancelled.
@@ -39,7 +39,7 @@ if "%GEMINI_API_KEY%"=="" (
         exit /b 1
     )
 ) else (
-    echo ✓ GEMINI_API_KEY is set: %GEMINI_API_KEY:~0,8%...
+    echo ✓ OPENROUTER_API_KEY is set: %OPENROUTER_API_KEY:~0,8%...
 )
 
 REM Change to backend directory
@@ -69,10 +69,10 @@ echo [5/6] Deploying to Cloud Run...
 cd /d "%~dp0"
 
 REM Set environment variables for deployment
-if "%GEMINI_API_KEY%"=="" (
+if "%OPENROUTER_API_KEY%"=="" (
     set ENV_VARS="DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production"
 ) else (
-    set ENV_VARS="GEMINI_API_KEY=%GEMINI_API_KEY%,DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production"
+    set ENV_VARS="OPENROUTER_API_KEY=%OPENROUTER_API_KEY%,DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production"
 )
 
 echo Deploying with configuration:

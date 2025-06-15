@@ -208,3 +208,10 @@
 2025-06-15 18:57:49,123 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:49] "GET /api/avatars?language=zh HTTP/1.1" 200 -
 2025-06-15 18:57:51,173 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:51] "GET /api/avatar/emma_teacher?language=en HTTP/1.1" 200 -
 2025-06-15 19:04:13,158 - werkzeug - INFO -  * Detected change in 'C:\\Users\\qatty\\Downloads\\New folder (67)\\TTSAI\\backend\\app.py', reloading
+2025-06-15 19:16:24,407 - app - INFO - Initializing Google Cloud Speech client...
+2025-06-15 19:16:24,408 - app - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-15 19:16:24,408 - app - INFO - Initializing Google Cloud TTS client...
+2025-06-15 19:16:24,408 - app - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-15 19:16:24,409 - app - INFO - Configuring OpenRouter with API key: sk-or-v1...c6b5
+2025-06-15 19:16:25,152 - app - ERROR - OpenRouter connection test failed: 401
+2025-06-15 19:16:25,156 - app - INFO - Cache cleanup completed. Removed 0 expired entries
