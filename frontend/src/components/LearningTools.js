@@ -25,6 +25,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Avatar,
+  Collapse,
 } from '@mui/material';
 import {
   School as SchoolIcon,
@@ -38,6 +40,7 @@ import {
   EmojiEvents as EmojiEventsIcon,
   Timeline as TimelineIcon,
   Send as SendIcon,
+  SwapHoriz as SwapHorizIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -185,29 +188,53 @@ const LearningTools = ({ userId, language }) => {
     }
   };
 
-  const ConversationMode = ({ language, userId }) => {
+  const AvatarConversation = ({ language, userId }) => {
+    const [avatars, setAvatars] = useState([]);
+    const [selectedAvatar, setSelectedAvatar] = useState(null);
     const [messages, setMessages] = useState([]);
     const [userInput, setUserInput] = useState('');
     const [context, setContext] = useState('general');
     const [proficiency, setProficiency] = useState('beginner');
     const [loading, setLoading] = useState(false);
-    const [stats, setStats] = useState(null);
+    const [sessionId, setSessionId] = useState(null);
+    const [showAvatarSelection, setShowAvatarSelection] = useState(true);
     const messagesEndRef = useRef(null);
 
     const contexts = [
-      { value: 'general', label: 'General Conversation' },
-      { value: 'travel', label: 'Travel & Directions' },
-      { value: 'restaurant', label: 'Restaurant & Food' },
-      { value: 'business', label: 'Business & Work' },
-      { value: 'shopping', label: 'Shopping' },
-      { value: 'emergency', label: 'Emergency Situations' },
+      { value: 'general', label: 'General Conversation', icon: '💬' },
+      { value: 'travel', label: 'Travel & Directions', icon: '✈️' },
+      { value: 'restaurant', label: 'Restaurant & Food', icon: '🍽️' },
+      { value: 'business', label: 'Business & Work', icon: '💼' },
+      { value: 'shopping', label: 'Shopping', icon: '🛍️' },
+      { value: 'emergency', label: 'Emergency Situations', icon: '🚨' },
+      { value: 'casual', label: 'Casual Chat', icon: '☕' },
+      { value: 'learning', label: 'Language Learning', icon: '📚' },
     ];
 
     const proficiencyLevels = [
-      { value: 'beginner', label: 'Beginner' },
-      { value: 'intermediate', label: 'Intermediate' },
-      { value: 'advanced', label: 'Advanced' },
+      { value: 'beginner', label: 'Beginner', color: '#4CAF50', icon: '🌱' },
+      { value: 'intermediate', label: 'Intermediate', color: '#FF9800', icon: '🌿' },
+      { value: 'advanced', label: 'Advanced', color: '#F44336', icon: '🌳' },
     ];
+
+    // Fetch avatars on component mount
+    useEffect(() => {
+      fetchAvatars();
+    }, [language]);
+
+    const fetchAvatars = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/avatars?language=${language}`);
+        setAvatars(response.data.avatars || []);
+      } catch (err) {
+        console.error('Error fetching avatars:', err);
+        setNotification({
+          open: true,
+          message: 'Failed to load avatars',
+          severity: 'error',
+        });
+      }
+    };
 
     const scrollToBottom = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -217,9 +244,34 @@ const LearningTools = ({ userId, language }) => {
       scrollToBottom();
     }, [messages]);
 
+    const startConversationSession = async (avatar) => {
+      try {
+        setLoading(true);
+        const response = await axios.post(`${API_URL}/conversation/start-session`, {
+          userId,
+          language,
+          avatarId: avatar.id,
+        });
+
+        setSelectedAvatar(avatar);
+        setSessionId(response.data.session_id);
+        setMessages([response.data.initial_message]);
+        setShowAvatarSelection(false);
+      } catch (err) {
+        console.error('Error starting conversation session:', err);
+        setNotification({
+          open: true,
+          message: 'Failed to start conversation',
+          severity: 'error',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     const handleSubmit = async (e) => {
       e.preventDefault();
-      if (!userInput.trim()) return;
+      if (!userInput.trim() || !selectedAvatar) return;
 
       const newMessage = {
         type: 'user',
@@ -232,32 +284,36 @@ const LearningTools = ({ userId, language }) => {
       setLoading(true);
 
       try {
-        const response = await axios.post(`${API_URL}/conversation`, {
+        const response = await axios.post(`${API_URL}/conversation/avatar`, {
           text: userInput,
           language,
           userId,
+          avatarId: selectedAvatar.id,
           context,
           proficiency,
+          conversationHistory: messages,
         });
 
         const aiResponse = {
-          type: 'ai',
-          response: response.data.ai_response,
+          type: 'avatar',
+          response: response.data.response,
           translation: response.data.translation,
           vocabulary: response.data.vocabulary,
           grammar_notes: response.data.grammar_notes,
           cultural_note: response.data.cultural_note,
           suggested_responses: response.data.suggested_responses,
+          avatar_emotion: response.data.avatar_emotion,
+          teaching_tip: response.data.teaching_tip,
+          avatar: response.data.avatar,
           timestamp: new Date().toISOString(),
         };
 
         setMessages(prev => [...prev, aiResponse]);
-        setStats(response.data.stats);
       } catch (err) {
-        console.error('Error in conversation:', err);
+        console.error('Error in avatar conversation:', err);
         setNotification({
           open: true,
-          message: 'Failed to get response',
+          message: 'Failed to get response from avatar',
           severity: 'error',
         });
       } finally {
@@ -265,161 +321,367 @@ const LearningTools = ({ userId, language }) => {
       }
     };
 
+    const useSuggestedResponse = (suggestion) => {
+      setUserInput(suggestion);
+    };
+
+    const changeAvatar = () => {
+      setShowAvatarSelection(true);
+      setMessages([]);
+      setSelectedAvatar(null);
+      setSessionId(null);
+    };
+
+    const getEmotionColor = (emotion) => {
+      const emotionColors = {
+        happy: '#4CAF50',
+        encouraging: '#2196F3',
+        thoughtful: '#9C27B0',
+        excited: '#FF9800',
+        concerned: '#F44336',
+        welcoming: '#00BCD4',
+      };
+      return emotionColors[emotion] || '#757575';
+    };
+
+    if (showAvatarSelection) {
+      return (
+        <Card elevation={3}>
+          <CardContent>
+            <Stack direction="row" alignItems="center" spacing={1} mb={3}>
+              <SchoolIcon color="primary" />
+              <Typography variant="h6">Choose Your AI Language Partner</Typography>
+            </Stack>
+
+            <Typography variant="body2" color="text.secondary" mb={3}>
+              Select an AI avatar to practice {language} with. Each avatar has unique personality and specialties.
+            </Typography>
+
+            <Grid container spacing={3}>
+              {avatars.map((avatar) => (
+                <Grid item xs={12} sm={6} md={4} key={avatar.id}>
+                  <Card 
+                    elevation={2}
+                    sx={{ 
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        elevation: 6,
+                        transform: 'translateY(-4px)',
+                      }
+                    }}
+                    onClick={() => startConversationSession(avatar)}
+                  >
+                    <CardContent>
+                      <Stack alignItems="center" spacing={2}>
+                        <Typography variant="h2">{avatar.avatar_image}</Typography>
+                        <Typography variant="h6" align="center">
+                          {avatar.name}
+                        </Typography>
+                        <Typography variant="subtitle2" color="primary" align="center">
+                          {avatar.role}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" align="center">
+                          {avatar.personality}
+                        </Typography>
+                        <Box>
+                          {avatar.specialties.slice(0, 3).map((specialty, index) => (
+                            <Chip
+                              key={index}
+                              label={specialty.replace('_', ' ')}
+                              size="small"
+                              sx={{ m: 0.25 }}
+                            />
+                          ))}
+                        </Box>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+
+            {loading && (
+              <Box display="flex" justifyContent="center" mt={3}>
+                <CircularProgress />
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      );
+    }
+
     return (
       <Card elevation={3}>
         <CardContent>
-          <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-            <SchoolIcon color="primary" />
-            <Typography variant="h6">Interactive Conversation</Typography>
+          {/* Header with Avatar Info */}
+          <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+            <Avatar sx={{ bgcolor: 'primary.main' }}>
+              <Typography variant="h6">{selectedAvatar?.avatar_image}</Typography>
+            </Avatar>
+            <Box flex={1}>
+              <Typography variant="h6">{selectedAvatar?.name}</Typography>
+              <Typography variant="subtitle2" color="text.secondary">
+                {selectedAvatar?.role}
+              </Typography>
+            </Box>
+            <IconButton onClick={changeAvatar} color="primary">
+              <SwapHorizIcon />
+            </IconButton>
           </Stack>
 
+          {/* Settings */}
           <Grid container spacing={2} mb={2}>
             <Grid item xs={12} sm={6}>
-              <Box sx={{ minWidth: 120 }}>
-                <FormControl fullWidth>
-                  <InputLabel>Context</InputLabel>
-                  <Select
-                    value={context}
-                    label="Context"
-                    onChange={(e) => setContext(e.target.value)}
-                  >
-                    {contexts.map(ctx => (
-                      <MenuItem key={ctx.value} value={ctx.value}>
-                        {ctx.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
+              <FormControl fullWidth size="small">
+                <InputLabel>Context</InputLabel>
+                <Select
+                  value={context}
+                  label="Context"
+                  onChange={(e) => setContext(e.target.value)}
+                >
+                  {contexts.map(ctx => (
+                    <MenuItem key={ctx.value} value={ctx.value}>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <span>{ctx.icon}</span>
+                        <span>{ctx.label}</span>
+                      </Stack>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Box sx={{ minWidth: 120 }}>
-                <FormControl fullWidth>
-                  <InputLabel>Proficiency</InputLabel>
-                  <Select
-                    value={proficiency}
-                    label="Proficiency"
-                    onChange={(e) => setProficiency(e.target.value)}
-                  >
-                    {proficiencyLevels.map(level => (
-                      <MenuItem key={level.value} value={level.value}>
-                        {level.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
+              <FormControl fullWidth size="small">
+                <InputLabel>Proficiency</InputLabel>
+                <Select
+                  value={proficiency}
+                  label="Proficiency"
+                  onChange={(e) => setProficiency(e.target.value)}
+                >
+                  {proficiencyLevels.map(level => (
+                    <MenuItem key={level.value} value={level.value}>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <span>{level.icon}</span>
+                        <span>{level.label}</span>
+                      </Stack>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
 
+          {/* Chat Area */}
           <Paper 
             elevation={0} 
             sx={{ 
-              height: 400, 
+              height: 450, 
               p: 2, 
               mb: 2, 
               overflow: 'auto',
-              bgcolor: 'background.default'
+              bgcolor: 'background.default',
+              border: '1px solid',
+              borderColor: 'divider'
             }}
           >
             {messages.map((msg, index) => (
               <Box
                 key={index}
                 sx={{
-                  mb: 2,
+                  mb: 3,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: msg.type === 'user' ? 'flex-end' : 'flex-start',
                 }}
               >
-                <Paper
-                  elevation={1}
-                  sx={{
-                    p: 2,
-                    maxWidth: '80%',
-                    bgcolor: msg.type === 'user' ? 'primary.light' : 'background.paper',
-                    color: msg.type === 'user' ? 'primary.contrastText' : 'text.primary',
-                  }}
-                >
-                  {msg.type === 'user' ? (
+                {msg.type === 'user' ? (
+                  <Paper
+                    elevation={1}
+                    sx={{
+                      p: 2,
+                      maxWidth: '75%',
+                      bgcolor: 'primary.main',
+                      color: 'primary.contrastText',
+                      borderRadius: '20px 20px 5px 20px',
+                    }}
+                  >
                     <Typography>{msg.text}</Typography>
-                  ) : (
-                    <Stack spacing={1}>
-                      <Typography variant="body1" color="primary">
-                        {msg.response}
-                      </Typography>
-                      <Typography variant="body2">
-                        {msg.translation}
-                      </Typography>
-                      <Divider />
+                  </Paper>
+                ) : (
+                  <Box sx={{ maxWidth: '85%' }}>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                      <Avatar sx={{ width: 32, height: 32 }}>
+                        <Typography variant="body2">{selectedAvatar?.avatar_image}</Typography>
+                      </Avatar>
                       <Typography variant="caption" color="text.secondary">
-                        Key Vocabulary:
+                        {selectedAvatar?.name}
                       </Typography>
-                      <Box>
-                        {msg.vocabulary?.map((word, i) => (
-                          <Chip
-                            key={i}
-                            label={word}
-                            size="small"
-                            sx={{ m: 0.5 }}
-                            onClick={() => playAudio(word)}
-                          />
-                        ))}
-                      </Box>
-                      {msg.grammar_notes && (
-                        <>
-                          <Typography variant="caption" color="text.secondary">
-                            Grammar Points:
-                          </Typography>
-                          <Typography variant="body2">
-                            {msg.grammar_notes}
-                          </Typography>
-                        </>
-                      )}
-                      {msg.cultural_note && (
-                        <Alert severity="info" sx={{ mt: 1 }}>
-                          {msg.cultural_note}
-                        </Alert>
+                      {msg.avatar_emotion && (
+                        <Chip
+                          label={msg.avatar_emotion}
+                          size="small"
+                          sx={{ 
+                            bgcolor: getEmotionColor(msg.avatar_emotion),
+                            color: 'white',
+                            fontSize: '0.7rem'
+                          }}
+                        />
                       )}
                     </Stack>
-                  )}
-                </Paper>
+                    
+                    <Paper
+                      elevation={1}
+                      sx={{
+                        p: 2,
+                        bgcolor: 'background.paper',
+                        borderRadius: '5px 20px 20px 20px',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}
+                    >
+                      <Stack spacing={2}>
+                        <Typography variant="body1" color="primary" fontWeight="medium">
+                          {msg.response}
+                        </Typography>
+                        
+                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                          {msg.translation}
+                        </Typography>
+
+                        {msg.vocabulary && msg.vocabulary.length > 0 && (
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+                              Key Vocabulary:
+                            </Typography>
+                            <Box>
+                              {msg.vocabulary.map((word, i) => (
+                                <Chip
+                                  key={i}
+                                  label={word}
+                                  size="small"
+                                  sx={{ m: 0.25 }}
+                                  onClick={() => playAudio(word)}
+                                  clickable
+                                />
+                              ))}
+                            </Box>
+                          </Box>
+                        )}
+
+                        {msg.grammar_notes && (
+                          <Alert severity="info" sx={{ py: 0.5 }}>
+                            <Typography variant="caption">
+                              <strong>Grammar:</strong> {msg.grammar_notes}
+                            </Typography>
+                          </Alert>
+                        )}
+
+                        {msg.teaching_tip && (
+                          <Alert severity="success" sx={{ py: 0.5 }}>
+                            <Typography variant="caption">
+                              <strong>Tip:</strong> {msg.teaching_tip}
+                            </Typography>
+                          </Alert>
+                        )}
+
+                        {msg.cultural_note && (
+                          <Alert severity="warning" sx={{ py: 0.5 }}>
+                            <Typography variant="caption">
+                              <strong>Culture:</strong> {msg.cultural_note}
+                            </Typography>
+                          </Alert>
+                        )}
+
+                        {msg.suggested_responses && msg.suggested_responses.length > 0 && (
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+                              Suggested responses:
+                            </Typography>
+                            <Stack direction="row" spacing={1} flexWrap="wrap">
+                              {msg.suggested_responses.map((suggestion, i) => (
+                                <Button
+                                  key={i}
+                                  variant="outlined"
+                                  size="small"
+                                  onClick={() => useSuggestedResponse(suggestion)}
+                                  sx={{ mb: 0.5 }}
+                                >
+                                  {suggestion}
+                                </Button>
+                              ))}
+                            </Stack>
+                          </Box>
+                        )}
+                      </Stack>
+                    </Paper>
+                  </Box>
+                )}
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
                   {new Date(msg.timestamp).toLocaleTimeString()}
                 </Typography>
               </Box>
             ))}
+            
+            {loading && (
+              <Box display="flex" alignItems="center" justifyContent="center" p={2}>
+                <CircularProgress size={24} sx={{ mr: 1 }} />
+                <Typography variant="body2" color="text.secondary">
+                  {selectedAvatar?.name} is typing...
+                </Typography>
+              </Box>
+            )}
+            
             <div ref={messagesEndRef} />
           </Paper>
 
+          {/* Input Area */}
           <form onSubmit={handleSubmit}>
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" spacing={1} alignItems="flex-end">
               <TextField
                 fullWidth
-                variant="outlined"
-                placeholder="Type your message..."
+                multiline
+                maxRows={3}
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
+                placeholder={`Type your message in ${language}...`}
                 disabled={loading}
+                variant="outlined"
+                size="small"
               />
               <IconButton 
                 type="submit" 
                 color="primary" 
                 disabled={loading || !userInput.trim()}
-                sx={{ p: '10px' }}
+                sx={{ mb: 0.5 }}
               >
-                {loading ? <CircularProgress size={24} /> : <SendIcon />}
+                <SendIcon />
+              </IconButton>
+              <IconButton 
+                color="primary" 
+                onClick={() => playAudio(userInput)}
+                disabled={!userInput.trim()}
+                sx={{ mb: 0.5 }}
+              >
+                <VolumeUpIcon />
               </IconButton>
             </Stack>
           </form>
 
-          {stats && (
-            <Box mt={2}>
-              <Typography variant="caption" color="text.secondary">
-                Total Conversations: {stats.conversations} | Messages: {stats.total_messages}
+          {/* Avatar Info Panel */}
+          <Collapse in={selectedAvatar !== null}>
+            <Paper elevation={1} sx={{ mt: 2, p: 2, bgcolor: 'background.default' }}>
+              <Typography variant="subtitle2" gutterBottom>
+                About {selectedAvatar?.name}
               </Typography>
-            </Box>
-          )}
+              <Typography variant="body2" color="text.secondary" paragraph>
+                {selectedAvatar?.background}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Specialties: {selectedAvatar?.specialties?.join(', ')}
+              </Typography>
+            </Paper>
+          </Collapse>
         </CardContent>
       </Card>
     );
@@ -1029,7 +1291,7 @@ const LearningTools = ({ userId, language }) => {
               </Card>
 
               {/* Conversation Mode */}
-              <ConversationMode language={language} userId={userId} />
+              <AvatarConversation language={language} userId={userId} />
 
               {/* Flashcards */}
               {flashcards.length > 0 && (

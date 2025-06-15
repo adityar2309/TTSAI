@@ -120,3 +120,90 @@
 2025-06-02 01:55:20,342 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:55:20] "POST /api/flashcards HTTP/1.1" 200 -
 2025-06-02 01:55:31,718 - werkzeug - INFO - 127.0.0.1 - - [02/Jun/2025 01:55:31] "POST /api/quiz/generate HTTP/1.1" 200 -
 2025-06-02 01:59:25,789 - werkzeug - INFO -  * Detected change in 'C:\\Users\\qatty\\Downloads\\New folder (49)\\TTSAI\\backend\\app.py', reloading
+2025-06-15 18:45:24,359 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-15 18:45:24,360 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-15 18:45:24,360 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-15 18:45:24,361 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-15 18:45:24,361 - __main__ - INFO - Configuring Gemini with API key: AIzaSyCZ...f-OM
+2025-06-15 18:45:25,585 - __main__ - INFO - Gemini connection test successful
+2025-06-15 18:45:25,590 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-15 18:45:25,592 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-06-15 18:45:25,592 - __main__ - INFO - Initializing database...
+2025-06-15 18:45:25,601 - __main__ - INFO - Database tables created successfully
+2025-06-15 18:45:25,601 - __main__ - INFO - Attempting database migration...
+2025-06-15 18:45:25,975 - __main__ - INFO - Database migration completed successfully
+2025-06-15 18:45:25,976 - __main__ - INFO - Checking word-of-day data...
+2025-06-15 18:45:25,999 - __main__ - INFO - Adding basic word for it...
+2025-06-15 18:45:26,004 - __main__ - INFO - Adding basic word for pt...
+2025-06-15 18:45:26,009 - __main__ - INFO - Database initialization completed successfully
+2025-06-15 18:45:26,009 - __main__ - INFO - Server starting on port 5000
+2025-06-15 18:45:26,022 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.18:5000
+2025-06-15 18:45:26,023 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-15 18:45:26,024 - werkzeug - INFO -  * Restarting with stat
+2025-06-15 18:45:26,958 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-15 18:45:26,959 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-15 18:45:26,959 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-15 18:45:26,959 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-15 18:45:26,960 - __main__ - INFO - Configuring Gemini with API key: AIzaSyCZ...f-OM
+2025-06-15 18:45:27,645 - __main__ - INFO - Gemini connection test successful
+2025-06-15 18:45:27,651 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-15 18:45:27,654 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-06-15 18:45:27,655 - __main__ - INFO - Initializing database...
+2025-06-15 18:45:27,658 - __main__ - INFO - Database tables created successfully
+2025-06-15 18:45:27,658 - __main__ - INFO - Attempting database migration...
+2025-06-15 18:45:28,030 - __main__ - INFO - Database migration completed successfully
+2025-06-15 18:45:28,030 - __main__ - INFO - Checking word-of-day data...
+2025-06-15 18:45:28,053 - __main__ - INFO - Database initialization completed successfully
+2025-06-15 18:45:28,053 - __main__ - INFO - Server starting on port 5000
+2025-06-15 18:45:28,057 - werkzeug - WARNING -  * Debugger is active!
+2025-06-15 18:45:28,060 - werkzeug - INFO -  * Debugger PIN: 226-016-043
+2025-06-15 18:47:21,626 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:47:21] "[33mGET /api/supported-languages HTTP/1.1[0m" 404 -
+2025-06-15 18:47:21,631 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:47:21] "[33mGET /api/supported-languages HTTP/1.1[0m" 404 -
+2025-06-15 18:57:03,355 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-15 18:57:03,356 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-15 18:57:03,357 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-15 18:57:03,357 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-15 18:57:03,357 - __main__ - INFO - Configuring Gemini with API key: AIzaSyCZ...f-OM
+2025-06-15 18:57:04,083 - __main__ - INFO - Gemini connection test successful
+2025-06-15 18:57:04,087 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-15 18:57:04,090 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-06-15 18:57:04,090 - __main__ - INFO - Initializing database...
+2025-06-15 18:57:04,093 - __main__ - INFO - Database tables created successfully
+2025-06-15 18:57:04,093 - __main__ - INFO - Attempting database migration...
+2025-06-15 18:57:04,504 - __main__ - INFO - Database migration completed successfully
+2025-06-15 18:57:04,505 - __main__ - INFO - Checking word-of-day data...
+2025-06-15 18:57:04,528 - __main__ - INFO - Database initialization completed successfully
+2025-06-15 18:57:04,529 - __main__ - INFO - Server starting on port 5000
+2025-06-15 18:57:04,542 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.18:5000
+2025-06-15 18:57:04,543 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-15 18:57:04,544 - werkzeug - INFO -  * Restarting with stat
+2025-06-15 18:57:05,539 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-06-15 18:57:05,541 - __main__ - ERROR - Failed to initialize Google Cloud Speech client: File path/to/your/credentials.json was not found.
+2025-06-15 18:57:05,541 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-06-15 18:57:05,541 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: File path/to/your/credentials.json was not found.
+2025-06-15 18:57:05,541 - __main__ - INFO - Configuring Gemini with API key: AIzaSyCZ...f-OM
+2025-06-15 18:57:06,998 - __main__ - INFO - Gemini connection test successful
+2025-06-15 18:57:07,004 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-15 18:57:07,008 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-06-15 18:57:07,009 - __main__ - INFO - Initializing database...
+2025-06-15 18:57:07,011 - __main__ - INFO - Database tables created successfully
+2025-06-15 18:57:07,012 - __main__ - INFO - Attempting database migration...
+2025-06-15 18:57:07,442 - __main__ - INFO - Database migration completed successfully
+2025-06-15 18:57:07,443 - __main__ - INFO - Checking word-of-day data...
+2025-06-15 18:57:07,467 - __main__ - INFO - Database initialization completed successfully
+2025-06-15 18:57:07,467 - __main__ - INFO - Server starting on port 5000
+2025-06-15 18:57:07,472 - werkzeug - WARNING -  * Debugger is active!
+2025-06-15 18:57:07,475 - werkzeug - INFO -  * Debugger PIN: 226-016-043
+2025-06-15 18:57:38,910 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:38] "GET /api/avatars?language=en HTTP/1.1" 200 -
+2025-06-15 18:57:40,946 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:40] "GET /api/avatars?language=es HTTP/1.1" 200 -
+2025-06-15 18:57:42,984 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:42] "GET /api/avatars?language=fr HTTP/1.1" 200 -
+2025-06-15 18:57:45,030 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:45] "GET /api/avatars?language=de HTTP/1.1" 200 -
+2025-06-15 18:57:47,090 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:47] "GET /api/avatars?language=ja HTTP/1.1" 200 -
+2025-06-15 18:57:49,123 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:49] "GET /api/avatars?language=zh HTTP/1.1" 200 -
+2025-06-15 18:57:51,173 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:51] "GET /api/avatar/emma_teacher?language=en HTTP/1.1" 200 -

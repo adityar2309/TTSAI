@@ -1263,113 +1263,404 @@ def schedule_cleanup():
 # Start cleanup scheduler
 schedule_cleanup()
 
-@app.route('/api/conversation', methods=['POST'])
+# AI Avatar system configuration
+AVATAR_DATA = {
+    'en': [
+        {
+            'id': 'emma_teacher',
+            'name': 'Emma',
+            'role': 'English Teacher',
+            'personality': 'Friendly, patient, encouraging',
+            'specialties': ['grammar', 'pronunciation', 'business_english'],
+            'avatar_image': '👩‍🏫',
+            'background': 'Experienced English teacher from London with 10 years of teaching experience',
+            'greeting': 'Hello! I\'m Emma, your English tutor. I\'m here to help you improve your English skills!',
+            'style': 'supportive and detailed explanations'
+        },
+        {
+            'id': 'mike_native',
+            'name': 'Mike',
+            'role': 'Native Speaker',
+            'personality': 'Casual, humorous, authentic',
+            'specialties': ['slang', 'idioms', 'casual_conversation'],
+            'avatar_image': '👨‍💼',
+            'background': 'American native speaker who loves helping people learn everyday English',
+            'greeting': 'Hey there! I\'m Mike. Let\'s chat and make your English sound more natural!',
+            'style': 'conversational and relaxed'
+        },
+        {
+            'id': 'sophia_academic',
+            'name': 'Dr. Sophia',
+            'role': 'Academic English Expert',
+            'personality': 'Professional, thorough, articulate',
+            'specialties': ['academic_writing', 'formal_english', 'advanced_grammar'],
+            'avatar_image': '👩‍🎓',
+            'background': 'PhD in Linguistics, specializes in academic and formal English',
+            'greeting': 'Good day! I\'m Dr. Sophia. I specialize in academic and formal English communication.',
+            'style': 'formal and comprehensive'
+        }
+    ],
+    'es': [
+        {
+            'id': 'carlos_maestro',
+            'name': 'Carlos',
+            'role': 'Profesor de Español',
+            'personality': 'Entusiasta, paciente, cultural',
+            'specialties': ['gramática', 'cultura', 'español_mexicano'],
+            'avatar_image': '👨‍🏫',
+            'background': 'Profesor de español de México con experiencia en enseñanza intercultural',
+            'greeting': '¡Hola! Soy Carlos, tu profesor de español. ¡Vamos a aprender juntos!',
+            'style': 'warm and culturally rich'
+        },
+        {
+            'id': 'maria_nativa',
+            'name': 'María',
+            'role': 'Hablante Nativa',
+            'personality': 'Amigable, expresiva, auténtica',
+            'specialties': ['conversación', 'expresiones', 'español_cotidiano'],
+            'avatar_image': '👩‍💃',
+            'background': 'Española nativa que disfruta compartiendo su idioma y cultura',
+            'greeting': '¡Hola, qué tal! Soy María. ¡Hablemos en español como lo hacemos en España!',
+            'style': 'animated and authentic'
+        },
+        {
+            'id': 'alejandro_formal',
+            'name': 'Dr. Alejandro',
+            'role': 'Especialista en Español Formal',
+            'personality': 'Profesional, detallado, erudito',
+            'specialties': ['español_formal', 'literatura', 'escritura_académica'],
+            'avatar_image': '👨‍🎓',
+            'background': 'Doctor en Filología Hispánica, experto en español formal y académico',
+            'greeting': 'Buenos días. Soy el Dr. Alejandro, especialista en español formal y académico.',
+            'style': 'formal and scholarly'
+        }
+    ],
+    'fr': [
+        {
+            'id': 'claire_professeur',
+            'name': 'Claire',
+            'role': 'Professeure de Français',
+            'personality': 'Élégante, patiente, raffinée',
+            'specialties': ['grammaire', 'prononciation', 'culture_française'],
+            'avatar_image': '👩‍🏫',
+            'background': 'Professeure parisienne avec une passion pour la langue française',
+            'greeting': 'Bonjour! Je suis Claire, votre professeure de français. Enchanté de vous rencontrer!',
+            'style': 'elegant and precise'
+        },
+        {
+            'id': 'pierre_parisien',
+            'name': 'Pierre',
+            'role': 'Parisien Authentique',
+            'personality': 'Charmant, spirituel, authentique',
+            'specialties': ['français_familier', 'argot', 'vie_parisienne'],
+            'avatar_image': '👨‍🎨',
+            'background': 'Parisien de naissance qui adore partager sa culture',
+            'greeting': 'Salut! Moi c\'est Pierre. On va apprendre le français comme un vrai Parisien!',
+            'style': 'charming and witty'
+        }
+    ],
+    'de': [
+        {
+            'id': 'hans_lehrer',
+            'name': 'Hans',
+            'role': 'Deutschlehrer',
+            'personality': 'Strukturiert, geduldig, thorough',
+            'specialties': ['grammatik', 'deutsche_kultur', 'hochdeutsch'],
+            'avatar_image': '👨‍🏫',
+            'background': 'Erfahrener Deutschlehrer aus Berlin',
+            'greeting': 'Guten Tag! Ich bin Hans, Ihr Deutschlehrer. Freut mich, Sie kennenzulernen!',
+            'style': 'systematic and thorough'
+        },
+        {
+            'id': 'greta_berlin',
+            'name': 'Greta',
+            'role': 'Berlinerin',
+            'personality': 'Cool, direkt, modern',
+            'specialties': ['umgangssprache', 'berliner_dialekt', 'jugendsprache'],
+            'avatar_image': '👩‍🎤',
+            'background': 'Echte Berlinerin mit moderner Sicht auf die deutsche Sprache',
+            'greeting': 'Hallo! Ich bin Greta aus Berlin. Lass uns Deutsch lernen, wie es wirklich gesprochen wird!',
+            'style': 'modern and direct'
+        }
+    ],
+    'ja': [
+        {
+            'id': 'yuki_sensei',
+            'name': 'Yuki',
+            'role': '日本語の先生',
+            'personality': 'Polite, patient, traditional',
+            'specialties': ['keigo', 'kanji', 'japanese_culture'],
+            'avatar_image': '👩‍🏫',
+            'background': 'Traditional Japanese teacher with deep cultural knowledge',
+            'greeting': 'こんにちは！私はゆきです。日本語と日本の文化を教えます。',
+            'style': 'polite and traditional'
+        },
+        {
+            'id': 'takeshi_tokyo',
+            'name': 'Takeshi',
+            'role': '東京人',
+            'personality': 'Modern, friendly, tech-savvy',
+            'specialties': ['casual_japanese', 'modern_slang', 'tokyo_life'],
+            'avatar_image': '👨‍💻',
+            'background': 'Young Tokyo professional who loves sharing modern Japanese',
+            'greeting': 'こんにちは！たけしです。現代の日本語を一緒に学びましょう！',
+            'style': 'modern and casual'
+        }
+    ],
+    'zh': [
+        {
+            'id': 'mei_laoshi',
+            'name': 'Mei',
+            'role': '中文老师',
+            'personality': 'Kind, patient, traditional',
+            'specialties': ['pinyin', 'characters', 'chinese_culture'],
+            'avatar_image': '👩‍🏫',
+            'background': 'Experienced Chinese teacher from Beijing',
+            'greeting': '你好！我是美老师。我来帮你学习中文！',
+            'style': 'patient and encouraging'
+        },
+        {
+            'id': 'chen_beijing',
+            'name': 'Chen',
+            'role': '北京人',
+            'personality': 'Humorous, authentic, cultural',
+            'specialties': ['beijing_dialect', 'chinese_idioms', 'daily_conversation'],
+            'avatar_image': '👨‍🍳',
+            'background': 'Beijing native who loves sharing Chinese culture and language',
+            'greeting': '你好！我是小陈，地地道道的北京人。咱们一起学中文吧！',
+            'style': 'humorous and authentic'
+        }
+    ]
+}
+
+@app.route('/api/avatars', methods=['GET'])
 @rate_limit
-def conversation_practice():
-    """Interactive conversation practice with AI"""
+def get_avatars():
+    """Get available AI avatars for a language"""
+    try:
+        language = request.args.get('language', 'en')
+        
+        if language not in AVATAR_DATA:
+            return jsonify({'error': f'No avatars available for language {language}'}), 404
+        
+        avatars = AVATAR_DATA[language]
+        
+        return jsonify({
+            'avatars': avatars,
+            'total': len(avatars),
+            'language': language,
+            'available_languages': list(AVATAR_DATA.keys())
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching avatars: {e}")
+        return jsonify({'error': 'Failed to fetch avatars'}), 500
+
+@app.route('/api/avatar/<avatar_id>', methods=['GET'])
+@rate_limit
+def get_avatar_details(avatar_id):
+    """Get detailed information about a specific avatar"""
+    try:
+        language = request.args.get('language', 'en')
+        
+        if language not in AVATAR_DATA:
+            return jsonify({'error': f'Language {language} not supported'}), 404
+        
+        avatar = next((a for a in AVATAR_DATA[language] if a['id'] == avatar_id), None)
+        
+        if not avatar:
+            return jsonify({'error': f'Avatar {avatar_id} not found'}), 404
+        
+        return jsonify(avatar)
+        
+    except Exception as e:
+        logger.error(f"Error fetching avatar details: {e}")
+        return jsonify({'error': 'Failed to fetch avatar details'}), 500
+
+@app.route('/api/conversation/avatar', methods=['POST'])
+@rate_limit
+def avatar_conversation():
+    """Enhanced conversation with AI avatars"""
     try:
         data = request.get_json()
         user_input = data.get('text')
         language = data.get('language')
         user_id = data.get('userId')
+        avatar_id = data.get('avatarId')
         context = data.get('context', 'general')
         proficiency = data.get('proficiency', 'beginner')
+        conversation_history = data.get('conversationHistory', [])
         
-        if not all([user_input, language, user_id]):
+        if not all([user_input, language, user_id, avatar_id]):
             return jsonify({'error': 'Missing required fields'}), 400
 
-        # Generate conversation prompt based on context and proficiency
+        # Get avatar data
+        if language not in AVATAR_DATA:
+            return jsonify({'error': f'Language {language} not supported'}), 404
+            
+        avatar = next((a for a in AVATAR_DATA[language] if a['id'] == avatar_id), None)
+        if not avatar:
+            return jsonify({'error': f'Avatar {avatar_id} not found'}), 404
+
+        # Build conversation history context
+        history_context = ""
+        if conversation_history:
+            recent_history = conversation_history[-5:]  # Last 5 exchanges
+            history_context = "\nConversation History:\n"
+            for msg in recent_history:
+                if msg['type'] == 'user':
+                    history_context += f"User: {msg['text']}\n"
+                elif msg['type'] == 'avatar':
+                    history_context += f"You: {msg['response']}\n"
+
+        # Generate enhanced conversation prompt with avatar personality
         conversation_prompt = f"""
-        Act as a helpful language tutor having a conversation in {language}. 
-        The user's proficiency level is {proficiency}.
+        You are {avatar['name']}, a {avatar['role']} with the following characteristics:
+        - Personality: {avatar['personality']}
+        - Specialties: {', '.join(avatar['specialties'])}
+        - Background: {avatar['background']}
+        - Communication Style: {avatar['style']}
+        
+        You are having a conversation in {language} with a {proficiency} level learner.
         Context: {context}
+        {history_context}
         
-        User said: "{user_input}"
+        User just said: "{user_input}"
         
-        Respond naturally in {language} and provide a JSON response with these exact keys:
+        Respond in character as {avatar['name']} and provide a JSON response with these exact keys:
         {{
-            "response": "Your natural response in {language}",
+            "response": "Your natural response in {language} matching your personality",
             "translation": "English translation of your response",
-            "vocabulary": ["key", "vocabulary", "words"],
-            "grammar_notes": "Brief grammar explanation",
-            "cultural_note": "Cultural context if relevant",
-            "suggested_responses": ["suggestion1", "suggestion2", "suggestion3"]
+            "vocabulary": ["key", "vocabulary", "words", "from", "response"],
+            "grammar_notes": "Brief grammar explanation relevant to your response",
+            "cultural_note": "Cultural context if relevant to your character or response",
+            "suggested_responses": ["suggestion1", "suggestion2", "suggestion3"],
+            "avatar_emotion": "happy/encouraging/thoughtful/excited/concerned",
+            "teaching_tip": "A helpful tip related to your specialties if appropriate"
         }}
         
+        Stay in character and adapt your response style to match {avatar['name']}'s personality.
         Keep responses appropriate for {proficiency} level learners.
         """
 
         # Generate response using Gemini
+        if not model:
+            return jsonify({'error': 'AI service temporarily unavailable'}), 503
+            
         response = model.generate_content(conversation_prompt)
         
         try:
             # Try to parse the JSON response
             conversation_data = json.loads(response.text)
         except json.JSONDecodeError:
-            # Fallback if AI doesn't return valid JSON
+            # Fallback response in character
             conversation_data = {
-                "response": "I understand. Can you tell me more?",
-                "translation": "I understand. Can you tell me more?",
-                "vocabulary": ["understand", "tell", "more"],
+                "response": avatar['greeting'] if not conversation_history else "I understand. Please continue.",
+                "translation": avatar['greeting'] if not conversation_history else "I understand. Please continue.",
+                "vocabulary": ["understand", "continue", "please"],
                 "grammar_notes": "Simple present tense",
-                "cultural_note": "This is a friendly way to continue conversation",
-                "suggested_responses": ["Yes, I can explain more", "What would you like to know?", "That's interesting"]
+                "cultural_note": f"This is how {avatar['name']} would respond",
+                "suggested_responses": ["Yes, I see", "Can you help me?", "Tell me more"],
+                "avatar_emotion": "encouraging",
+                "teaching_tip": f"Practice with {avatar['name']} to improve your {language} skills"
             }
         
-        # Track user progress
-        progress = load_json_file(USER_PROGRESS_FILE, {'users': {}})
-        
-        if user_id not in progress['users']:
-            progress['users'][user_id] = {
-                'flashcards': [],
-                'quiz_scores': [],
-                'practice_sessions': [],
-                'learning_stats': {
-                    'total_cards': 0,
-                    'mastered_cards': 0,
-                    'study_streak': 0,
-                    'last_study_date': None
-                }
+        # Add avatar information to response
+        conversation_data['avatar'] = {
+            'id': avatar['id'],
+            'name': avatar['name'],
+            'role': avatar['role'],
+            'avatar_image': avatar['avatar_image']
+        }
+
+        # Track user progress with avatar interaction
+        if db_service:
+            practice_session = {
+                'timestamp': datetime.now().isoformat(),
+                'type': 'avatar_conversation',
+                'user_input': user_input,
+                'ai_response': conversation_data['response'],
+                'language': language,
+                'context': context,
+                'proficiency': proficiency,
+                'avatar_id': avatar_id,
+                'avatar_name': avatar['name'],
+                'duration': 60,
+                'performance': 0.8
             }
+            
+            # Use database service to track the session
+            session_data = {
+                'user_id': user_id,
+                'session_type': 'avatar_conversation',
+                'language': language,
+                'context': context,
+                'proficiency': proficiency,
+                'duration': 60,
+                'performance': 0.8,
+                'data': practice_session
+            }
+            db_service.track_event(session_data)
         
-        user_data = progress['users'][user_id]
+        return jsonify(conversation_data)
         
-        # Add conversation to practice sessions
-        practice_session = {
+    except Exception as e:
+        logger.error(f"Error in avatar conversation: {e}")
+        return jsonify({'error': 'Failed to generate avatar conversation response'}), 500
+
+@app.route('/api/conversation/start-session', methods=['POST'])
+@rate_limit
+def start_conversation_session():
+    """Start a new conversation session with an avatar"""
+    try:
+        data = request.get_json()
+        user_id = data.get('userId')
+        language = data.get('language')
+        avatar_id = data.get('avatarId')
+        
+        if not all([user_id, language, avatar_id]):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        # Get avatar data
+        if language not in AVATAR_DATA:
+            return jsonify({'error': f'Language {language} not supported'}), 404
+            
+        avatar = next((a for a in AVATAR_DATA[language] if a['id'] == avatar_id), None)
+        if not avatar:
+            return jsonify({'error': f'Avatar {avatar_id} not found'}), 404
+
+        # Generate session ID
+        session_id = str(uuid.uuid4())
+        
+        # Create initial greeting from avatar
+        initial_message = {
+            'type': 'avatar',
+            'response': avatar['greeting'],
+            'translation': avatar['greeting'],  # Same for greeting
+            'avatar': {
+                'id': avatar['id'],
+                'name': avatar['name'],
+                'role': avatar['role'],
+                'avatar_image': avatar['avatar_image']
+            },
             'timestamp': datetime.now().isoformat(),
-            'type': 'conversation',
-            'user_input': user_input,
-            'ai_response': conversation_data['response'],
-            'language': language,
-            'context': context,
-            'proficiency': proficiency,
-            'duration': 60,  # Estimate 1 minute per exchange
-            'performance': 0.8  # Default performance score
+            'session_id': session_id,
+            'vocabulary': [],
+            'grammar_notes': 'Welcome message',
+            'cultural_note': f"Meet {avatar['name']}, your {avatar['role']}",
+            'avatar_emotion': 'welcoming'
         }
         
-        user_data['practice_sessions'].append(practice_session)
-        
-        # Update learning stats
-        user_data['learning_stats']['last_study_date'] = datetime.now().isoformat()
-        
-        save_json_file(USER_PROGRESS_FILE, progress)
-        
         return jsonify({
-            'ai_response': conversation_data['response'],
-            'translation': conversation_data['translation'],
-            'vocabulary': conversation_data['vocabulary'],
-            'grammar_notes': conversation_data['grammar_notes'],
-            'cultural_note': conversation_data['cultural_note'],
-            'suggested_responses': conversation_data['suggested_responses'],
-            'stats': {
-                'total_conversations': len(user_data['practice_sessions']),
-                'session_count': len([s for s in user_data['practice_sessions'] if s['type'] == 'conversation'])
-            }
+            'session_id': session_id,
+            'avatar': avatar,
+            'initial_message': initial_message,
+            'language': language
         })
         
     except Exception as e:
-        logger.error(f"Error in conversation practice: {e}")
-        return jsonify({'error': 'Failed to generate conversation response'}), 500
+        logger.error(f"Error starting conversation session: {e}")
+        return jsonify({'error': 'Failed to start conversation session'}), 500
 
 @app.route('/api/quizzes', methods=['GET'])
 @rate_limit
