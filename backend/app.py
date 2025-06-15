@@ -22,6 +22,9 @@ from google.auth import default
 from fuzzywuzzy import fuzz
 import re
 
+# Import centralized configuration
+from config import get_llm_config, get_model_name, LLM_PROVIDER, OPENROUTER_API_KEY, OPENROUTER_BASE_URL
+
 # Configure comprehensive logging first
 logging.basicConfig(
     level=logging.INFO,
@@ -98,43 +101,46 @@ except Exception as e:
     logger.error(f"Failed to initialize Google Cloud TTS client: {e}")
     tts_client = None
 
-# Configure OpenRouter API with enhanced error handling
-openrouter_api_key = os.getenv('OPENROUTER_API_KEY')
-if not openrouter_api_key:
-    logger.warning("OPENROUTER_API_KEY not found in environment variables")
+# Configure LLM API using centralized configuration
+llm_config = get_llm_config()
+model_name = get_model_name()
+
+if not llm_config["api_key"]:
+    logger.warning("LLM API key not found in environment variables")
     logger.warning("Translation services will be limited. Set OPENROUTER_API_KEY for full functionality.")
     openrouter_client = None
 else:
     try:
-        logger.info(f"Configuring OpenRouter with API key: {openrouter_api_key[:8]}...{openrouter_api_key[-4:]}")
+        logger.info(f"Configuring {llm_config['provider']} with model: {model_name}")
+        logger.info(f"API key: {llm_config['api_key'][:8]}...{llm_config['api_key'][-4:]}")
         
-        # Test OpenRouter connection
+        # Test LLM connection
         headers = {
-            "Authorization": f"Bearer {openrouter_api_key}",
+            "Authorization": f"Bearer {llm_config['api_key']}",
             "Content-Type": "application/json"
         }
         
         test_data = {
-            "model": "google/gemini-2.0-flash-exp:free",
+            "model": model_name,
             "messages": [{"role": "user", "content": "Test connection"}]
         }
         
         test_response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
+            llm_config["base_url"],
             headers=headers,
             json=test_data,
             timeout=10
         )
         
         if test_response.status_code == 200:
-            logger.info("OpenRouter connection test successful")
+            logger.info(f"LLM connection test successful for {model_name}")
             openrouter_client = True
         else:
-            logger.error(f"OpenRouter connection test failed: {test_response.status_code}")
+            logger.error(f"LLM connection test failed: {test_response.status_code}")
             openrouter_client = None
             
     except Exception as e:
-        logger.error(f"Failed to configure OpenRouter: {e}")
+        logger.error(f"Failed to configure LLM: {e}")
         openrouter_client = None
 
 # Enhanced rate limiting decorator
@@ -182,14 +188,20 @@ def cache_result(cache_dict, key, result):
     """Cache a result with timestamp"""
     cache_dict[key] = (result, time.time())
 
-# OpenRouter API helper function
-def call_openrouter_api(prompt, model="google/gemini-2.0-flash-exp:free", max_tokens=4000):
-    """Make a call to OpenRouter API"""
-    if not openrouter_client or not openrouter_api_key:
-        raise Exception("OpenRouter API not configured")
+# LLM API helper function
+def call_llm_api(prompt, model=None, max_tokens=None):
+    """Make a call to the configured LLM API"""
+    llm_config = get_llm_config()
+    
+    if not openrouter_client or not llm_config["api_key"]:
+        raise Exception("LLM API not configured")
+    
+    # Use configured values as defaults
+    model = model or llm_config["model"]
+    max_tokens = max_tokens or llm_config["max_tokens"]
     
     headers = {
-        "Authorization": f"Bearer {openrouter_api_key}",
+        "Authorization": f"Bearer {llm_config['api_key']}",
         "Content-Type": "application/json"
     }
     
@@ -197,12 +209,12 @@ def call_openrouter_api(prompt, model="google/gemini-2.0-flash-exp:free", max_to
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": max_tokens,
-        "temperature": 0.7
+        "temperature": llm_config["temperature"]
     }
     
     try:
         response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
+            llm_config["base_url"],
             headers=headers,
             json=data,
             timeout=30
@@ -212,17 +224,17 @@ def call_openrouter_api(prompt, model="google/gemini-2.0-flash-exp:free", max_to
             result = response.json()
             return result['choices'][0]['message']['content']
         else:
-            error_msg = f"OpenRouter API error: {response.status_code}"
+            error_msg = f"LLM API error: {response.status_code}"
             if response.text:
                 error_msg += f" - {response.text}"
             raise Exception(error_msg)
             
     except requests.exceptions.Timeout:
-        raise Exception("OpenRouter API timeout")
+        raise Exception("LLM API timeout")
     except requests.exceptions.RequestException as e:
-        raise Exception(f"OpenRouter API request failed: {e}")
+        raise Exception(f"LLM API request failed: {e}")
     except Exception as e:
-        raise Exception(f"OpenRouter API error: {e}")
+        raise Exception(f"LLM API error: {e}")
 
 # Enhanced translation prompt with more detailed instructions
 def get_advanced_translation_prompt(text, source_lang, target_lang, formality="neutral", dialect=None, context=None):
@@ -462,9 +474,9 @@ Return your response as a JSON object with this exact structure:
         logger.info(f"Basic translating: '{text}' from {source_lang} to {target_lang}")
         
         try:
-            response_text = call_openrouter_api(prompt)
+            response_text = call_llm_api(prompt)
             if not response_text:
-                raise Exception("Empty response from OpenRouter")
+                raise Exception("Empty response from LLM API")
             
             # Clean up response text - remove markdown formatting if present
             response_text = response_text.strip()
@@ -561,9 +573,9 @@ def advanced_translate():
         logger.info(f"Translating: '{text}' from {source_lang} to {target_lang}")
         
         try:
-            response_text = call_openrouter_api(prompt)
+            response_text = call_llm_api(prompt)
             if not response_text:
-                raise Exception("Empty response from OpenRouter")
+                raise Exception("Empty response from LLM API")
                 
             # Parse JSON response
             translation_data = json.loads(response_text)
@@ -989,7 +1001,7 @@ def generate_vocabulary_questions(flashcards, difficulty, count):
     return questions
 
 def generate_grammar_questions(language, difficulty, count):
-    """Generate grammar-based questions using OpenRouter AI"""
+    """Generate grammar-based questions using LLM API"""
     questions = []
     
     try:
@@ -1005,7 +1017,7 @@ def generate_grammar_questions(language, difficulty, count):
             }}
             """
             
-            response_text = call_openrouter_api(prompt)
+            response_text = call_llm_api(prompt)
             try:
                 question_data = json.loads(response_text)
                 questions.append({
@@ -1030,7 +1042,7 @@ def generate_grammar_questions(language, difficulty, count):
     return questions
 
 def generate_conversation_questions(language, difficulty, count):
-    """Generate conversation-based questions using OpenRouter AI"""
+    """Generate conversation-based questions using LLM API"""
     questions = []
     
     try:
@@ -1048,7 +1060,7 @@ def generate_conversation_questions(language, difficulty, count):
             }}
             """
             
-            response_text = call_openrouter_api(prompt)
+            response_text = call_llm_api(prompt)
             try:
                 question_data = json.loads(response_text)
                 questions.append({
@@ -1616,11 +1628,11 @@ def avatar_conversation():
         Keep responses appropriate for {proficiency} level learners.
         """
 
-        # Generate response using OpenRouter
+        # Generate response using LLM API
         if not openrouter_client:
             return jsonify({'error': 'AI service temporarily unavailable'}), 503
             
-        response_text = call_openrouter_api(conversation_prompt)
+        response_text = call_llm_api(conversation_prompt)
         
         try:
             # Try to parse the JSON response

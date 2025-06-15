@@ -7,6 +7,9 @@
 !requirements.txt
 !app.py
 !config.py
+!models.py
+!db_service.py
+!migrate_to_sqlite.py
 !credentials/**
 !.dockerignore
 !data/** 

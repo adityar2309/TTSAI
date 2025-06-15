@@ -215,3 +215,7 @@
 2025-06-15 19:16:24,409 - app - INFO - Configuring OpenRouter with API key: sk-or-v1...c6b5
 2025-06-15 19:16:25,152 - app - ERROR - OpenRouter connection test failed: 401
 2025-06-15 19:16:25,156 - app - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-15 19:57:04,089 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-15 19:57:07,010 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-15 20:57:04,101 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-06-15 20:57:07,016 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
