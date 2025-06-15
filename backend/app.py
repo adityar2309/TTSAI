@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 import google.cloud.texttospeech as tts
 import google.cloud.speech as speech
-import google.generativeai as genai
 from google.cloud.speech_v1 import SpeechClient
 from google.cloud.texttospeech_v1 import TextToSpeechClient
 import logging
@@ -18,6 +17,7 @@ import threading
 from collections import defaultdict, deque
 import hashlib
 import uuid
+import requests
 from google.auth import default
 from fuzzywuzzy import fuzz
 import re
@@ -87,24 +87,44 @@ except Exception as e:
     logger.error(f"Failed to initialize Google Cloud TTS client: {e}")
     tts_client = None
 
-# Configure Gemini with enhanced error handling
-api_key = os.getenv('GEMINI_API_KEY')
-if not api_key:
-    logger.warning("GEMINI_API_KEY not found in environment variables")
-    logger.warning("Translation services will be limited. Set GEMINI_API_KEY for full functionality.")
-    model = None
+# Configure OpenRouter API with enhanced error handling
+openrouter_api_key = os.getenv('OPENROUTER_API_KEY')
+if not openrouter_api_key:
+    logger.warning("OPENROUTER_API_KEY not found in environment variables")
+    logger.warning("Translation services will be limited. Set OPENROUTER_API_KEY for full functionality.")
+    openrouter_client = None
 else:
     try:
-        logger.info(f"Configuring Gemini with API key: {api_key[:8]}...{api_key[-4:]}")
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-
-        # Test Gemini connection
-        test_response = model.generate_content("Test connection")
-        logger.info("Gemini connection test successful")
+        logger.info(f"Configuring OpenRouter with API key: {openrouter_api_key[:8]}...{openrouter_api_key[-4:]}")
+        
+        # Test OpenRouter connection
+        headers = {
+            "Authorization": f"Bearer {openrouter_api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        test_data = {
+            "model": "google/gemini-2.0-flash-exp:free",
+            "messages": [{"role": "user", "content": "Test connection"}]
+        }
+        
+        test_response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=test_data,
+            timeout=10
+        )
+        
+        if test_response.status_code == 200:
+            logger.info("OpenRouter connection test successful")
+            openrouter_client = True
+        else:
+            logger.error(f"OpenRouter connection test failed: {test_response.status_code}")
+            openrouter_client = None
+            
     except Exception as e:
-        logger.error(f"Failed to configure Gemini: {e}")
-        model = None
+        logger.error(f"Failed to configure OpenRouter: {e}")
+        openrouter_client = None
 
 # Enhanced rate limiting decorator
 def rate_limit(func):
@@ -150,6 +170,48 @@ def get_cached_result(cache_dict, key):
 def cache_result(cache_dict, key, result):
     """Cache a result with timestamp"""
     cache_dict[key] = (result, time.time())
+
+# OpenRouter API helper function
+def call_openrouter_api(prompt, model="google/gemini-2.0-flash-exp:free", max_tokens=4000):
+    """Make a call to OpenRouter API"""
+    if not openrouter_client or not openrouter_api_key:
+        raise Exception("OpenRouter API not configured")
+    
+    headers = {
+        "Authorization": f"Bearer {openrouter_api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": max_tokens,
+        "temperature": 0.7
+    }
+    
+    try:
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=data,
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            return result['choices'][0]['message']['content']
+        else:
+            error_msg = f"OpenRouter API error: {response.status_code}"
+            if response.text:
+                error_msg += f" - {response.text}"
+            raise Exception(error_msg)
+            
+    except requests.exceptions.Timeout:
+        raise Exception("OpenRouter API timeout")
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"OpenRouter API request failed: {e}")
+    except Exception as e:
+        raise Exception(f"OpenRouter API error: {e}")
 
 # Enhanced translation prompt with more detailed instructions
 def get_advanced_translation_prompt(text, source_lang, target_lang, formality="neutral", dialect=None, context=None):
@@ -249,7 +311,7 @@ def health_check():
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
             'services': {
-                'gemini': bool(genai.api_key),
+                'openrouter': bool(openrouter_client),
                 'speech_client': bool(speech_client),
                 'tts_client': bool(tts_client)
             }
@@ -354,7 +416,7 @@ def basic_translate():
             logger.info(f"Returning cached basic translation for: {text[:50]}...")
             return jsonify(cached_result)
         
-        if not model:
+        if not openrouter_client:
             return jsonify({'error': 'Translation service temporarily unavailable'}), 503
         
         # Generate basic translation prompt with romanization
@@ -389,12 +451,12 @@ Return your response as a JSON object with this exact structure:
         logger.info(f"Basic translating: '{text}' from {source_lang} to {target_lang}")
         
         try:
-            response = model.generate_content(prompt)
-            if not response or not response.text:
-                raise Exception("Empty response from Gemini")
+            response_text = call_openrouter_api(prompt)
+            if not response_text:
+                raise Exception("Empty response from OpenRouter")
             
             # Clean up response text - remove markdown formatting if present
-            response_text = response.text.strip()
+            response_text = response_text.strip()
             if response_text.startswith('```json'):
                 response_text = response_text[7:]
             if response_text.endswith('```'):
@@ -422,7 +484,7 @@ Return your response as a JSON object with this exact structure:
             return jsonify(translation_data)
             
         except Exception as e:
-            logger.error(f"Gemini API error in basic translate: {e}")
+            logger.error(f"OpenRouter API error in basic translate: {e}")
             return jsonify({
                 'error': 'Translation service error',
                 'details': 'Please try again later'
@@ -477,7 +539,7 @@ def advanced_translate():
             logger.info(f"Returning cached translation for: {text[:50]}...")
             return jsonify(cached_result)
         
-        if not model:
+        if not openrouter_client:
             return jsonify({'error': 'Translation service temporarily unavailable'}), 503
         
         # Generate prompt and get translation
@@ -488,12 +550,12 @@ def advanced_translate():
         logger.info(f"Translating: '{text}' from {source_lang} to {target_lang}")
         
         try:
-            response = model.generate_content(prompt)
-            if not response or not response.text:
-                raise Exception("Empty response from Gemini")
+            response_text = call_openrouter_api(prompt)
+            if not response_text:
+                raise Exception("Empty response from OpenRouter")
                 
             # Parse JSON response
-            translation_data = json.loads(response.text)
+            translation_data = json.loads(response_text)
             
             # Add metadata
             translation_data['metadata'] = {
@@ -513,14 +575,14 @@ def advanced_translate():
             return jsonify(translation_data)
             
         except json.JSONDecodeError as e:
-            logger.error(f"JSON decode error: {e}. Response: {response.text[:200]}")
+            logger.error(f"JSON decode error: {e}. Response: {response_text[:200]}")
             return jsonify({
                 'error': 'Translation service returned invalid format',
                 'details': 'Please try again'
             }), 500
             
-    except Exception as e:
-            logger.error(f"Gemini API error: {e}")
+        except Exception as e:
+            logger.error(f"OpenRouter API error: {e}")
             return jsonify({
                 'error': 'Translation service error',
                 'details': 'Please try again later'
@@ -916,7 +978,7 @@ def generate_vocabulary_questions(flashcards, difficulty, count):
     return questions
 
 def generate_grammar_questions(language, difficulty, count):
-    """Generate grammar-based questions using Gemini AI"""
+    """Generate grammar-based questions using OpenRouter AI"""
     questions = []
     
     try:
@@ -932,9 +994,9 @@ def generate_grammar_questions(language, difficulty, count):
             }}
             """
             
-            response = model.generate_content(prompt)
+            response_text = call_openrouter_api(prompt)
             try:
-                question_data = json.loads(response.text)
+                question_data = json.loads(response_text)
                 questions.append({
                     'id': str(uuid.uuid4()),
                     'type': 'multiple_choice',
@@ -957,7 +1019,7 @@ def generate_grammar_questions(language, difficulty, count):
     return questions
 
 def generate_conversation_questions(language, difficulty, count):
-    """Generate conversation-based questions using Gemini AI"""
+    """Generate conversation-based questions using OpenRouter AI"""
     questions = []
     
     try:
@@ -975,9 +1037,9 @@ def generate_conversation_questions(language, difficulty, count):
             }}
             """
             
-            response = model.generate_content(prompt)
+            response_text = call_openrouter_api(prompt)
             try:
-                question_data = json.loads(response.text)
+                question_data = json.loads(response_text)
                 questions.append({
                     'id': str(uuid.uuid4()),
                     'type': 'conversation',
@@ -1543,15 +1605,15 @@ def avatar_conversation():
         Keep responses appropriate for {proficiency} level learners.
         """
 
-        # Generate response using Gemini
-        if not model:
+        # Generate response using OpenRouter
+        if not openrouter_client:
             return jsonify({'error': 'AI service temporarily unavailable'}), 503
             
-        response = model.generate_content(conversation_prompt)
+        response_text = call_openrouter_api(conversation_prompt)
         
         try:
             # Try to parse the JSON response
-            conversation_data = json.loads(response.text)
+            conversation_data = json.loads(response_text)
         except json.JSONDecodeError:
             # Fallback response in character
             conversation_data = {

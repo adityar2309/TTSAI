@@ -207,3 +207,4 @@
 2025-06-15 18:57:47,090 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:47] "GET /api/avatars?language=ja HTTP/1.1" 200 -
 2025-06-15 18:57:49,123 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:49] "GET /api/avatars?language=zh HTTP/1.1" 200 -
 2025-06-15 18:57:51,173 - werkzeug - INFO - 127.0.0.1 - - [15/Jun/2025 18:57:51] "GET /api/avatar/emma_teacher?language=en HTTP/1.1" 200 -
+2025-06-15 19:04:13,158 - werkzeug - INFO -  * Detected change in 'C:\\Users\\qatty\\Downloads\\New folder (67)\\TTSAI\\backend\\app.py', reloading
