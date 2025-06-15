@@ -1,24 +1,8 @@
-# Python
+# Python bytecode only
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
+*.pyc
+*.pyo
+*.pyd
 
 # Virtual Environment
 venv/
@@ -33,23 +17,21 @@ ENV/
 # Local development
 .env
 .env.local
-*.log
 
 # Git
 .git
-.gitignore
 
-# Docker
-Dockerfile
-.dockerignore
+# Test files (but allow essential ones)
+test_*.py
+*_test.py
 
-# Allow important scripts
-!entrypoint.sh
-
-# Allow important Python modules
+# Allow all essential files
 !models.py
 !db_service.py
 !app.py
+!config.py
+!requirements.txt
+!entrypoint.sh
 
 # Allow credentials
 !credentials/
