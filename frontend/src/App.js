@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from '@mui/material';
 import Layout from './components/Layout';
 import Translator from './components/Translator';
 import { deepPurple, amber } from '@mui/material/colors';
+import './styles/gradients.css';
 
 function App() {
   const [mode, setMode] = useState(() => {

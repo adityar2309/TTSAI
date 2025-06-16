@@ -81,6 +81,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import AdvancedTranslation from './AdvancedTranslation';
 import LearningTools from './LearningTools';
+import '../styles/gradients.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -837,9 +838,334 @@ export const Translator = ({ initialMode = 'type' }) => {
         {/* Translation View */}
       {activeView === 'translate' && (
         <Stack spacing={3}>
-          {/* Language Selection */}
-            <Card elevation={2}>
-              <CardContent>
+          {/* Modern Translation Card */}
+          <Card className="card-gradient shadow-modern rounded-modern">
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h4" className="text-gradient" align="center" gutterBottom>
+                Universal Translator
+              </Typography>
+              
+              {/* Language Selection */}
+              <Box sx={{ mb: 4 }}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={5}>
+                    <FormControl fullWidth>
+                      <InputLabel>From</InputLabel>
+                      <Select
+                        value={sourceLang}
+                        onChange={(e) => setSourceLang(e.target.value)}
+                        label="From"
+                        className="select-modern"
+                        startAdornment={
+                          isDetecting && (
+                            <CircularProgress size={16} sx={{ mr: 1 }} />
+                          )
+                        }
+                      >
+                        <MenuItem value="auto">
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <AutorenewIcon fontSize="small" />
+                            Auto-detect
+                          </Box>
+                        </MenuItem>
+                        {languages.map((lang) => (
+                          <MenuItem key={lang.code} value={lang.code}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography>{lang.native_name || lang.name}</Typography>
+                              {lang.tts_supported && <VolumeUpIcon fontSize="small" color="action" />}
+                              {lang.speech_recognition_supported && <MicIcon fontSize="small" color="action" />}
+                            </Box>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={2} sx={{ textAlign: 'center' }}>
+                    <Tooltip title="Swap languages">
+                      <IconButton 
+                        onClick={handleSwapLanguages}
+                        disabled={sourceLang === 'auto'}
+                        className="button-gradient"
+                        sx={{ 
+                          color: 'white',
+                          '&:disabled': { 
+                            background: 'rgba(0,0,0,0.12)', 
+                            color: 'rgba(0,0,0,0.26)' 
+                          }
+                        }}
+                      >
+                        <SwapHorizIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+
+                  <Grid item xs={12} sm={5}>
+                    <FormControl fullWidth>
+                      <InputLabel>To</InputLabel>
+                      <Select
+                        value={targetLang}
+                        onChange={(e) => setTargetLang(e.target.value)}
+                        label="To"
+                        className="select-modern"
+                      >
+                        {languages.map((lang) => (
+                          <MenuItem key={lang.code} value={lang.code}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography>{lang.native_name || lang.name}</Typography>
+                              {lang.tts_supported && <VolumeUpIcon fontSize="small" color="action" />}
+                            </Box>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+
+                {/* Advanced Options */}
+                <Collapse in={showAdvanced}>
+                  <Box sx={{ mt: 3 }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={4}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Formality</InputLabel>
+                          <Select
+                            value={formality}
+                            onChange={(e) => handleSettingsChange('formality', e.target.value)}
+                            label="Formality"
+                            className="select-modern"
+                          >
+                            {formalityLevels.map((level) => (
+                              <MenuItem key={level.value} value={level.value}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <span>{level.icon}</span>
+                                  <Box>
+                                    <Typography variant="body2">{level.label}</Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {level.description}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      {dialects[sourceLang] && (
+                        <Grid item xs={12} sm={4}>
+                          <FormControl fullWidth size="small">
+                            <InputLabel>Dialect</InputLabel>
+                            <Select
+                              value={dialect}
+                              onChange={(e) => handleSettingsChange('dialect', e.target.value)}
+                              label="Dialect"
+                              className="select-modern"
+                            >
+                              <MenuItem value="">Default</MenuItem>
+                              {dialects[sourceLang].map((d) => (
+                                <MenuItem key={d.value} value={d.value}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <span>{d.flag}</span>
+                                    {d.label}
+                                  </Box>
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      )}
+
+                      <Grid item xs={12} sm={4}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Voice</InputLabel>
+                          <Select
+                            value={voiceGender}
+                            onChange={(e) => handleSettingsChange('voiceGender', e.target.value)}
+                            label="Voice"
+                            className="select-modern"
+                          >
+                            {voiceOptions.map((voice) => (
+                              <MenuItem key={voice.value} value={voice.value}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <span>{voice.icon}</span>
+                                  {voice.label}
+                                </Box>
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Collapse>
+
+                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Button
+                    startIcon={<TuneIcon />}
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    size="small"
+                    variant="outlined"
+                  >
+                    {showAdvanced ? 'Hide' : 'Show'} Options
+                  </Button>
+                  
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Tooltip title="History">
+                      <IconButton onClick={() => setShowHistory(true)} size="small">
+                        <Badge badgeContent={history.length > 0 ? history.length : null} color="primary">
+                          <HistoryIcon />
+                        </Badge>
+                      </IconButton>
+                    </Tooltip>
+                    
+                    <Tooltip title="Settings">
+                      <IconButton onClick={() => setShowSettings(true)} size="small">
+                        <SettingsIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Input/Output Section */}
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <Box>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                      <Typography variant="subtitle1" fontWeight="600">
+                        Source Text
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {inputText.length}/1000
+                      </Typography>
+                    </Stack>
+                    
+                    <Box sx={{ position: 'relative' }}>
+                      <TextField
+                        multiline
+                        rows={5}
+                        fullWidth
+                        placeholder="Type or speak your text here..."
+                        value={inputText}
+                        onChange={handleTextChange}
+                        className="input-modern"
+                        inputProps={{ 
+                          maxLength: 1000,
+                          style: { 
+                            fontFamily: getFontFamily(sourceLang),
+                            direction: getTextDirection(sourceLang)
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { border: 'none' },
+                          },
+                        }}
+                      />
+                      
+                      {speechSupported && (
+                        <IconButton
+                          sx={{
+                            position: 'absolute',
+                            bottom: 8,
+                            right: 8,
+                            color: 'white'
+                          }}
+                          className={isRecording ? 'button-gradient animate-pulse' : 'button-gradient'}
+                          onClick={toggleRecording}
+                          size="small"
+                        >
+                          <MicIcon className={isRecording ? 'animate-wave' : ''} />
+                        </IconButton>
+                      )}
+                    </Box>
+                    
+                    <Button
+                      onClick={() => handleTranslate(false)}
+                      disabled={!inputText.trim() || isTranslating}
+                      className="button-gradient"
+                      fullWidth
+                      sx={{ mt: 2, py: 1.5 }}
+                      size="large"
+                    >
+                      {isTranslating ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <CircularProgress size={20} color="inherit" />
+                          Translating...
+                        </Box>
+                      ) : (
+                        'Translate'
+                      )}
+                    </Button>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="600" mb={2}>
+                      Translation
+                    </Typography>
+                    
+                    <TextField
+                      multiline
+                      rows={5}
+                      fullWidth
+                      placeholder="Translation will appear here..."
+                      value={translatedText}
+                      readOnly
+                      className="input-modern"
+                      inputProps={{
+                        style: { 
+                          fontFamily: getFontFamily(targetLang),
+                          direction: getTextDirection(targetLang),
+                          backgroundColor: '#f8fafc'
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': { border: 'none' },
+                          backgroundColor: '#f8fafc'
+                        },
+                      }}
+                    />
+                    
+                    <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => playTranslatedAudio(translatedText)}
+                        disabled={!translatedText}
+                        startIcon={<VolumeUpIcon />}
+                      >
+                        Play
+                      </Button>
+                      
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleCopyText(translatedText)}
+                        disabled={!translatedText}
+                        startIcon={<ContentCopyIcon />}
+                      >
+                        Copy
+                      </Button>
+                      
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={saveAsFlashcard}
+                        disabled={!translatedText}
+                        startIcon={<BookmarkIcon />}
+                      >
+                        Save
+                      </Button>
+                    </Stack>
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={5}>
                     <FormControl fullWidth>

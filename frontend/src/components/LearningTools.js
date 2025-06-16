@@ -41,8 +41,15 @@ import {
   Timeline as TimelineIcon,
   Send as SendIcon,
   SwapHoriz as SwapHorizIcon,
+  MicRounded as MicIcon,
+  BookRounded as BookIcon,
+  StarRounded as StarIcon,
+  CircleRounded as CircleIcon,
+  EditRounded as EditIcon,
+  CloseRounded as CloseIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
+import '../styles/gradients.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -186,6 +193,272 @@ const LearningTools = ({ userId, language }) => {
     } catch (err) {
       console.error('Error playing audio:', err);
     }
+  };
+
+  // Learning Dashboard Component
+  const LearningDashboard = () => {
+    const learningModules = [
+      {
+        id: 'word-of-day',
+        title: 'Word of the Day',
+        icon: '💡',
+        content: wordOfDay,
+        color: 'avatar-gradient-blue'
+      },
+      {
+        id: 'flashcards',
+        title: 'Flashcards',
+        icon: '⚡',
+        content: {
+          totalCards: flashcards.length,
+          reviewToday: flashcards.filter(card => card.next_review && new Date(card.next_review) <= new Date()).length,
+          mastered: flashcards.filter(card => card.mastery_level >= 5).length,
+          progress: flashcards.length > 0 ? (flashcards.filter(card => card.mastery_level >= 5).length / flashcards.length) * 100 : 0
+        },
+        color: 'avatar-gradient-green'
+      },
+      {
+        id: 'quizzes',
+        title: 'Quizzes',
+        icon: '📝',
+        content: {
+          lastScore: progress?.quiz_scores?.length > 0 ? progress.quiz_scores[progress.quiz_scores.length - 1].score : 0,
+          totalCompleted: progress?.quiz_scores?.length || 0,
+          averageScore: progress?.quiz_scores?.length > 0 ? 
+            progress.quiz_scores.reduce((sum, score) => sum + score.score, 0) / progress.quiz_scores.length : 0,
+          nextQuiz: 'Grammar Basics'
+        },
+        color: 'avatar-gradient-purple'
+      },
+      {
+        id: 'conversation',
+        title: 'AI Conversation',
+        icon: '🗣️',
+        content: {
+          activeAvatar: 'Maria',
+          totalConversations: progress?.practice_sessions?.filter(s => s.session_type === 'conversation').length || 0,
+          lastTopic: 'Travel Planning'
+        },
+        color: 'avatar-gradient-orange'
+      }
+    ];
+
+    const achievements = [
+      { name: 'First Translation', unlocked: true, icon: '🎯' },
+      { name: 'Week Streak', unlocked: progress?.current_streak >= 7, icon: '🔥' },
+      { name: 'Quiz Master', unlocked: (progress?.quiz_scores?.length || 0) >= 10, icon: '🏆' },
+      { name: 'Conversation Expert', unlocked: (progress?.practice_sessions?.filter(s => s.session_type === 'conversation').length || 0) >= 5, icon: '💬' }
+    ];
+
+    return (
+      <Box className="animate-fade-in">
+        {/* Progress Overview */}
+        <Card className="card-gradient shadow-modern" sx={{ mb: 3 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="h4" className="text-gradient" align="center" gutterBottom>
+              Your Learning Journey
+            </Typography>
+            
+            <Grid container spacing={4} sx={{ mb: 4 }}>
+              <Grid item xs={6} md={3}>
+                <Box textAlign="center">
+                  <Typography variant="h3" className="text-gradient" fontWeight="bold">
+                    {progress?.total_xp || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">Total XP</Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <Box textAlign="center">
+                  <Typography variant="h3" className="text-gradient" fontWeight="bold">
+                    {progress?.current_streak || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">Day Streak</Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <Box textAlign="center">
+                  <Typography variant="h3" className="text-gradient" fontWeight="bold">
+                    {flashcards.length}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">Words Learned</Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <Box textAlign="center">
+                  <Typography variant="h3" className="text-gradient" fontWeight="bold">
+                    Level {progress?.level || 1}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">Current Level</Typography>
+                </Box>
+              </Grid>
+            </Grid>
+            
+            <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2">Progress to Level {(progress?.level || 1) + 1}</Typography>
+                <Typography variant="body2">{progress?.total_xp || 0}/200 XP</Typography>
+              </Box>
+              <LinearProgress 
+                variant="determinate" 
+                value={((progress?.total_xp || 0) % 200) / 200 * 100} 
+                className="progress-gradient"
+                sx={{ height: 8, borderRadius: 4 }}
+              />
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Learning Modules */}
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          {learningModules.map((module) => (
+            <Grid item xs={12} md={6} key={module.id}>
+              <Card className="card-gradient transition-modern" sx={{ height: '100%', '&:hover': { transform: 'translateY(-4px)' } }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+                    <Box className={`${module.color} rounded-modern`} sx={{ p: 1.5, color: 'white', fontSize: '1.5rem' }}>
+                      {module.icon}
+                    </Box>
+                    <Typography variant="h6" fontWeight="600">
+                      {module.title}
+                    </Typography>
+                  </Stack>
+
+                  {module.id === 'word-of-day' && module.content && (
+                    <Box>
+                      <Paper sx={{ p: 3, mb: 2, bgcolor: 'grey.50', textAlign: 'center' }}>
+                        <Typography variant="h5" fontWeight="bold">
+                          {module.content.word}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" fontFamily="monospace">
+                          {module.content.pronunciation}
+                        </Typography>
+                        <Typography className="text-gradient" fontWeight="600">
+                          {module.content.translation}
+                        </Typography>
+                      </Paper>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        {module.content.definition}
+                      </Typography>
+                      <Stack direction="row" spacing={1}>
+                        <Button size="small" variant="outlined" startIcon={<VolumeUpIcon />}>
+                          Listen
+                        </Button>
+                        <Button size="small" variant="outlined" startIcon={<BookIcon />}>
+                          Learn More
+                        </Button>
+                      </Stack>
+                    </Box>
+                  )}
+
+                  {module.id === 'flashcards' && (
+                    <Box>
+                      <Grid container spacing={2} sx={{ mb: 2, textAlign: 'center' }}>
+                        <Grid item xs={4}>
+                          <Typography variant="h6" className="text-gradient">{module.content.totalCards}</Typography>
+                          <Typography variant="caption">Total</Typography>
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Typography variant="h6" className="text-gradient">{module.content.reviewToday}</Typography>
+                          <Typography variant="caption">Review</Typography>
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Typography variant="h6" className="text-gradient">{module.content.mastered}</Typography>
+                          <Typography variant="caption">Mastered</Typography>
+                        </Grid>
+                      </Grid>
+                      <LinearProgress 
+                        variant="determinate" 
+                        value={module.content.progress} 
+                        className="progress-gradient"
+                        sx={{ height: 6, borderRadius: 3, mb: 2 }}
+                      />
+                      <Button className="button-gradient" fullWidth onClick={() => setActiveTab(1)}>
+                        Start Review
+                      </Button>
+                    </Box>
+                  )}
+
+                  {module.id === 'quizzes' && (
+                    <Box>
+                      <Stack spacing={2} sx={{ mb: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="body2">Last Score:</Typography>
+                          <Chip label={`${Math.round(module.content.lastScore)}%`} className="badge-secondary" size="small" />
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="body2">Average:</Typography>
+                          <Typography variant="body2" fontWeight="600">{Math.round(module.content.averageScore)}%</Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Next: {module.content.nextQuiz}
+                        </Typography>
+                      </Stack>
+                      <Button className="button-gradient" fullWidth onClick={() => setActiveTab(2)}>
+                        Start New Quiz
+                      </Button>
+                    </Box>
+                  )}
+
+                  {module.id === 'conversation' && (
+                    <Box>
+                      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                        <Avatar className="avatar-gradient-pink" sx={{ width: 32, height: 32, fontSize: '0.875rem' }}>
+                          M
+                        </Avatar>
+                        <Box>
+                          <Typography variant="body2" fontWeight="600">{module.content.activeAvatar}</Typography>
+                          <Typography variant="caption" color="text.secondary">Spanish Teacher</Typography>
+                        </Box>
+                      </Stack>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Last topic: {module.content.lastTopic}
+                      </Typography>
+                      <Button className="button-gradient" fullWidth onClick={() => setActiveTab(3)}>
+                        Continue Conversation
+                      </Button>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Achievements */}
+        <Card className="card-gradient">
+          <CardContent sx={{ p: 3 }}>
+            <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+              <CircleIcon className="text-gradient" />
+              <Typography variant="h6" fontWeight="600">Achievements</Typography>
+            </Stack>
+            
+            <Grid container spacing={2}>
+              {achievements.map((achievement) => (
+                <Grid item xs={6} md={3} key={achievement.name}>
+                  <Paper
+                    className={achievement.unlocked ? 'glass-effect' : ''}
+                    sx={{
+                      p: 2,
+                      textAlign: 'center',
+                      opacity: achievement.unlocked ? 1 : 0.5,
+                      border: achievement.unlocked ? '1px solid rgba(102, 126, 234, 0.3)' : '1px solid rgba(0,0,0,0.1)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <Typography variant="h4" sx={{ mb: 1 }}>{achievement.icon}</Typography>
+                    <Typography variant="body2" fontWeight="600">{achievement.name}</Typography>
+                    {achievement.unlocked && (
+                      <Chip label="Unlocked" className="badge-success" size="small" sx={{ mt: 1 }} />
+                    )}
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      </Box>
+    );
   };
 
   const AvatarConversation = ({ language, userId }) => {
@@ -1202,17 +1475,17 @@ const LearningTools = ({ userId, language }) => {
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
+    <Box sx={{ width: '100%', maxWidth: '1200px', mx: 'auto', p: 2 }}>
       {/* Show message if language is not set */}
       {(!language || language.trim() === '') ? (
-        <Card elevation={3}>
+        <Card className="card-gradient shadow-modern">
           <CardContent>
             <Box display="flex" flexDirection="column" alignItems="center" p={4}>
-              <SchoolIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
+              <SchoolIcon className="text-gradient" sx={{ fontSize: 48, mb: 2 }} />
+              <Typography variant="h5" className="text-gradient" gutterBottom>
                 Select a Language to Start Learning
               </Typography>
-              <Typography variant="body2" color="text.secondary" align="center">
+              <Typography variant="body1" color="text.secondary" align="center">
                 Please select a target language in the translator to access learning tools.
               </Typography>
             </Box>
@@ -1220,19 +1493,145 @@ const LearningTools = ({ userId, language }) => {
         </Card>
       ) : (
         <>
-          <Tabs 
-            value={activeTab} 
-            onChange={(e, newValue) => setActiveTab(newValue)}
-            variant="fullWidth"
-            sx={{ mb: 3 }}
-          >
-            <Tab icon={<FlashOnIcon />} label="Practice" />
-            <Tab icon={<QuizIcon />} label="Quiz" />
-            <Tab icon={<TimelineIcon />} label="Progress" />
-          </Tabs>
+          {/* Modern Tab Navigation */}
+          <Card className="card-gradient" sx={{ mb: 3 }}>
+            <CardContent sx={{ p: 2 }}>
+              <Tabs 
+                value={activeTab} 
+                onChange={(e, newValue) => setActiveTab(newValue)}
+                variant="fullWidth"
+                                sx={{
+                  '& .MuiTab-root': {
+                    borderRadius: 2,
+                    mx: 0.5,
+                    fontWeight: 600,
+                  },
+                  '& .Mui-selected': {
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white !important',
+                  }
+                }}
+              >
+                <Tab 
+                  icon={<TimelineIcon />} 
+                  label="Dashboard" 
+                  value={0}
+                />
+                <Tab 
+                  icon={<FlashOnIcon />} 
+                  label="Flashcards" 
+                  value={1}
+                />
+                <Tab 
+                  icon={<QuizIcon />} 
+                  label="Quizzes" 
+                  value={2}
+                />
+                <Tab 
+                  icon={<SendIcon />} 
+                  label="AI Conversation" 
+                  value={3}
+                />
+              </Tabs>
+            </CardContent>
+          </Card>
 
-          {/* Practice Tab */}
-          {activeTab === 0 && (
+          {/* Tab Content */}
+          {activeTab === 0 && <LearningDashboard />}
+          
+          {/* Flashcards Tab */}
+          {activeTab === 1 && (
+            <Card className="card-gradient">
+              <CardContent sx={{ p: 4 }}>
+                <Typography variant="h5" className="text-gradient" gutterBottom>
+                  Flashcard Review
+                </Typography>
+                {flashcards.length > 0 ? (
+                  <Box>
+                    <Box
+                      onClick={() => setShowAnswer(!showAnswer)}
+                      className="transition-modern card-gradient"
+                      sx={{
+                        minHeight: 250,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        p: 4,
+                        borderRadius: 3,
+                        '&:hover': {
+                          transform: 'scale(1.02)',
+                        },
+                      }}
+                    >
+                      <Typography variant="h3" align="center" className="text-gradient" gutterBottom>
+                        {showAnswer 
+                          ? flashcards[currentFlashcardIndex].translated_text
+                          : flashcards[currentFlashcardIndex].original_text
+                        }
+                      </Typography>
+                      {showAnswer && (
+                        <IconButton 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            playAudio(flashcards[currentFlashcardIndex].translated_text);
+                          }}
+                          className="button-gradient"
+                          sx={{ mt: 2, color: 'white' }}
+                        >
+                          <VolumeUpIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                    <Stack 
+                      direction="row" 
+                      justifyContent="space-between" 
+                      alignItems="center"
+                      sx={{ mt: 3 }}
+                    >
+                      <Button 
+                        variant="outlined" 
+                        onClick={() => handleFlashcardNavigation('prev')}
+                        startIcon={<ArrowBackIcon />}
+                      >
+                        Previous
+                      </Button>
+                      <Chip 
+                        label={`${currentFlashcardIndex + 1} / ${flashcards.length}`}
+                        className="badge-secondary"
+                      />
+                      <Button 
+                        variant="outlined" 
+                        onClick={() => handleFlashcardNavigation('next')}
+                        endIcon={<ArrowForwardIcon />}
+                      >
+                        Next
+                      </Button>
+                    </Stack>
+                  </Box>
+                ) : (
+                  <Box textAlign="center" py={4}>
+                    <Typography variant="h6" color="text.secondary">
+                      No flashcards available
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      Start translating to create your first flashcard!
+                    </Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Quiz Tab */}
+          {activeTab === 2 && <QuizMode language={language} userId={userId} />}
+          
+          {/* Conversation Tab */}
+          {activeTab === 3 && <AvatarConversation language={language} userId={userId} />}
+
+          {/* Legacy Practice Tab (Remove old content) */}
+          {false && (
             <Stack spacing={3}>
               {/* Word of the Day Card */}
               <Card elevation={3}>
