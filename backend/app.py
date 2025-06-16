@@ -363,10 +363,11 @@ Return ONLY a valid JSON response with these exact keys:
 }}"""
 
 @app.route('/api/health', methods=['GET'])
+@rate_limit
 def health_check():
-    """Enhanced health check endpoint"""
+    """Health check endpoint with detailed service status"""
     try:
-        health_status = {
+        service_status = {
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
             'services': {
@@ -375,9 +376,170 @@ def health_check():
                 'tts_client': bool(tts_client)
             }
         }
-        return jsonify(health_status)
+        return jsonify(service_status)
     except Exception as e:
+        logger.error(f"Health check error: {e}")
         return jsonify({'status': 'unhealthy', 'error': str(e)}), 500
+
+@app.route('/api/supported-languages', methods=['GET'])
+@rate_limit
+def get_supported_languages():
+    """Get list of supported languages with their capabilities"""
+    try:
+        # Define supported languages with their capabilities
+        supported_languages = [
+            {
+                "code": "en",
+                "name": "English",
+                "native_name": "English",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "es", 
+                "name": "Spanish",
+                "native_name": "Español",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "fr",
+                "name": "French", 
+                "native_name": "Français",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "de",
+                "name": "German",
+                "native_name": "Deutsch", 
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "it",
+                "name": "Italian",
+                "native_name": "Italiano",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "pt",
+                "name": "Portuguese",
+                "native_name": "Português",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "ru",
+                "name": "Russian",
+                "native_name": "Русский",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "ja",
+                "name": "Japanese",
+                "native_name": "日本語",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "ko",
+                "name": "Korean", 
+                "native_name": "한국어",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "zh",
+                "name": "Chinese (Simplified)",
+                "native_name": "简体中文",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "zh-TW",
+                "name": "Chinese (Traditional)", 
+                "native_name": "繁體中文",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "ar",
+                "name": "Arabic",
+                "native_name": "العربية",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "hi",
+                "name": "Hindi",
+                "native_name": "हिन्दी", 
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "th",
+                "name": "Thai",
+                "native_name": "ไทย",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "vi",
+                "name": "Vietnamese",
+                "native_name": "Tiếng Việt",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "nl",
+                "name": "Dutch",
+                "native_name": "Nederlands",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "pl",
+                "name": "Polish",
+                "native_name": "Polski",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "tr",
+                "name": "Turkish",
+                "native_name": "Türkçe",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "sv",
+                "name": "Swedish",
+                "native_name": "Svenska",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            },
+            {
+                "code": "da",
+                "name": "Danish",
+                "native_name": "Dansk",
+                "tts_supported": True,
+                "speech_recognition_supported": True
+            }
+        ]
+        
+        return jsonify({
+            "languages": supported_languages,
+            "total_languages": len(supported_languages),
+            "tts_supported_count": sum(1 for lang in supported_languages if lang["tts_supported"]),
+            "speech_recognition_supported_count": sum(1 for lang in supported_languages if lang["speech_recognition_supported"])
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching supported languages: {e}")
+        return jsonify({'error': 'Failed to fetch supported languages'}), 500
 
 @app.route('/api/debug/data-status', methods=['GET'])
 def debug_data_status():

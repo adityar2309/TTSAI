@@ -180,7 +180,8 @@ MIT License - feel free to use this project for your own purposes.
 
 ## Acknowledgments
 
-- Google Cloud Platform for AI services
+- Google AI Studio for Gemini AI services
+- Google Cloud Platform for TTS/STT services
 - Material-UI team for the component library
 - React team for the framework
 - Flask team for the backend framework 

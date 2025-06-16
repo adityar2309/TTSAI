@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 import os
+import pathlib
 
 Base = declarative_base()
 
@@ -183,6 +184,15 @@ Index('idx_analytics_user_event', Analytics.user_id, Analytics.event_type)
 
 # Database setup
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///ttsai.db')
+
+# Ensure the database directory exists for SQLite
+if DATABASE_URL.startswith('sqlite:///'):
+    db_path = DATABASE_URL.replace('sqlite:///', '')
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        pathlib.Path(db_dir).mkdir(parents=True, exist_ok=True)
+        print(f"Created database directory: {db_dir}")
+
 engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

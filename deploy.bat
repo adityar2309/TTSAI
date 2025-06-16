@@ -15,6 +15,7 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
+echo ✓ Google Cloud CLI found
 
 REM Check authentication
 echo [2/6] Checking authentication...
@@ -26,12 +27,14 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
+echo ✓ Google Cloud authentication verified
 
-REM Check if OPENROUTER_API_KEY is set
+REM Check if GEMINI_API_KEY is set
 echo [3/6] Checking environment variables...
-if "%OPENROUTER_API_KEY%"=="" (
-    echo WARNING: OPENROUTER_API_KEY is not set. The backend will run with limited functionality.
-    echo Set it with: set OPENROUTER_API_KEY=your_api_key_here
+if "%GEMINI_API_KEY%"=="" (
+    echo WARNING: GEMINI_API_KEY is not set. The backend will run with limited functionality.
+    echo Set it with: set GEMINI_API_KEY=your_google_ai_studio_api_key_here
+    echo Get your API key from: https://aistudio.google.com/app/apikey
     set /p continue="Continue deployment anyway? (y/N): "
     if /i not "!continue!"=="y" (
         echo Deployment cancelled.
@@ -39,7 +42,7 @@ if "%OPENROUTER_API_KEY%"=="" (
         exit /b 1
     )
 ) else (
-    echo ✓ OPENROUTER_API_KEY is set: %OPENROUTER_API_KEY:~0,8%...
+    echo ✓ GEMINI_API_KEY is set: %GEMINI_API_KEY:~0,8%...
 )
 
 REM Change to backend directory
@@ -69,10 +72,10 @@ echo [5/6] Deploying to Cloud Run...
 cd /d "%~dp0"
 
 REM Set environment variables for deployment
-if "%OPENROUTER_API_KEY%"=="" (
-    set ENV_VARS="DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production"
+if "%GEMINI_API_KEY%"=="" (
+    set "ENV_VARS=DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production"
 ) else (
-    set ENV_VARS="OPENROUTER_API_KEY=%OPENROUTER_API_KEY%,DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production"
+    set "ENV_VARS=GEMINI_API_KEY=%GEMINI_API_KEY%,DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production"
 )
 
 echo Deploying with configuration:
@@ -82,7 +85,7 @@ echo   - Memory: 2Gi
 echo   - CPU: 2
 echo   - Max instances: 100
 echo   - Min instances: 0
-echo   - Environment: %ENV_VARS%
+echo   - Environment: Using Google AI Studio (Gemini)
 
 gcloud run deploy ttsai-backend ^
   --image gcr.io/ttsai-461209/ttsai-backend:latest ^
@@ -121,6 +124,10 @@ if not "%SERVICE_URL%"=="" (
     echo ✓ Health Check: %SERVICE_URL%/api/health
     echo ✓ Testing with basic request...
     
+    REM Wait for service to be ready
+    echo Waiting for service to start up...
+    timeout /t 10 /nobreak >nul
+    
     REM Test the health endpoint
     curl -s "%SERVICE_URL%/api/health" >nul 2>&1
     if errorlevel 1 (
@@ -135,6 +142,9 @@ if not "%SERVICE_URL%"=="" (
     echo 1. Update frontend API_BASE_URL to: %SERVICE_URL%/api
     echo 2. Test the learning tools with: python test_learning_tools_deployed.py
     echo 3. Redeploy frontend if needed
+    echo.
+    echo To set your API key for next time:
+    echo set GEMINI_API_KEY=your_google_ai_studio_api_key_here
 ) else (
     echo ⚠️  Could not retrieve service URL. Check deployment manually.
 )
