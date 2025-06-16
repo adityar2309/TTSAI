@@ -816,6 +816,260 @@ def advanced_translate():
             'details': 'An unexpected error occurred'
         }), 500
 
+@app.route('/api/text-to-speech', methods=['POST'])
+@rate_limit
+def text_to_speech():
+    """Enhanced Text-to-Speech endpoint with multiple language support"""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+            
+        # Validate required fields
+        text = data.get('text', '').strip()
+        language = data.get('language', 'en')
+        voice_gender = data.get('voiceGender', 'NEUTRAL')
+        
+        if not text:
+            return jsonify({'error': 'Text is required'}), 400
+            
+        if len(text) > 500:
+            return jsonify({'error': 'Text too long (max 500 characters)'}), 400
+        
+        # Check cache first
+        cache_key = get_cache_key({
+            'text': text, 'language': language, 'voice_gender': voice_gender
+        })
+        
+        cached_result = get_cached_result(tts_cache, cache_key)
+        if cached_result:
+            logger.info(f"Returning cached TTS for: {text[:30]}...")
+            return jsonify(cached_result)
+        
+        # Try Google Cloud TTS first
+        if tts_client:
+            try:
+                # Map language codes to Google TTS format
+                lang_mapping = {
+                    'en': 'en-US',
+                    'es': 'es-ES', 
+                    'fr': 'fr-FR',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-BR',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'zh': 'zh-CN',
+                    'zh-CN': 'zh-CN',
+                    'zh-TW': 'zh-TW',
+                    'ru': 'ru-RU',
+                    'ar': 'ar-XA',
+                    'hi': 'hi-IN',
+                    'th': 'th-TH',
+                    'vi': 'vi-VN',
+                    'nl': 'nl-NL',
+                    'pl': 'pl-PL',
+                    'tr': 'tr-TR',
+                    'sv': 'sv-SE',
+                    'da': 'da-DK'
+                }
+                
+                google_lang = lang_mapping.get(language, 'en-US')
+                
+                # Configure voice
+                voice_gender_mapping = {
+                    'MALE': tts.SsmlVoiceGender.MALE,
+                    'FEMALE': tts.SsmlVoiceGender.FEMALE,
+                    'NEUTRAL': tts.SsmlVoiceGender.NEUTRAL
+                }
+                
+                voice = tts.VoiceSelectionParams(
+                    language_code=google_lang,
+                    ssml_gender=voice_gender_mapping.get(voice_gender.upper(), tts.SsmlVoiceGender.NEUTRAL)
+                )
+                
+                # Configure audio
+                audio_config = tts.AudioConfig(
+                    audio_encoding=tts.AudioEncoding.MP3,
+                    speaking_rate=1.0,
+                    pitch=0.0
+                )
+                
+                # Synthesize speech
+                synthesis_input = tts.SynthesisInput(text=text)
+                response = tts_client.synthesize_speech(
+                    input=synthesis_input,
+                    voice=voice,
+                    audio_config=audio_config
+                )
+                
+                # Encode audio to base64
+                audio_base64 = base64.b64encode(response.audio_content).decode('utf-8')
+                
+                result = {
+                    'audio': audio_base64,
+                    'format': 'mp3',
+                    'text': text,
+                    'language': language,
+                    'voice_gender': voice_gender,
+                    'provider': 'google_cloud_tts',
+                    'success': True
+                }
+                
+                # Cache the result
+                cache_result(tts_cache, cache_key, result)
+                
+                logger.info(f"TTS synthesis completed for: {text[:30]}...")
+                return jsonify(result)
+                
+            except Exception as e:
+                logger.warning(f"Google Cloud TTS failed: {e}")
+                # Continue to fallback
+        
+        # Fallback: Return error if Google TTS fails
+        logger.error("TTS service temporarily unavailable")
+        return jsonify({
+            'error': 'Text-to-speech service temporarily unavailable',
+            'details': 'Please try again later or check your internet connection',
+            'text': text,
+            'language': language,
+            'success': False
+        }), 503
+        
+    except Exception as e:
+        logger.error(f"TTS error: {e}", exc_info=True)
+        return jsonify({
+            'error': 'Text-to-speech failed',
+            'details': 'An unexpected error occurred',
+            'success': False
+                 }), 500
+
+@app.route('/api/speech-to-text', methods=['POST'])
+@rate_limit
+def speech_to_text():
+    """Enhanced Speech-to-Text endpoint for audio transcription"""
+    try:
+        # Check if audio data is provided
+        if 'audio' not in request.files and 'audioData' not in request.form:
+            return jsonify({'error': 'No audio data provided'}), 400
+        
+        language = request.form.get('language', 'en')
+        
+        # Get audio data (either from file upload or base64 data)
+        audio_data = None
+        if 'audio' in request.files:
+            audio_file = request.files['audio']
+            audio_data = audio_file.read()
+        elif 'audioData' in request.form:
+            try:
+                # Decode base64 audio data
+                audio_base64 = request.form.get('audioData')
+                if audio_base64.startswith('data:audio'):
+                    # Remove data URL prefix
+                    audio_base64 = audio_base64.split(',')[1]
+                audio_data = base64.b64decode(audio_base64)
+            except Exception as e:
+                return jsonify({'error': f'Invalid audio data format: {e}'}), 400
+        
+        if not audio_data:
+            return jsonify({'error': 'No valid audio data found'}), 400
+        
+        # Try Google Cloud Speech-to-Text
+        if speech_client:
+            try:
+                # Map language codes to Google Speech format
+                lang_mapping = {
+                    'en': 'en-US',
+                    'es': 'es-ES',
+                    'fr': 'fr-FR',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-BR',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'zh': 'zh-CN',
+                    'zh-CN': 'zh-CN',
+                    'zh-TW': 'zh-TW',
+                    'ru': 'ru-RU',
+                    'ar': 'ar-SA',
+                    'hi': 'hi-IN',
+                    'th': 'th-TH',
+                    'vi': 'vi-VN',
+                    'nl': 'nl-NL',
+                    'pl': 'pl-PL',
+                    'tr': 'tr-TR',
+                    'sv': 'sv-SE',
+                    'da': 'da-DK'
+                }
+                
+                google_lang = lang_mapping.get(language, 'en-US')
+                
+                # Configure recognition
+                config = speech.RecognitionConfig(
+                    encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+                    sample_rate_hertz=48000,
+                    language_code=google_lang,
+                    enable_automatic_punctuation=True,
+                    model='latest_long'
+                )
+                
+                # Create audio object
+                audio = speech.RecognitionAudio(content=audio_data)
+                
+                # Perform recognition
+                response = speech_client.recognize(config=config, audio=audio)
+                
+                # Extract transcript
+                transcript = ""
+                confidence = 0.0
+                
+                for result in response.results:
+                    transcript += result.alternatives[0].transcript + " "
+                    confidence = max(confidence, result.alternatives[0].confidence)
+                
+                transcript = transcript.strip()
+                
+                if not transcript:
+                    return jsonify({
+                        'error': 'No speech detected in audio',
+                        'transcript': '',
+                        'confidence': 0.0,
+                        'language': language,
+                        'success': False
+                    }), 400
+                
+                result = {
+                    'transcript': transcript,
+                    'confidence': confidence,
+                    'language': language,
+                    'provider': 'google_cloud_speech',
+                    'success': True
+                }
+                
+                logger.info(f"STT transcription completed: {transcript[:50]}...")
+                return jsonify(result)
+                
+            except Exception as e:
+                logger.warning(f"Google Cloud Speech-to-Text failed: {e}")
+                # Continue to fallback
+        
+        # Fallback: Return error if Google Speech fails
+        logger.error("Speech-to-text service temporarily unavailable")
+        return jsonify({
+            'error': 'Speech-to-text service temporarily unavailable',
+            'details': 'Please try again later or check your internet connection',
+            'language': language,
+            'success': False
+        }), 503
+        
+    except Exception as e:
+        logger.error(f"STT error: {e}", exc_info=True)
+        return jsonify({
+            'error': 'Speech-to-text failed',
+            'details': 'An unexpected error occurred',
+            'success': False
+        }), 500
+
 # Enhanced data file paths with better structure
 DATA_DIR = 'data'
 PHRASES_FILE = os.path.join(DATA_DIR, 'common_phrases.json')
