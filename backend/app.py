@@ -2484,108 +2484,365 @@ def initialize_data_files():
 
 @app.route('/api/debug/populate-words', methods=['POST'])
 def populate_word_data():
-    """Debug endpoint to manually populate word-of-day data"""
+    """Debug endpoint to manually populate comprehensive word-of-day data for multiple languages"""
     try:
-        logger.info("Manually populating word-of-day data...")
+        logger.info("Manually populating multilingual word-of-day data...")
         
         # Ensure database tables exist
         create_tables()
         
-        # Add comprehensive default words for English
-        default_words = [
-            {
-                'word': 'hello',
-                'translation': 'a greeting or expression of goodwill',
-                'pronunciation': 'həˈloʊ',
-                'part_of_speech': 'interjection',
-                'difficulty': 'beginner',
-                'example_sentence': 'Hello, how are you?',
-                'example_translation': 'A common greeting used when meeting someone.',
-                'etymology': 'From Old English hæl (whole, healthy)',
-                'related_words': ['hi', 'greetings', 'salutation'],
-                'cultural_note': 'The most common greeting in English-speaking countries.'
-            },
-            {
-                'word': 'thank you',
-                'translation': 'expression of gratitude',
-                'pronunciation': 'θæŋk juː',
-                'part_of_speech': 'phrase',
-                'difficulty': 'beginner',
-                'example_sentence': 'Thank you for your help.',
-                'example_translation': 'Used to express appreciation.',
-                'etymology': 'From Old English þancian (to give thanks)',
-                'related_words': ['thanks', 'gratitude', 'appreciation'],
-                'cultural_note': 'Essential politeness expression in English.'
-            },
-            {
-                'word': 'wonderful',
-                'translation': 'inspiring delight, pleasure, or admiration; extremely good',
-                'pronunciation': 'ˈwʌn.də.fəl',
-                'part_of_speech': 'adjective',
-                'difficulty': 'intermediate',
-                'example_sentence': 'What a wonderful day!',
-                'example_translation': 'Used to express that something is very good or pleasant.',
-                'etymology': 'From wonder + -ful',
-                'related_words': ['amazing', 'fantastic', 'marvelous'],
-                'cultural_note': 'Often used to express enthusiasm and positivity.'
-            },
-            {
-                'word': 'serendipity',
-                'translation': 'the occurrence of events by chance in a happy way',
-                'pronunciation': 'ˌser.ənˈdɪp.ə.ti',
-                'part_of_speech': 'noun',
-                'difficulty': 'advanced',
-                'example_sentence': 'It was pure serendipity that we met at the coffee shop.',
-                'example_translation': 'Describes pleasant surprises or fortunate accidents.',
-                'etymology': 'Coined by Horace Walpole in 1754',
-                'related_words': ['chance', 'fortune', 'luck'],
-                'cultural_note': 'A beloved word expressing life\'s pleasant surprises.'
-            },
-            {
-                'word': 'friend',
-                'translation': 'a person you know well and regard with affection and trust',
-                'pronunciation': 'frɛnd',
-                'part_of_speech': 'noun',
-                'difficulty': 'beginner',
-                'example_sentence': 'She is my best friend.',
-                'example_translation': 'Used to describe a close relationship.',
-                'etymology': 'From Old English freond (lover, friend)',
-                'related_words': ['buddy', 'companion', 'pal'],
-                'cultural_note': 'Friendship is valued across all cultures.'
-            }
-        ]
+        # Comprehensive word data for multiple languages
+        multilingual_words = {
+            'en': [
+                {
+                    'word': 'serendipity',
+                    'translation': 'the occurrence of events by chance in a happy way',
+                    'pronunciation': 'ˌser.ənˈdɪp.ə.ti',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': 'It was pure serendipity that we met at the coffee shop.',
+                    'example_translation': 'Describes pleasant surprises or fortunate accidents.',
+                    'etymology': 'Coined by Horace Walpole in 1754 from the Persian fairy tale',
+                    'related_words': ['chance', 'fortune', 'luck', 'coincidence'],
+                    'cultural_note': 'A beloved English word expressing life\'s pleasant surprises.'
+                },
+                {
+                    'word': 'wanderlust',
+                    'translation': 'a strong desire to travel and explore the world',
+                    'pronunciation': 'ˈwɒn.də.lʌst',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'Her wanderlust led her to visit 30 countries.',
+                    'example_translation': 'Used to describe someone with a passion for traveling.',
+                    'etymology': 'From German wandern (to hike) + lust (desire)',
+                    'related_words': ['travel', 'adventure', 'exploration'],
+                    'cultural_note': 'Reflects the human desire for exploration and discovery.'
+                },
+                {
+                    'word': 'resilience',
+                    'translation': 'the ability to recover quickly from difficulties',
+                    'pronunciation': 'rɪˈzɪl.i.əns',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'She showed remarkable resilience after the setback.',
+                    'example_translation': 'The capacity to bounce back from challenges.',
+                    'etymology': 'From Latin resilire (to rebound)',
+                    'related_words': ['strength', 'toughness', 'adaptability'],
+                    'cultural_note': 'Highly valued quality in personal and professional contexts.'
+                }
+            ],
+            'es': [
+                {
+                    'word': 'sobremesa',
+                    'translation': 'time spent at the table after finishing a meal',
+                    'pronunciation': 'so.βɾeˈme.sa',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'La sobremesa duró más que la cena.',
+                    'example_translation': 'The after-dinner conversation lasted longer than dinner.',
+                    'etymology': 'From sobre (over) + mesa (table)',
+                    'related_words': ['charla', 'conversación', 'tertulia'],
+                    'cultural_note': 'An important social custom in Spanish-speaking countries.'
+                },
+                {
+                    'word': 'duende',
+                    'translation': 'a quality of passion and inspiration, especially in flamenco',
+                    'pronunciation': 'ˈdwen.de',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': 'El bailaor de flamenco tiene mucho duende.',
+                    'example_translation': 'The flamenco dancer has great spirit and charm.',
+                    'etymology': 'From dueño (owner), originally meaning a magical creature',
+                    'related_words': ['alma', 'espíritu', 'pasión'],
+                    'cultural_note': 'Essential concept in flamenco and Spanish arts.'
+                },
+                {
+                    'word': 'querencia',
+                    'translation': 'a place where one feels safe and at home',
+                    'pronunciation': 'ke.ˈɾen.θja',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': 'Este café es mi querencia en la ciudad.',
+                    'example_translation': 'This café is my safe haven in the city.',
+                    'etymology': 'From querer (to love, to want)',
+                    'related_words': ['hogar', 'refugio', 'santuario'],
+                    'cultural_note': 'Deeply rooted in Spanish culture and bullfighting tradition.'
+                }
+            ],
+            'fr': [
+                {
+                    'word': 'dépaysement',
+                    'translation': 'the feeling of being in a foreign place',
+                    'pronunciation': 'de.pɛ.iz.mɑ̃',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': 'Le dépaysement total lors de mon premier voyage à Tokyo.',
+                    'example_translation': 'The complete feeling of displacement during my first trip to Tokyo.',
+                    'etymology': 'From dé- (un-) + pays (country)',
+                    'related_words': ['voyage', 'étranger', 'expatriation'],
+                    'cultural_note': 'Unique French concept with no direct English equivalent.'
+                },
+                {
+                    'word': 'flâner',
+                    'translation': 'to wander aimlessly with pleasure',
+                    'pronunciation': 'flɑ.ne',
+                    'part_of_speech': 'verb',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'J\'aime flâner dans les rues de Paris.',
+                    'example_translation': 'I love strolling through the streets of Paris.',
+                    'etymology': 'From Old Norse flana (to rush about)',
+                    'related_words': ['se promener', 'errer', 'déambuler'],
+                    'cultural_note': 'Central to Parisian culture and the art of leisurely observation.'
+                },
+                {
+                    'word': 'savoir-vivre',
+                    'translation': 'knowledge of how to live well and behave properly',
+                    'pronunciation': 'sa.vwaʁ.vivʁ',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'Son savoir-vivre impressionne toujours les invités.',
+                    'example_translation': 'His good manners always impress the guests.',
+                    'etymology': 'From savoir (to know) + vivre (to live)',
+                    'related_words': ['étiquette', 'politesse', 'bonnes manières'],
+                    'cultural_note': 'Essential concept in French social interactions.'
+                }
+            ],
+            'de': [
+                {
+                    'word': 'Fernweh',
+                    'translation': 'longing for distant places; wanderlust',
+                    'pronunciation': 'ˈfɛʁn.veː',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'Sie hat Fernweh nach den Bergen.',
+                    'example_translation': 'She longs for the mountains.',
+                    'etymology': 'From fern (far) + Weh (pain)',
+                    'related_words': ['Heimweh', 'Reisefieber', 'Wanderlust'],
+                    'cultural_note': 'Reflects German romantic ideals of travel and exploration.'
+                },
+                {
+                    'word': 'Gemütlichkeit',
+                    'translation': 'warmth, coziness, and good cheer',
+                    'pronunciation': 'ɡəˈmyːt.lɪç.kaɪt',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': 'Die Gemütlichkeit des Cafés lädt zum Verweilen ein.',
+                    'example_translation': 'The coziness of the café invites you to linger.',
+                    'etymology': 'From Gemüt (mind, spirit) + -lich (like) + -keit (-ness)',
+                    'related_words': ['Behaglichkeit', 'Wärme', 'Geborgenheit'],
+                    'cultural_note': 'Central to German culture and hospitality.'
+                },
+                {
+                    'word': 'Zeitgeist',
+                    'translation': 'the spirit or mood of a particular time period',
+                    'pronunciation': 'ˈtsaɪt.ɡaɪst',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'Der Zeitgeist der 60er Jahre war revolutionär.',
+                    'example_translation': 'The spirit of the 60s was revolutionary.',
+                    'etymology': 'From Zeit (time) + Geist (spirit)',
+                    'related_words': ['Epoche', 'Ära', 'Stimmung'],
+                    'cultural_note': 'Widely adopted into English and other languages.'
+                }
+            ],
+            'ja': [
+                {
+                    'word': '木漏れ日',
+                    'translation': 'sunlight filtering through trees',
+                    'pronunciation': 'ko-mo-re-bi',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': '木漏れ日が森の中で踊っている。',
+                    'example_translation': 'Sunlight is dancing through the trees in the forest.',
+                    'etymology': 'From 木 (tree) + 漏れ (leak) + 日 (sun)',
+                    'related_words': ['日光', '森林', '陽射し'],
+                    'cultural_note': 'Reflects Japanese appreciation for subtle natural beauty.'
+                },
+                {
+                    'word': 'もったいない',
+                    'translation': 'regret over waste; too good to waste',
+                    'pronunciation': 'mot-tai-nai',
+                    'part_of_speech': 'adjective',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'まだ食べられるのに捨てるなんてもったいない。',
+                    'example_translation': 'It\'s wasteful to throw it away when it\'s still edible.',
+                    'etymology': 'From Buddhist concept of intrinsic value',
+                    'related_words': ['無駄', '惜しい', '節約'],
+                    'cultural_note': 'Reflects Japanese values of conservation and respect for resources.'
+                },
+                {
+                    'word': '一期一会',
+                    'translation': 'once in a lifetime encounter; treasure the moment',
+                    'pronunciation': 'i-chi-go-i-chi-e',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': '今日の出会いは一期一会ですね。',
+                    'example_translation': 'Today\'s meeting is a once-in-a-lifetime encounter.',
+                    'etymology': 'From tea ceremony philosophy',
+                    'related_words': ['出会い', '瞬間', '大切'],
+                    'cultural_note': 'Important concept in Japanese tea ceremony and relationships.'
+                }
+            ],
+            'zh': [
+                {
+                    'word': '缘分',
+                    'translation': 'predestined relationship or connection',
+                    'pronunciation': 'yuán-fèn',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': '我们能相遇真是缘分。',
+                    'example_translation': 'Our meeting is truly fate.',
+                    'etymology': 'From 缘 (connection) + 分 (portion)',
+                    'related_words': ['命运', '缘份', '注定'],
+                    'cultural_note': 'Important concept in Chinese philosophy and relationships.'
+                },
+                {
+                    'word': '面子',
+                    'translation': 'face; dignity and reputation in social contexts',
+                    'pronunciation': 'miàn-zi',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': '给他留点面子吧。',
+                    'example_translation': 'Let\'s save some face for him.',
+                    'etymology': 'From 面 (face) + 子 (suffix)',
+                    'related_words': ['尊严', '脸面', '声誉'],
+                    'cultural_note': 'Crucial concept in Chinese social interactions.'
+                },
+                {
+                    'word': '孝顺',
+                    'translation': 'filial piety; respect and care for parents',
+                    'pronunciation': 'xiào-shùn',
+                    'part_of_speech': 'adjective/noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': '他是个很孝顺的儿子。',
+                    'example_translation': 'He is a very filial son.',
+                    'etymology': 'From 孝 (filial piety) + 顺 (obedience)',
+                    'related_words': ['尊敬', '孝心', '侍奉'],
+                    'cultural_note': 'Fundamental virtue in Confucian culture.'
+                }
+            ],
+            'it': [
+                {
+                    'word': 'dolce far niente',
+                    'translation': 'the sweetness of doing nothing',
+                    'pronunciation': 'ˈdol.tʃe far ˈnjen.te',
+                    'part_of_speech': 'phrase',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'Oggi ho voglia di dolce far niente.',
+                    'example_translation': 'Today I feel like enjoying the sweetness of doing nothing.',
+                    'etymology': 'From dolce (sweet) + far (to do) + niente (nothing)',
+                    'related_words': ['riposo', 'relax', 'ozio'],
+                    'cultural_note': 'Italian appreciation for leisure and contemplation.'
+                },
+                {
+                    'word': 'passeggiata',
+                    'translation': 'evening stroll for socializing',
+                    'pronunciation': 'pas.sed.ˈdʒa.ta',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'beginner',
+                    'example_sentence': 'Facciamo una passeggiata in centro?',
+                    'example_translation': 'Shall we take a stroll in the city center?',
+                    'etymology': 'From passeggiare (to walk, to stroll)',
+                    'related_words': ['camminata', 'giro', 'passeggiate'],
+                    'cultural_note': 'Important Italian social tradition, especially in small towns.'
+                },
+                {
+                    'word': 'sprezzatura',
+                    'translation': 'studied carelessness; effortless grace',
+                    'pronunciation': 'spret.tsa.ˈtu.ra',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': 'La sua sprezzatura nel vestire è ammirevole.',
+                    'example_translation': 'His effortless elegance in dressing is admirable.',
+                    'etymology': 'From sprezzare (to despise, to scorn)',
+                    'related_words': ['eleganza', 'grazia', 'naturalezza'],
+                    'cultural_note': 'Renaissance ideal of appearing naturally graceful.'
+                }
+            ],
+            'pt': [
+                {
+                    'word': 'saudade',
+                    'translation': 'deep nostalgic longing for something absent',
+                    'pronunciation': 'saw.ˈda.dʒi',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'Tenho saudade dos tempos de escola.',
+                    'example_translation': 'I have nostalgia for school days.',
+                    'etymology': 'From Latin solitas (solitude)',
+                    'related_words': ['nostalgia', 'longing', 'melancolia'],
+                    'cultural_note': 'Quintessential Portuguese emotion, untranslatable to other languages.'
+                },
+                {
+                    'word': 'cafuné',
+                    'translation': 'gently running fingers through someone\'s hair',
+                    'pronunciation': 'ka.fu.ˈnɛ',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'intermediate',
+                    'example_sentence': 'Ela fazia cafuné no filho para ele dormir.',
+                    'example_translation': 'She gently stroked her son\'s hair to help him sleep.',
+                    'etymology': 'From African languages brought to Brazil',
+                    'related_words': ['carinho', 'caricia', 'mimo'],
+                    'cultural_note': 'Tender gesture common in Brazilian family relationships.'
+                },
+                {
+                    'word': 'desenrascanço',
+                    'translation': 'the art of finding creative solutions to problems',
+                    'pronunciation': 'de.zen.ʁas.ˈkɐ̃.su',
+                    'part_of_speech': 'noun',
+                    'difficulty': 'advanced',
+                    'example_sentence': 'O desenrascanço português é famoso no mundo todo.',
+                    'example_translation': 'Portuguese resourcefulness is famous worldwide.',
+                    'etymology': 'From desenrascar (to get out of trouble)',
+                    'related_words': ['criatividade', 'jeitinho', 'improviso'],
+                    'cultural_note': 'Reflects Portuguese resourcefulness and problem-solving spirit.'
+                }
+            ]
+        }
         
-        added_count = 0
-        failed_count = 0
+        # Add word data for each language
+        total_added = 0
+        total_failed = 0
+        languages_processed = []
         
-        for word_data in default_words:
-            success = db_service.add_word_of_day('en', word_data)
-            if success:
-                added_count += 1
-                logger.info(f"Added word: {word_data['word']}")
-            else:
-                failed_count += 1
-                logger.warning(f"Failed to add word: {word_data['word']}")
+        for language, words in multilingual_words.items():
+            language_added = 0
+            
+            for word in words:
+                success = db_service.add_word_of_day(language, word)
+                if success:
+                    language_added += 1
+                    total_added += 1
+                    logger.info(f"Added {language}: {word['word']}")
+                else:
+                    total_failed += 1
+                    logger.warning(f"Failed to add {language}: {word['word']}")
+            
+            if language_added > 0:
+                languages_processed.append(f"{language} ({language_added} words)")
         
-        # Verify words were added
-        test_word = db_service.get_word_of_day('en')
+        # Verify by getting test words from each language
+        verification_results = {}
+        for language in multilingual_words.keys():
+            test_word = db_service.get_word_of_day(language)
+            verification_results[language] = test_word.get('word') if test_word else 'NONE'
         
         return jsonify({
             'success': True,
-            'message': f'Populated word-of-day data for English',
-            'added_count': added_count,
-            'failed_count': failed_count,
-            'total_words': len(default_words),
-            'test_word': test_word.get('word') if test_word else None,
-            'verification': 'SUCCESS' if test_word else 'FAILED'
+            'message': f'Successfully populated multilingual word-of-day data',
+            'total_added': total_added,
+            'total_failed': total_failed,
+            'languages_processed': languages_processed,
+            'available_languages': list(multilingual_words.keys()),
+            'verification': verification_results,
+            'summary': f'Added {total_added} words across {len(multilingual_words)} languages'
         })
         
     except Exception as e:
-        logger.error(f"Error populating word data: {e}", exc_info=True)
+        logger.error(f"Error populating multilingual word data: {e}", exc_info=True)
         return jsonify({
             'success': False,
             'error': str(e),
-            'message': 'Failed to populate word-of-day data'
+            'message': 'Failed to populate multilingual word-of-day data'
         }), 500
 
 if __name__ == '__main__':
