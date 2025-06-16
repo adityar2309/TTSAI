@@ -41,8 +41,8 @@ Try the app here: [https://ttsai.netlify.app/](https://ttsai.netlify.app/)
 
 ### Backend
 - Flask
-- Google Cloud Services:
-  - Gemini AI for translations
+- Google AI Studio (Gemini) for translations
+- Google Cloud Services (optional):
   - Text-to-Speech
   - Speech-to-Text
 - CORS handling
@@ -52,8 +52,8 @@ Try the app here: [https://ttsai.netlify.app/](https://ttsai.netlify.app/)
 
 1. Node.js (v16 or higher)
 2. Python 3.8+
-3. Google Cloud account with API access
-4. Gemini API key
+3. Google AI Studio API key (get from https://aistudio.google.com/app/apikey)
+4. Google Cloud account (optional, for TTS/STT services)
 
 ## Setup Instructions
 
@@ -74,8 +74,11 @@ pip install -r requirements.txt
 3. Set up environment variables:
 ```bash
 # Create .env file in backend directory
-GEMINI_API_KEY=your_gemini_api_key
+GEMINI_API_KEY=your_google_ai_studio_api_key_here
 FLASK_ENV=development
+
+# Optional: For Google Cloud TTS/STT services
+# GOOGLE_APPLICATION_CREDENTIALS=path/to/your/google-cloud-credentials.json
 ```
 
 ### Frontend Setup

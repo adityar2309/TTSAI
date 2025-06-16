@@ -1,5 +1,23 @@
 # TTSAI Tasks
 
+## 🔄 **CURRENT TASK - 2025-01-28**
+
+### LLM Migration: OpenRouter → Google AI Studio
+- [x] **COMPLETED**: Changed LLM provider from OpenRouter to Google AI Studio direct API
+- [x] **COMPLETED**: Updated configuration in `config.py` to support Google AI Studio
+- [x] **COMPLETED**: Added `google-generativeai` package to requirements.txt
+- [x] **COMPLETED**: Updated `app.py` to use Google Generative AI library instead of REST calls
+- [x] **COMPLETED**: Maintained backward compatibility with OpenRouter as fallback
+- [x] **COMPLETED**: Updated all references from `openrouter_client` to `gemini_model`
+- [x] **COMPLETED**: Updated error messages to reference Gemini instead of OpenRouter
+
+#### Changes Made:
+1. **Configuration**: Changed default provider to `google_ai_studio` with model `gemini-2.0-flash-exp`
+2. **Dependencies**: Added `google-generativeai==0.8.3` package
+3. **API Integration**: Direct integration with Google's Generative AI library
+4. **Fallback Support**: Maintained OpenRouter compatibility for legacy setups
+5. **Environment**: Users now need `GEMINI_API_KEY` instead of `OPENROUTER_API_KEY`
+
 ## 🚨 **CURRENT URGENT ISSUE - 2024-12-14**
 
 ### 404 Errors in Production

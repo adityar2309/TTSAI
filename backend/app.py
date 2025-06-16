@@ -21,9 +21,10 @@ import requests
 from google.auth import default
 from fuzzywuzzy import fuzz
 import re
+import google.generativeai as genai
 
 # Import centralized configuration
-from config import get_llm_config, get_model_name, LLM_PROVIDER, OPENROUTER_API_KEY, OPENROUTER_BASE_URL
+from config import get_llm_config, get_model_name, LLM_PROVIDER, GEMINI_API_KEY
 
 # Configure comprehensive logging first
 logging.basicConfig(
@@ -104,44 +105,61 @@ except Exception as e:
 # Configure LLM API using centralized configuration
 llm_config = get_llm_config()
 model_name = get_model_name()
+gemini_model = None
 
 if not llm_config["api_key"]:
     logger.warning("LLM API key not found in environment variables")
-    logger.warning("Translation services will be limited. Set OPENROUTER_API_KEY for full functionality.")
-    openrouter_client = None
+    logger.warning("Translation services will be limited. Set GEMINI_API_KEY for full functionality.")
+    gemini_model = None
 else:
     try:
-        logger.info(f"Configuring {llm_config['provider']} with model: {model_name}")
-        logger.info(f"API key: {llm_config['api_key'][:8]}...{llm_config['api_key'][-4:]}")
-        
-        # Test LLM connection
-        headers = {
-            "Authorization": f"Bearer {llm_config['api_key']}",
-            "Content-Type": "application/json"
-        }
-        
-        test_data = {
-            "model": model_name,
-            "messages": [{"role": "user", "content": "Test connection"}]
-        }
-        
-        test_response = requests.post(
-            llm_config["base_url"],
-            headers=headers,
-            json=test_data,
-            timeout=10
-        )
-        
-        if test_response.status_code == 200:
-            logger.info(f"LLM connection test successful for {model_name}")
-            openrouter_client = True
+        if llm_config["provider"] == "google_ai_studio":
+            logger.info(f"Configuring Google AI Studio with model: {model_name}")
+            logger.info(f"API key: {llm_config['api_key'][:8]}...{llm_config['api_key'][-4:]}")
+            
+            # Configure the Google Generative AI library
+            genai.configure(api_key=llm_config["api_key"])
+            
+            # Initialize the model
+            gemini_model = genai.GenerativeModel(model_name)
+            
+            # Test connection
+            test_response = gemini_model.generate_content("Test connection")
+            logger.info("Gemini connection test successful")
+            
         else:
-            logger.error(f"LLM connection test failed: {test_response.status_code}")
-            openrouter_client = None
+            # Legacy OpenRouter support (fallback)
+            logger.info(f"Using legacy OpenRouter with model: {model_name}")
+            logger.info(f"API key: {llm_config['api_key'][:8]}...{llm_config['api_key'][-4:]}")
+            
+            # Test OpenRouter connection
+            headers = {
+                "Authorization": f"Bearer {llm_config['api_key']}",
+                "Content-Type": "application/json"
+            }
+            
+            test_data = {
+                "model": model_name,
+                "messages": [{"role": "user", "content": "Test connection"}]
+            }
+            
+            test_response = requests.post(
+                llm_config["base_url"],
+                headers=headers,
+                json=test_data,
+                timeout=10
+            )
+            
+            if test_response.status_code == 200:
+                logger.info(f"OpenRouter connection test successful for {model_name}")
+                gemini_model = "openrouter"  # Flag for OpenRouter usage
+            else:
+                logger.error(f"OpenRouter connection test failed: {test_response.status_code}")
+                gemini_model = None
             
     except Exception as e:
         logger.error(f"Failed to configure LLM: {e}")
-        openrouter_client = None
+        gemini_model = None
 
 # Enhanced rate limiting decorator
 def rate_limit(func):
@@ -193,41 +211,59 @@ def call_llm_api(prompt, model=None, max_tokens=None):
     """Make a call to the configured LLM API"""
     llm_config = get_llm_config()
     
-    if not openrouter_client or not llm_config["api_key"]:
+    if not gemini_model or not llm_config["api_key"]:
         raise Exception("LLM API not configured")
     
-    # Use configured values as defaults
-    model = model or llm_config["model"]
-    max_tokens = max_tokens or llm_config["max_tokens"]
-    
-    headers = {
-        "Authorization": f"Bearer {llm_config['api_key']}",
-        "Content-Type": "application/json"
-    }
-    
-    data = {
-        "model": model,
-        "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": max_tokens,
-        "temperature": llm_config["temperature"]
-    }
-    
     try:
-        response = requests.post(
-            llm_config["base_url"],
-            headers=headers,
-            json=data,
-            timeout=30
-        )
-        
-        if response.status_code == 200:
-            result = response.json()
-            return result['choices'][0]['message']['content']
-        else:
-            error_msg = f"LLM API error: {response.status_code}"
+        if llm_config["provider"] == "google_ai_studio" and isinstance(gemini_model, genai.GenerativeModel):
+            # Use Google AI Studio API directly
+            generation_config = genai.types.GenerationConfig(
+                max_output_tokens=max_tokens or llm_config["max_tokens"],
+                temperature=llm_config["temperature"]
+            )
+            
+            response = gemini_model.generate_content(
+                prompt,
+                generation_config=generation_config
+            )
+            
             if response.text:
-                error_msg += f" - {response.text}"
-            raise Exception(error_msg)
+                return response.text.strip()
+            else:
+                raise Exception("Empty response from Gemini API")
+                
+        else:
+            # OpenRouter fallback
+            model = model or llm_config["model"]
+            max_tokens = max_tokens or llm_config["max_tokens"]
+            
+            headers = {
+                "Authorization": f"Bearer {llm_config['api_key']}",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": max_tokens,
+                "temperature": llm_config["temperature"]
+            }
+            
+            response = requests.post(
+                llm_config["base_url"],
+                headers=headers,
+                json=data,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return result['choices'][0]['message']['content']
+            else:
+                error_msg = f"OpenRouter API error: {response.status_code}"
+                if response.text:
+                    error_msg += f" - {response.text}"
+                raise Exception(error_msg)
             
     except requests.exceptions.Timeout:
         raise Exception("LLM API timeout")
@@ -334,7 +370,7 @@ def health_check():
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
             'services': {
-                'openrouter': bool(openrouter_client),
+                'gemini': bool(gemini_model),
                 'speech_client': bool(speech_client),
                 'tts_client': bool(tts_client)
             }
@@ -439,7 +475,7 @@ def basic_translate():
             logger.info(f"Returning cached basic translation for: {text[:50]}...")
             return jsonify(cached_result)
         
-        if not openrouter_client:
+        if not gemini_model:
             return jsonify({'error': 'Translation service temporarily unavailable'}), 503
         
         # Generate basic translation prompt with romanization
@@ -507,7 +543,7 @@ Return your response as a JSON object with this exact structure:
             return jsonify(translation_data)
             
         except Exception as e:
-            logger.error(f"OpenRouter API error in basic translate: {e}")
+            logger.error(f"Gemini API error in basic translate: {e}")
             return jsonify({
                 'error': 'Translation service error',
                 'details': 'Please try again later'
@@ -562,7 +598,7 @@ def advanced_translate():
             logger.info(f"Returning cached translation for: {text[:50]}...")
             return jsonify(cached_result)
         
-        if not openrouter_client:
+        if not gemini_model:
             return jsonify({'error': 'Translation service temporarily unavailable'}), 503
         
         # Generate prompt and get translation
@@ -605,7 +641,7 @@ def advanced_translate():
             }), 500
             
         except Exception as e:
-            logger.error(f"OpenRouter API error: {e}")
+            logger.error(f"Gemini API error: {e}")
             return jsonify({
                 'error': 'Translation service error',
                 'details': 'Please try again later'
@@ -1629,7 +1665,7 @@ def avatar_conversation():
         """
 
         # Generate response using LLM API
-        if not openrouter_client:
+        if not gemini_model:
             return jsonify({'error': 'AI service temporarily unavailable'}), 503
             
         response_text = call_llm_api(conversation_prompt)
