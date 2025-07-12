@@ -1166,6 +1166,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                 </Grid>
               </Grid>
             </Stack>
+              </CardContent>
             </Card>
 
             {/* Language Selection Section */}
@@ -1583,6 +1584,7 @@ export const Translator = ({ initialMode = 'type' }) => {
         {activeView === 'learning' && (
           <LearningHub userId={userId} language={targetLang} />
         )}
+      </Stack>
       </Box>
 
       {/* Advanced Translation Dialog */}
