@@ -1290,14 +1290,20 @@ def get_flashcards():
             return jsonify({'error': 'User ID required'}), 400
 
         language = request.args.get('language')
+        difficulty = request.args.get('difficulty')
+        category = request.args.get('category')
         
-        # Use database service to get flashcards
-        flashcards = db_service.get_flashcards(user_id, language)
+        # Use database service to get flashcards with filters
+        flashcards = db_service.get_flashcards(user_id, language, difficulty, category)
         
         return jsonify({
             'flashcards': flashcards,
             'total': len(flashcards),
-            'language': language
+            'language': language,
+            'filters': {
+                'difficulty': difficulty,
+                'category': category
+            }
         })
 
     except Exception as e:
@@ -1681,6 +1687,158 @@ def get_user_progress():
     except Exception as e:
         logger.error(f"Error getting user progress: {e}")
         return jsonify({'error': 'Failed to get progress data'}), 500
+
+@app.route('/api/progress/summary', methods=['GET'])
+@rate_limit
+def get_progress_summary():
+    """Provide high-level progress data for the Learning Hub dashboard"""
+    try:
+        user_id = request.args.get('userId')
+        language = request.args.get('language')
+        time_range = request.args.get('timeRange', 'all')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        logger.info(f"Fetching progress summary for user {user_id}, language {language}, timeRange {time_range}")
+        
+        # Use database service to get comprehensive progress summary
+        progress_summary = db_service.get_user_progress_summary(user_id, time_range)
+        
+        if not progress_summary:
+            # Return default progress summary for new users
+            progress_summary = {
+                'total_xp': 0,
+                'current_streak': 0,
+                'words_learned': 0,
+                'level': 1,
+                'quizzes_completed': 0,
+                'flashcard_stats': {
+                    'total': 0,
+                    'due_for_review': 0,
+                    'mastered': 0,
+                    'avg_success_rate': 0.0
+                },
+                'quiz_stats': {
+                    'completed': 0,
+                    'avg_score': 0.0
+                },
+                'conversation_stats': {
+                    'total': 0,
+                    'avg_duration': 0,
+                    'last_topic': None
+                }
+            }
+        
+        return jsonify(progress_summary)
+        
+    except Exception as e:
+        logger.error(f"Error getting progress summary: {e}")
+        return jsonify({'error': 'Failed to get progress summary'}), 500
+
+@app.route('/api/word-explorer/get-word', methods=['GET'])
+@rate_limit
+def get_word_for_explorer():
+    """Fetch a detailed word for WordExplorer, supporting filters/search"""
+    try:
+        language = request.args.get('language')
+        difficulty = request.args.get('difficulty')
+        category = request.args.get('category')
+        search_term = request.args.get('searchTerm')
+        
+        if not language:
+            return jsonify({'error': 'Language parameter required'}), 400
+        
+        logger.info(f"Fetching word for language {language}, difficulty {difficulty}, category {category}, search {search_term}")
+        
+        # Use database service to get detailed word
+        word_data = db_service.get_detailed_word(language, difficulty, category, search_term)
+        
+        if not word_data:
+            return jsonify({'error': 'No words found matching criteria'}), 404
+        
+        return jsonify(word_data)
+        
+    except Exception as e:
+        logger.error(f"Error getting word for explorer: {e}")
+        return jsonify({'error': 'Failed to get word'}), 500
+
+@app.route('/api/flashcards/<flashcard_id>', methods=['DELETE'])
+@rate_limit
+def delete_flashcard_endpoint(flashcard_id):
+    """Delete a specific flashcard"""
+    try:
+        user_id = request.args.get('userId')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        if not flashcard_id:
+            return jsonify({'error': 'Flashcard ID required'}), 400
+        
+        logger.info(f"Deleting flashcard {flashcard_id} for user {user_id}")
+        
+        # Use database service to delete flashcard
+        success = db_service.delete_flashcard(user_id, flashcard_id)
+        
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'error': 'Flashcard not found or not authorized'}), 404
+        
+    except Exception as e:
+        logger.error(f"Error deleting flashcard: {e}")
+        return jsonify({'error': 'Failed to delete flashcard'}), 500
+
+@app.route('/api/progress/comprehensive', methods=['GET'])
+@rate_limit
+def get_comprehensive_progress():
+    """Get comprehensive progress data for ProgressTracker component"""
+    try:
+        user_id = request.args.get('userId')
+        language = request.args.get('language')
+        time_range = request.args.get('timeRange', 'all')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        logger.info(f"Fetching comprehensive progress for user {user_id}, language {language}, timeRange {time_range}")
+        
+        # Use database service to get comprehensive progress data
+        progress_data = db_service.get_comprehensive_progress(user_id, time_range, language)
+        
+        if not progress_data:
+            # Return default structure for new users
+            progress_data = {
+                'total_xp': 0,
+                'current_streak': 0,
+                'words_learned': 0,
+                'level': 1,
+                'flashcard_stats': {
+                    'total': 0,
+                    'due_for_review': 0,
+                    'mastered': 0,
+                    'avg_success_rate': 0.0
+                },
+                'quiz_stats': {
+                    'completed': 0,
+                    'avg_score': 0.0
+                },
+                'conversation_stats': {
+                    'total': 0,
+                    'avg_duration': 0,
+                    'last_topic': None
+                },
+                'daily_goal': 10,
+                'activity_data': [],
+                'recent_achievements': []
+            }
+        
+        return jsonify(progress_data)
+        
+    except Exception as e:
+        logger.error(f"Error getting comprehensive progress: {e}")
+        return jsonify({'error': 'Failed to get comprehensive progress'}), 500
 
 @app.route('/api/user/preferences', methods=['GET', 'POST'])
 @rate_limit

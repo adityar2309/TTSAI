@@ -80,7 +80,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import axios from 'axios';
 import { format } from 'date-fns';
 import AdvancedTranslation from './AdvancedTranslation';
-import LearningTools from './LearningTools';
+import LearningHub from './LearningHub';
 import '../styles/gradients.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -1575,7 +1575,7 @@ export const Translator = ({ initialMode = 'type' }) => {
 
         {/* Learning View */}
         {activeView === 'learning' && (
-          <LearningTools userId={userId} language={targetLang} />
+          <LearningHub userId={userId} language={targetLang} />
         )}
       </Box>
 
