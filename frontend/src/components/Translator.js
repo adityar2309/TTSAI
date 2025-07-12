@@ -1029,7 +1029,8 @@ export const Translator = ({ initialMode = 'type' }) => {
               </Box>
 
               {/* Input/Output Section */}
-              <Grid container spacing={3}>
+              <Stack spacing={3}>
+                <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   <Box>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
@@ -1164,16 +1165,20 @@ export const Translator = ({ initialMode = 'type' }) => {
                   </Box>
                 </Grid>
               </Grid>
-            </CardContent>
-          </Card>
+            </Stack>
+            </Card>
+
+            {/* Language Selection Section */}
+            <Card elevation={2}>
+              <CardContent>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={5}>
                     <FormControl fullWidth>
-                <InputLabel>From</InputLabel>
-                <Select
-                  value={sourceLang}
-                  onChange={(e) => setSourceLang(e.target.value)}
-                  label="From"
+                      <InputLabel>From</InputLabel>
+                      <Select
+                        value={sourceLang}
+                        onChange={(e) => setSourceLang(e.target.value)}
+                        label="From"
                         startAdornment={
                           isDetecting && (
                             <CircularProgress size={16} sx={{ mr: 1 }} />
@@ -1186,17 +1191,17 @@ export const Translator = ({ initialMode = 'type' }) => {
                             Auto-detect
                           </Box>
                         </MenuItem>
-                  {languages.map((lang) => (
-                    <MenuItem key={lang.code} value={lang.code}>
+                        {languages.map((lang) => (
+                          <MenuItem key={lang.code} value={lang.code}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Typography>{lang.native_name || lang.name}</Typography>
                               {lang.tts_supported && <VolumeUpIcon fontSize="small" color="action" />}
                               {lang.speech_recognition_supported && <MicIcon fontSize="small" color="action" />}
                             </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
 
                   <Grid item xs={12} sm={2} sx={{ textAlign: 'center' }}>
@@ -1210,29 +1215,29 @@ export const Translator = ({ initialMode = 'type' }) => {
                           '&:hover': { boxShadow: 2 }
                         }}
                       >
-                <SwapHorizIcon />
-              </IconButton>
+                        <SwapHorizIcon />
+                      </IconButton>
                     </Tooltip>
                   </Grid>
 
                   <Grid item xs={12} sm={5}>
                     <FormControl fullWidth>
-                <InputLabel>To</InputLabel>
-                <Select
-                  value={targetLang}
-                  onChange={(e) => setTargetLang(e.target.value)}
-                  label="To"
-                >
-                  {languages.map((lang) => (
-                    <MenuItem key={lang.code} value={lang.code}>
+                      <InputLabel>To</InputLabel>
+                      <Select
+                        value={targetLang}
+                        onChange={(e) => setTargetLang(e.target.value)}
+                        label="To"
+                      >
+                        {languages.map((lang) => (
+                          <MenuItem key={lang.code} value={lang.code}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Typography>{lang.native_name || lang.name}</Typography>
                               {lang.tts_supported && <VolumeUpIcon fontSize="small" color="action" />}
                             </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
                 </Grid>
 
@@ -1256,7 +1261,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                                     <Typography variant="body2">{level.label}</Typography>
                                     <Typography variant="caption" color="text.secondary">
                                       {level.description}
-              </Typography>
+                                    </Typography>
                                   </Box>
                                 </Box>
                               </MenuItem>
@@ -1340,7 +1345,8 @@ export const Translator = ({ initialMode = 'type' }) => {
             </Card>
 
             {/* Input/Output Section */}
-            <Grid container spacing={3}>
+            <Stack spacing={3}>
+              <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <Card elevation={2} sx={{ height: '100%' }}>
                   <CardContent>
@@ -1368,7 +1374,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                           </Tooltip>
                         )}
                       </Box>
-            </Stack>
+                    </Stack>
 
                     <TextField
                       multiline
@@ -1442,7 +1448,7 @@ export const Translator = ({ initialMode = 'type' }) => {
                           </>
                         )}
                       </Box>
-              </Stack>
+                    </Stack>
 
                     <Box
                       sx={{
