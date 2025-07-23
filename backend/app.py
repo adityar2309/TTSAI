@@ -2671,9 +2671,9 @@ def initialize_data_files():
             # Verify words were added
             final_check = db_service.get_word_of_day('en')
             if final_check:
-                logger.info("✅ Word-of-day data successfully created")
+                logger.info("[OK] Word-of-day data successfully created")
             else:
-                logger.error("❌ Failed to create word-of-day data")
+                logger.error("[ERROR] Failed to create word-of-day data")
         else:
             logger.info(f"[OK] Word-of-day data exists: {word_data.get('word', 'Unknown')}")
             
