@@ -565,3 +565,26 @@ message: "API key not valid. Please pass a valid API key."
  * Running on http://127.0.0.1:5000
  * Running on http://192.168.1.5:5000
 2025-07-23 17:03:17,034 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-23 17:07:03,293 - __main__ - INFO - Successfully imported models and db_service
+2025-07-23 17:07:03,295 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-07-23 17:07:04,164 - __main__ - INFO - Google Cloud Speech client initialized successfully
+2025-07-23 17:07:04,165 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-07-23 17:07:04,985 - __main__ - INFO - Google Cloud TTS client initialized successfully
+2025-07-23 17:07:04,985 - __main__ - INFO - Configuring Google AI Studio with model: gemini-2.0-flash-exp
+2025-07-23 17:07:04,986 - __main__ - INFO - API key: AIzaSyCZ...f-OM
+2025-07-23 17:07:05,692 - __main__ - INFO - Gemini connection test successful
+2025-07-23 17:07:05,700 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-07-23 17:07:05,704 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-07-23 17:07:05,704 - __main__ - INFO - Initializing database...
+2025-07-23 17:07:05,708 - __main__ - INFO - Database tables created successfully
+2025-07-23 17:07:05,708 - __main__ - INFO - Attempting database migration...
+2025-07-23 17:07:06,063 - __main__ - INFO - Database migration completed successfully
+2025-07-23 17:07:06,064 - __main__ - INFO - Checking word-of-day data...
+2025-07-23 17:07:06,113 - __main__ - INFO - [OK] Word-of-day data exists: ephemeral
+2025-07-23 17:07:06,118 - __main__ - INFO - Database initialization completed successfully
+2025-07-23 17:07:06,118 - __main__ - INFO - Server starting on port 5000
+2025-07-23 17:07:06,122 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+2025-07-23 17:07:06,123 - werkzeug - INFO - [33mPress CTRL+C to quit[0m

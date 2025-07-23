@@ -8,7 +8,7 @@ gcloud run deploy ttsai-backend ^
   --allow-unauthenticated ^
   --memory 2Gi ^
   --cpu 2 ^
-  --set-env-vars GEMINI_API_KEY=AIzaSyDhFOZFdZZjoA-hgHrbW9waBtvoYSRY6nw,DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production ^
+  --set-env-vars GEMINI_API_KEY="AIzaSyCZzto0BK9sPgX8_QEidRP4mM8-90tf-OM",DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production ^
   --port 5000
 
 echo Deployment complete!
