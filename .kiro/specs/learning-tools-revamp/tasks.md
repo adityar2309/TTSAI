@@ -17,6 +17,8 @@
 
 
     - Configure authentication callback URL
+
+
     - _Requirements: 3.1, 3.2, 3.3_
 
 
@@ -25,13 +27,17 @@
     - Add React Google Login package
     - Add quiz-related UI components
 
+
     - _Requirements: 2.1, 3.1_
 
 - [ ] 2. Implement Google Authentication
-  - [ ] 2.1 Create authentication service in backend
+  - [x] 2.1 Create authentication service in backend
+
+
     - Implement Google OAuth verification endpoint
     - Create user account creation/linking logic
     - Implement JWT token generation for authenticated users
+
     - _Requirements: 3.2, 3.3, 3.7_
 
   - [ ] 2.2 Implement authentication components in frontend
