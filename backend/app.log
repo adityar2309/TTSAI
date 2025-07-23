@@ -520,3 +520,25 @@ message: "API key not valid. Please pass a valid API key."
 2025-07-23 16:58:51,634 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 16:58:51] "GET /api/flashcards?userId=test_user_id HTTP/1.1" 200 -
 2025-07-23 16:58:53,700 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 16:58:53] "POST /api/quiz/generate HTTP/1.1" 200 -
 2025-07-23 16:58:55,786 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 16:58:55] "GET /api/progress?userId=test_user_id HTTP/1.1" 200 -
+2025-07-23 17:00:56,455 - __main__ - INFO - Successfully imported models and db_service
+2025-07-23 17:00:56,457 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-07-23 17:00:57,342 - __main__ - INFO - Google Cloud Speech client initialized successfully
+2025-07-23 17:00:57,342 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-07-23 17:00:58,174 - __main__ - INFO - Google Cloud TTS client initialized successfully
+2025-07-23 17:00:58,174 - __main__ - INFO - Configuring Google AI Studio with model: gemini-2.0-flash-exp
+2025-07-23 17:00:58,174 - __main__ - INFO - API key: AIzaSyCZ...f-OM
+2025-07-23 17:00:59,105 - __main__ - INFO - Gemini connection test successful
+2025-07-23 17:00:59,113 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-07-23 17:00:59,117 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-07-23 17:00:59,118 - __main__ - INFO - Initializing database...
+2025-07-23 17:00:59,121 - __main__ - INFO - Database tables created successfully
+2025-07-23 17:00:59,122 - __main__ - INFO - Attempting database migration...
+2025-07-23 17:00:59,479 - __main__ - INFO - Database migration completed successfully
+2025-07-23 17:00:59,479 - __main__ - INFO - Checking word-of-day data...
+2025-07-23 17:00:59,533 - __main__ - INFO - Database initialization completed successfully
+2025-07-23 17:00:59,533 - __main__ - INFO - Server starting on port 5000
+2025-07-23 17:00:59,537 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+2025-07-23 17:00:59,538 - werkzeug - INFO - [33mPress CTRL+C to quit[0m

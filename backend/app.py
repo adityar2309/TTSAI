@@ -26,16 +26,24 @@ import google.generativeai as genai
 # Import centralized configuration
 from config import get_llm_config, get_model_name, LLM_PROVIDER, GEMINI_API_KEY
 
-# Configure comprehensive logging first
+# Configure comprehensive logging first with UTF-8 encoding
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('app.log'),
+        logging.FileHandler('app.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
+
+# Fix for console output encoding issues on Windows
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+console_handler.setStream(open(os.devnull, 'w'))  # Redirect to null device if encoding issues occur
+
 logger = logging.getLogger(__name__)
+logger.handlers = [h for h in logger.handlers if not isinstance(h, logging.StreamHandler)]
+logger.addHandler(console_handler)
 
 # Import database service
 try:
@@ -2667,7 +2675,7 @@ def initialize_data_files():
             else:
                 logger.error("❌ Failed to create word-of-day data")
         else:
-            logger.info(f"✅ Word-of-day data exists: {word_data.get('word', 'Unknown')}")
+            logger.info(f"[OK] Word-of-day data exists: {word_data.get('word', 'Unknown')}")
             
         # Check for other languages too
         for lang in ['es', 'fr', 'de', 'it', 'pt']:
