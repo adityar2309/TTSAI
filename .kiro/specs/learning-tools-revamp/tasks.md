@@ -19,9 +19,12 @@
     - Configure authentication callback URL
     - _Requirements: 3.1, 3.2, 3.3_
 
+
+
   - [ ] 1.3 Install required frontend dependencies
     - Add React Google Login package
     - Add quiz-related UI components
+
     - _Requirements: 2.1, 3.1_
 
 - [ ] 2. Implement Google Authentication
