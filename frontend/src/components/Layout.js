@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import TranslateIcon from '@mui/icons-material/Translate';
+import BugReportIcon from '@mui/icons-material/BugReport';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -31,6 +32,7 @@ const Layout = ({ children, toggleColorMode, mode }) => {
 
   const menuItems = [
     { text: 'Translator', icon: <TranslateIcon />, path: '/' },
+    { text: 'Diagnostics', icon: <BugReportIcon />, path: '/diagnostics' },
   ];
 
   const handleNavigation = (path) => {

@@ -207,70 +207,81 @@ def cache_result(cache_dict, key, result):
     cache_dict[key] = (result, time.time())
 
 # LLM API helper function
-def call_llm_api(prompt, model=None, max_tokens=None):
-    """Make a call to the configured LLM API"""
+def call_llm_api(prompt, model=None, max_tokens=None, retries=2):
+    """Make a call to the configured LLM API with retry logic"""
     llm_config = get_llm_config()
     
     if not gemini_model or not llm_config["api_key"]:
         raise Exception("LLM API not configured")
     
-    try:
-        if llm_config["provider"] == "google_ai_studio" and isinstance(gemini_model, genai.GenerativeModel):
-            # Use Google AI Studio API directly
-            generation_config = genai.types.GenerationConfig(
-                max_output_tokens=max_tokens or llm_config["max_tokens"],
-                temperature=llm_config["temperature"]
-            )
-            
-            response = gemini_model.generate_content(
-                prompt,
-                generation_config=generation_config
-            )
-            
-            if response.text:
-                return response.text.strip()
-            else:
-                raise Exception("Empty response from Gemini API")
+    last_error = None
+    for attempt in range(retries + 1):
+        try:
+            if llm_config["provider"] == "google_ai_studio" and isinstance(gemini_model, genai.GenerativeModel):
+                # Use Google AI Studio API directly
+                generation_config = genai.types.GenerationConfig(
+                    max_output_tokens=max_tokens or llm_config["max_tokens"],
+                    temperature=llm_config["temperature"]
+                )
                 
-        else:
-            # OpenRouter fallback
-            model = model or llm_config["model"]
-            max_tokens = max_tokens or llm_config["max_tokens"]
-            
-            headers = {
-                "Authorization": f"Bearer {llm_config['api_key']}",
-                "Content-Type": "application/json"
-            }
-            
-            data = {
-                "model": model,
-                "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": max_tokens,
-                "temperature": llm_config["temperature"]
-            }
-            
-            response = requests.post(
-                llm_config["base_url"],
-                headers=headers,
-                json=data,
-                timeout=30
-            )
-            
-            if response.status_code == 200:
-                result = response.json()
-                return result['choices'][0]['message']['content']
-            else:
-                error_msg = f"OpenRouter API error: {response.status_code}"
+                response = gemini_model.generate_content(
+                    prompt,
+                    generation_config=generation_config
+                )
+                
                 if response.text:
-                    error_msg += f" - {response.text}"
-                raise Exception(error_msg)
-            
-    except requests.exceptions.Timeout:
-        raise Exception("LLM API timeout")
-    except requests.exceptions.RequestException as e:
-        raise Exception(f"LLM API request failed: {e}")
-    except Exception as e:
-        raise Exception(f"LLM API error: {e}")
+                    return response.text.strip()
+                else:
+                    raise Exception("Empty response from Gemini API")
+                    
+            else:
+                # OpenRouter fallback
+                model = model or llm_config["model"]
+                max_tokens = max_tokens or llm_config["max_tokens"]
+                
+                headers = {
+                    "Authorization": f"Bearer {llm_config['api_key']}",
+                    "Content-Type": "application/json"
+                }
+                
+                data = {
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": max_tokens,
+                    "temperature": llm_config["temperature"]
+                }
+                
+                response = requests.post(
+                    llm_config["base_url"],
+                    headers=headers,
+                    json=data,
+                    timeout=30
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    return result['choices'][0]['message']['content']
+                else:
+                    error_msg = f"OpenRouter API error: {response.status_code}"
+                    if response.text:
+                        error_msg += f" - {response.text}"
+                    raise Exception(error_msg)
+                
+        except requests.exceptions.Timeout:
+            last_error = Exception("LLM API timeout")
+        except requests.exceptions.RequestException as e:
+            last_error = Exception(f"LLM API request failed: {e}")
+        except Exception as e:
+            last_error = Exception(f"LLM API error: {e}")
+        
+        # If we're here, there was an error
+        if attempt < retries:
+            logger.warning(f"LLM API call failed (attempt {attempt+1}/{retries+1}), retrying...")
+            time.sleep(1)  # Wait before retrying
+        
+    # If we've exhausted all retries, raise the last error
+    if last_error:
+        raise last_error
 
 # Enhanced translation prompt with more detailed instructions
 def get_advanced_translation_prompt(text, source_lang, target_lang, formality="neutral", dialect=None, context=None):
@@ -775,30 +786,73 @@ def advanced_translate():
             if not response_text:
                 raise Exception("Empty response from LLM API")
                 
-            # Parse JSON response
-            translation_data = json.loads(response_text)
+            # Clean up response text - remove markdown formatting if present
+            response_text = response_text.strip()
+            if response_text.startswith('```json'):
+                response_text = response_text[7:]
+            if response_text.endswith('```'):
+                response_text = response_text[:-3]
+            response_text = response_text.strip()
             
-            # Add metadata
-            translation_data['metadata'] = {
-                'timestamp': datetime.now().isoformat(),
-                'source_lang': source_lang,
-                'target_lang': target_lang,
-                'formality': formality,
-                'dialect': dialect,
-                'context': context,
-                'cached': False
-            }
-            
-            # Cache the result
-            cache_result(translation_cache, cache_key, translation_data)
-            
-            logger.info(f"Translation completed successfully for: {text[:50]}...")
-            return jsonify(translation_data)
-            
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON decode error: {e}. Response: {response_text[:200]}")
+            try:
+                # Parse JSON response
+                translation_data = json.loads(response_text)
+                
+                # Add metadata
+                translation_data['metadata'] = {
+                    'timestamp': datetime.now().isoformat(),
+                    'source_lang': source_lang,
+                    'target_lang': target_lang,
+                    'formality': formality,
+                    'dialect': dialect,
+                    'context': context,
+                    'cached': False
+                }
+                
+                # Cache the result
+                cache_result(translation_cache, cache_key, translation_data)
+                
+                logger.info(f"Translation completed successfully for: {text[:50]}...")
+                return jsonify(translation_data)
+            except json.JSONDecodeError as e:
+                logger.error(f"JSON decode error: {e}. Response: {response_text[:200]}")
+                
+                # Fallback to basic translation
+                logger.info("Falling back to basic translation")
+                basic_translation = {
+                    'main_translation': text,  # Default to original text
+                    'alternatives': [],
+                    'pronunciation': {},
+                    'grammar': {},
+                    'context': {},
+                    'additional': {},
+                    'metadata': {
+                        'timestamp': datetime.now().isoformat(),
+                        'source_lang': source_lang,
+                        'target_lang': target_lang,
+                        'formality': formality,
+                        'dialect': dialect,
+                        'context': context,
+                        'cached': False,
+                        'fallback': True
+                    }
+                }
+                
+                # Try to extract at least the main translation using basic translate
+                try:
+                    basic_prompt = f"Translate this text from {source_lang} to {target_lang}: '{text}'. Return ONLY the translation, nothing else."
+                    basic_response = call_llm_api(basic_prompt, max_tokens=100)
+                    if basic_response:
+                        basic_translation['main_translation'] = basic_response.strip()
+                except Exception as inner_e:
+                    logger.error(f"Fallback translation also failed: {inner_e}")
+                
+                return jsonify(basic_translation)
+                
+        except Exception as e:
+            logger.error(f"Translation error: {e}")
             return jsonify({
-                'error': 'Translation service returned invalid format',
+                'error': 'Translation service error',
                 'details': 'Please try again'
             }), 500
             

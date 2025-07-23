@@ -1,0 +1,218 @@
+2025-07-23 16:25:42,834 - health_check - INFO - [36mStarting comprehensive backend health check...[0m
+2025-07-23 16:25:44,900 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:25:46,973 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:25:49,038 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:25:51,105 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:25:53,181 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:25:55,236 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:25:57,323 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:25:59,380 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:26:01,439 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:26:03,499 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:26:05,552 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:26:07,587 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:26:09,637 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:26:09,638 - health_check - INFO - 
+[36m=== Health Check Summary ===[0m
+2025-07-23 16:26:09,638 - health_check - INFO - Total tests: 13
+2025-07-23 16:26:09,638 - health_check - INFO - [32mPassed: 0[0m
+2025-07-23 16:26:09,638 - health_check - INFO - [31mFailed: 13[0m
+2025-07-23 16:26:09,639 - health_check - INFO - [33mWarnings: 0[0m
+2025-07-23 16:26:09,639 - health_check - INFO - Success rate: 0.0%
+2025-07-23 16:26:09,639 - health_check - INFO - 
+[31mFailed endpoints:[0m
+2025-07-23 16:26:09,639 - health_check - INFO - - Health Check: Unknown error
+2025-07-23 16:26:09,640 - health_check - INFO - - Supported Languages: Unknown error
+2025-07-23 16:26:09,640 - health_check - INFO - - Basic Translation (en to es): Unknown error
+2025-07-23 16:26:09,640 - health_check - INFO - - Advanced Translation (en to es): Unknown error
+2025-07-23 16:26:09,640 - health_check - INFO - - Romanization: Unknown error
+2025-07-23 16:26:09,641 - health_check - INFO - - Word of Day (en): Unknown error
+2025-07-23 16:26:09,641 - health_check - INFO - - Common Phrases (en): Unknown error
+2025-07-23 16:26:09,641 - health_check - INFO - - Flashcards: Unknown error
+2025-07-23 16:26:09,641 - health_check - INFO - - Quiz Generation: Unknown error
+2025-07-23 16:26:09,641 - health_check - INFO - - User Progress: Unknown error
+2025-07-23 16:26:09,642 - health_check - INFO - - Quiz Submission: Unknown error
+2025-07-23 16:26:09,642 - health_check - INFO - - Avatar Conversation: Unknown error
+2025-07-23 16:26:09,643 - health_check - INFO - Results saved to health_check_results.json
+2025-07-23 16:26:54,627 - health_check - INFO - [36mStarting comprehensive backend health check...[0m
+2025-07-23 16:27:52,534 - health_check - INFO - [36mStarting comprehensive backend health check...[0m
+2025-07-23 16:28:11,402 - health_check - ERROR - Response: {
+  "details": "Please try again",
+  "error": "Translation service returned invalid format"
+}
+2025-07-23 16:28:20,574 - health_check - ERROR - Response: {
+  "error": "User ID required"
+}
+2025-07-23 16:28:22,628 - health_check - ERROR - Response: {
+  "error": "Missing required fields"
+}
+2025-07-23 16:28:24,682 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:28:26,738 - health_check - ERROR - Response: {
+  "error": "Quiz test_quiz_id not found"
+}
+2025-07-23 16:28:28,829 - health_check - ERROR - Response: {
+  "error": "Method not allowed"
+}
+2025-07-23 16:28:28,830 - health_check - INFO - 
+[36m=== Health Check Summary ===[0m
+2025-07-23 16:28:28,830 - health_check - INFO - Total tests: 13
+2025-07-23 16:28:28,830 - health_check - INFO - [32mPassed: 7[0m
+2025-07-23 16:28:28,831 - health_check - INFO - [31mFailed: 6[0m
+2025-07-23 16:28:28,831 - health_check - INFO - [33mWarnings: 0[0m
+2025-07-23 16:28:28,831 - health_check - INFO - Success rate: 53.85%
+2025-07-23 16:28:28,831 - health_check - INFO - 
+[31mFailed endpoints:[0m
+2025-07-23 16:28:28,832 - health_check - INFO - - Advanced Translation (en to es): Unknown error
+2025-07-23 16:28:28,832 - health_check - INFO - - Flashcards: Unknown error
+2025-07-23 16:28:28,832 - health_check - INFO - - Quiz Generation: Unknown error
+2025-07-23 16:28:28,832 - health_check - INFO - - User Progress: Unknown error
+2025-07-23 16:28:28,833 - health_check - INFO - - Quiz Submission: Unknown error
+2025-07-23 16:28:28,833 - health_check - INFO - - Avatar Conversation: Unknown error
+2025-07-23 16:28:28,835 - health_check - INFO - Results saved to health_check_results.json
+2025-07-23 16:33:03,138 - health_check - INFO - [36mStarting comprehensive backend health check...[0m
+2025-07-23 16:33:22,661 - health_check - ERROR - [31mFAIL Advanced Translation (en to es): Got 500, expected 200[0m
+2025-07-23 16:33:22,661 - health_check - ERROR - Response: {
+  "details": "Please try again",
+  "error": "Translation service returned invalid format"
+}
+2025-07-23 16:33:31,796 - health_check - ERROR - [31mFAIL Flashcards: Got 400, expected 200[0m
+2025-07-23 16:33:31,796 - health_check - ERROR - Response: {
+  "error": "User ID required"
+}
+2025-07-23 16:33:33,836 - health_check - ERROR - [31mFAIL Quiz Generation: Got 400, expected 200[0m
+2025-07-23 16:33:33,836 - health_check - ERROR - Response: {
+  "error": "Missing required fields"
+}
+2025-07-23 16:33:35,877 - health_check - ERROR - [31mFAIL User Progress: Got 404, expected 200[0m
+2025-07-23 16:33:35,878 - health_check - ERROR - Response: {
+  "error": "Endpoint not found"
+}
+2025-07-23 16:33:37,933 - health_check - ERROR - [31mFAIL Quiz Generation for Submission: Got 400, expected 200[0m
+2025-07-23 16:33:37,933 - health_check - ERROR - Response: {
+  "error": "Missing required fields"
+}
+2025-07-23 16:33:40,009 - health_check - ERROR - [31mFAIL Quiz Submission: Got 404, expected 200[0m
+2025-07-23 16:33:40,009 - health_check - ERROR - Response: {
+  "error": "Quiz test_quiz_id not found"
+}
+2025-07-23 16:33:42,069 - health_check - ERROR - [31mFAIL Avatar Conversation: Got 400, expected 200[0m
+2025-07-23 16:33:42,070 - health_check - ERROR - Response: {
+  "error": "Missing required fields"
+}
+2025-07-23 16:33:42,070 - health_check - INFO - 
+[36m=== Health Check Summary ===[0m
+2025-07-23 16:33:42,071 - health_check - INFO - Total tests: 14
+2025-07-23 16:33:42,071 - health_check - INFO - [32mPassed: 7[0m
+2025-07-23 16:33:42,071 - health_check - INFO - [31mFailed: 7[0m
+2025-07-23 16:33:42,071 - health_check - INFO - [33mWarnings: 0[0m
+2025-07-23 16:33:42,072 - health_check - INFO - Success rate: 50.0%
+2025-07-23 16:33:42,072 - health_check - INFO - 
+[31mFailed endpoints:[0m
+2025-07-23 16:33:42,072 - health_check - INFO - - Advanced Translation (en to es): Unknown error
+2025-07-23 16:33:42,072 - health_check - INFO - - Flashcards: Unknown error
+2025-07-23 16:33:42,072 - health_check - INFO - - Quiz Generation: Unknown error
+2025-07-23 16:33:42,073 - health_check - INFO - - User Progress: Unknown error
+2025-07-23 16:33:42,073 - health_check - INFO - - Quiz Generation for Submission: Unknown error
+2025-07-23 16:33:42,073 - health_check - INFO - - Quiz Submission: Unknown error
+2025-07-23 16:33:42,073 - health_check - INFO - - Avatar Conversation: Unknown error
+2025-07-23 16:33:42,075 - health_check - INFO - Results saved to health_check_results.json
+2025-07-23 16:34:49,270 - health_check - INFO - [36mStarting comprehensive backend health check...[0m
+2025-07-23 16:35:06,339 - health_check - ERROR - [31mFAIL Advanced Translation (en to es): Got 500, expected 200[0m
+2025-07-23 16:35:06,339 - health_check - ERROR - Response: {
+  "details": "Please try again",
+  "error": "Translation service returned invalid format"
+}
+2025-07-23 16:35:22,710 - health_check - ERROR - [31mFAIL Quiz Submission: Got 400, expected 200[0m
+2025-07-23 16:35:22,711 - health_check - ERROR - Response: {
+  "error": "Missing required parameters"
+}
+2025-07-23 16:35:24,756 - health_check - ERROR - [31mFAIL Avatar Conversation: Got 400, expected 200[0m
+2025-07-23 16:35:24,757 - health_check - ERROR - Response: {
+  "error": "Missing required fields"
+}
+2025-07-23 16:35:24,757 - health_check - INFO - 
+[36m=== Health Check Summary ===[0m
+2025-07-23 16:35:24,757 - health_check - INFO - Total tests: 14
+2025-07-23 16:35:24,757 - health_check - INFO - [32mPassed: 11[0m
+2025-07-23 16:35:24,757 - health_check - INFO - [31mFailed: 3[0m
+2025-07-23 16:35:24,758 - health_check - INFO - [33mWarnings: 0[0m
+2025-07-23 16:35:24,758 - health_check - INFO - Success rate: 78.57%
+2025-07-23 16:35:24,758 - health_check - INFO - 
+[31mFailed endpoints:[0m
+2025-07-23 16:35:24,758 - health_check - INFO - - Advanced Translation (en to es): Unknown error
+2025-07-23 16:35:24,758 - health_check - INFO - - Quiz Submission: Unknown error
+2025-07-23 16:35:24,758 - health_check - INFO - - Avatar Conversation: Unknown error
+2025-07-23 16:35:24,761 - health_check - INFO - Results saved to health_check_results.json
+2025-07-23 16:37:25,257 - health_check - INFO - [36mStarting comprehensive backend health check...[0m
+2025-07-23 16:37:42,615 - health_check - ERROR - [31mFAIL Advanced Translation (en to es): Got 500, expected 200[0m
+2025-07-23 16:37:42,615 - health_check - ERROR - Response: {
+  "details": "Please try again",
+  "error": "Translation service returned invalid format"
+}
+2025-07-23 16:37:59,117 - health_check - ERROR - [31mFAIL Quiz Submission: Got 404, expected 200[0m
+2025-07-23 16:37:59,117 - health_check - ERROR - Response: {
+  "error": "Quiz 7ab33df6-c8a9-4322-927c-9386f7ae2e53 not found"
+}
+2025-07-23 16:38:01,184 - health_check - ERROR - [31mFAIL Avatar Conversation: Got 404, expected 200[0m
+2025-07-23 16:38:01,184 - health_check - ERROR - Response: {
+  "error": "Avatar default not found"
+}
+2025-07-23 16:38:01,184 - health_check - INFO - 
+[36m=== Health Check Summary ===[0m
+2025-07-23 16:38:01,185 - health_check - INFO - Total tests: 14
+2025-07-23 16:38:01,185 - health_check - INFO - [32mPassed: 11[0m
+2025-07-23 16:38:01,185 - health_check - INFO - [31mFailed: 3[0m
+2025-07-23 16:38:01,185 - health_check - INFO - [33mWarnings: 0[0m
+2025-07-23 16:38:01,186 - health_check - INFO - Success rate: 78.57%
+2025-07-23 16:38:01,186 - health_check - INFO - 
+[31mFailed endpoints:[0m
+2025-07-23 16:38:01,186 - health_check - INFO - - Advanced Translation (en to es): Unknown error
+2025-07-23 16:38:01,186 - health_check - INFO - - Quiz Submission: Unknown error
+2025-07-23 16:38:01,186 - health_check - INFO - - Avatar Conversation: Unknown error
+2025-07-23 16:38:01,189 - health_check - INFO - Results saved to health_check_results.json
+2025-07-23 16:40:05,703 - health_check - INFO - [36mStarting comprehensive backend health check...[0m
+2025-07-23 16:40:28,275 - health_check - INFO - 
+[36m=== Health Check Summary ===[0m
+2025-07-23 16:40:28,276 - health_check - INFO - Total tests: 10
+2025-07-23 16:40:28,276 - health_check - INFO - [32mPassed: 13[0m
+2025-07-23 16:40:28,276 - health_check - INFO - [31mFailed: 0[0m
+2025-07-23 16:40:28,277 - health_check - INFO - [33mWarnings: 0[0m
+2025-07-23 16:40:28,277 - health_check - INFO - Success rate: 130.0%
+2025-07-23 16:40:28,279 - health_check - INFO - Results saved to health_check_results.json
+2025-07-23 16:58:33,272 - health_check - INFO - [36mStarting comprehensive backend health check...[0m
+2025-07-23 16:58:55,787 - health_check - INFO - 
+[36m=== Health Check Summary ===[0m
+2025-07-23 16:58:55,788 - health_check - INFO - Total tests: 10
+2025-07-23 16:58:55,788 - health_check - INFO - [32mPassed: 13[0m
+2025-07-23 16:58:55,788 - health_check - INFO - [31mFailed: 0[0m
+2025-07-23 16:58:55,789 - health_check - INFO - [33mWarnings: 0[0m
+2025-07-23 16:58:55,789 - health_check - INFO - Success rate: 130.0%
+2025-07-23 16:58:55,792 - health_check - INFO - Results saved to health_check_results.json

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import Layout from './components/Layout';
 import Translator from './components/Translator';
+import DiagnosticTool from './components/DiagnosticTool';
 import { deepPurple, amber } from '@mui/material/colors';
 import './styles/gradients.css';
 
@@ -105,6 +106,7 @@ function App() {
         <Layout toggleColorMode={toggleColorMode} mode={mode}>
           <Routes>
             <Route path="/" element={<Translator />} />
+            <Route path="/diagnostics" element={<DiagnosticTool />} />
           </Routes>
         </Layout>
       </Router>

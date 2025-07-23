@@ -1,0 +1,120 @@
+{
+  "passed": 0,
+  "failed": 13,
+  "warnings": 0,
+  "total": 13,
+  "endpoints": {
+    "Health Check": {
+      "name": "Health Check",
+      "description": "Basic health check endpoint",
+      "endpoint": "/api/health",
+      "method": "GET",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:27.415464",
+      "success": false
+    },
+    "Supported Languages": {
+      "name": "Supported Languages",
+      "description": "Get list of supported languages",
+      "endpoint": "/api/supported-languages",
+      "method": "GET",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:23.321554",
+      "success": false
+    },
+    "Basic Translation (en to es)": {
+      "name": "Basic Translation (en to es)",
+      "description": "Translate 'Hello world' from en to es",
+      "endpoint": "/api/translate",
+      "method": "POST",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:31.542557",
+      "success": false
+    },
+    "Advanced Translation (en to es)": {
+      "name": "Advanced Translation (en to es)",
+      "description": "Advanced translate 'Hello world' from en to es",
+      "endpoint": "/api/advanced-translate",
+      "method": "POST",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:35.672006",
+      "success": false
+    },
+    "Romanization": {
+      "name": "Romanization",
+      "description": "Test romanization with Japanese translation",
+      "endpoint": "/api/translate",
+      "method": "POST",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:39.730941",
+      "success": false
+    },
+    "Word of Day (en)": {
+      "name": "Word of Day (en)",
+      "description": "Get word of day for language: en",
+      "endpoint": "/api/word-of-day?language=en",
+      "method": "GET",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:43.805689",
+      "success": false
+    },
+    "Common Phrases (en)": {
+      "name": "Common Phrases (en)",
+      "description": "Get common phrases for language: en",
+      "endpoint": "/api/common-phrases?language=en",
+      "method": "GET",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:47.905087",
+      "success": false
+    },
+    "Flashcards": {
+      "name": "Flashcards",
+      "description": "Get user flashcards",
+      "endpoint": "/api/flashcards?user_id=test_user_id",
+      "method": "GET",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:52.032283",
+      "success": false
+    },
+    "Quiz Generation": {
+      "name": "Quiz Generation",
+      "description": "Generate quiz",
+      "endpoint": "/api/quiz/generate",
+      "method": "POST",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:15:56.122228",
+      "success": false
+    },
+    "User Progress": {
+      "name": "User Progress",
+      "description": "Get user progress",
+      "endpoint": "/api/user/progress?user_id=test_user_id",
+      "method": "GET",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:16:00.248463",
+      "success": false
+    },
+    "Quiz Submission": {
+      "name": "Quiz Submission",
+      "description": "Submit quiz results",
+      "endpoint": "/api/quiz/submit",
+      "method": "POST",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:16:04.365856",
+      "success": false
+    },
+    "Avatar Conversation": {
+      "name": "Avatar Conversation",
+      "description": "Start avatar conversation",
+      "endpoint": "/api/avatar/start",
+      "method": "POST",
+      "error": "Connection error - server may be down",
+      "timestamp": "2025-07-23T16:16:08.485780",
+      "success": false
+    }
+  },
+  "summary": {
+    "success_rate": 0.0,
+    "timestamp": "2025-07-23T16:16:08.485780"
+  }
+}

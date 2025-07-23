@@ -1,0 +1,672 @@
+{
+  "passed": 13,
+  "failed": 0,
+  "warnings": 0,
+  "total": 10,
+  "endpoints": {
+    "Health Check": {
+      "name": "Health Check",
+      "description": "Basic health check endpoint",
+      "endpoint": "/api/health",
+      "method": "GET",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 2.058,
+      "timestamp": "2025-07-23T16:58:39.423116",
+      "success": true,
+      "response_data": {
+        "services": {
+          "gemini": true,
+          "speech_client": true,
+          "tts_client": true
+        },
+        "status": "healthy",
+        "timestamp": "2025-07-23T16:58:39.421901"
+      }
+    },
+    "Supported Languages": {
+      "name": "Supported Languages",
+      "description": "Get list of supported languages",
+      "endpoint": "/api/supported-languages",
+      "method": "GET",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 2.042,
+      "timestamp": "2025-07-23T16:58:37.365156",
+      "success": true,
+      "response_data": {
+        "languages": [
+          {
+            "code": "en",
+            "name": "English",
+            "native_name": "English",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "es",
+            "name": "Spanish",
+            "native_name": "Espa\u00f1ol",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "fr",
+            "name": "French",
+            "native_name": "Fran\u00e7ais",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "de",
+            "name": "German",
+            "native_name": "Deutsch",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "it",
+            "name": "Italian",
+            "native_name": "Italiano",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "pt",
+            "name": "Portuguese",
+            "native_name": "Portugu\u00eas",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "ru",
+            "name": "Russian",
+            "native_name": "\u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "ja",
+            "name": "Japanese",
+            "native_name": "\u65e5\u672c\u8a9e",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "ko",
+            "name": "Korean",
+            "native_name": "\ud55c\uad6d\uc5b4",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "zh",
+            "name": "Chinese (Simplified)",
+            "native_name": "\u7b80\u4f53\u4e2d\u6587",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "zh-TW",
+            "name": "Chinese (Traditional)",
+            "native_name": "\u7e41\u9ad4\u4e2d\u6587",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "ar",
+            "name": "Arabic",
+            "native_name": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "hi",
+            "name": "Hindi",
+            "native_name": "\u0939\u093f\u0928\u094d\u0926\u0940",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "th",
+            "name": "Thai",
+            "native_name": "\u0e44\u0e17\u0e22",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "vi",
+            "name": "Vietnamese",
+            "native_name": "Ti\u1ebfng Vi\u1ec7t",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "nl",
+            "name": "Dutch",
+            "native_name": "Nederlands",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "pl",
+            "name": "Polish",
+            "native_name": "Polski",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "tr",
+            "name": "Turkish",
+            "native_name": "T\u00fcrk\u00e7e",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "sv",
+            "name": "Swedish",
+            "native_name": "Svenska",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          },
+          {
+            "code": "da",
+            "name": "Danish",
+            "native_name": "Dansk",
+            "speech_recognition_supported": true,
+            "tts_supported": true
+          }
+        ],
+        "speech_recognition_supported_count": 20,
+        "total_languages": 20,
+        "tts_supported_count": 20
+      }
+    },
+    "Basic Translation (en to es)": {
+      "name": "Basic Translation (en to es)",
+      "description": "Translate 'Hello world' from en to es",
+      "endpoint": "/api/translate",
+      "method": "POST",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 3.004,
+      "timestamp": "2025-07-23T16:58:42.427585",
+      "success": true,
+      "response_data": {
+        "source_lang": "en",
+        "target_lang": "es",
+        "timestamp": "2025-07-23T16:58:42.425899",
+        "translation": "Hola mundo"
+      }
+    },
+    "Advanced Translation (en to es)": {
+      "name": "Advanced Translation (en to es)",
+      "description": "Advanced translate 'Hello world' from en to es",
+      "endpoint": "/api/advanced-translate",
+      "method": "POST",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 0.5,
+      "timestamp": "2025-07-23T16:58:42.428617",
+      "success": true,
+      "response_data": {
+        "main_translation": "Hola mundo",
+        "alternatives": [
+          {
+            "text": "Hola mundo",
+            "confidence": 95,
+            "explanation": "Standard translation",
+            "type": "literal"
+          },
+          {
+            "text": "Qu\u00e9 tal mundo",
+            "confidence": 85,
+            "explanation": "More casual greeting",
+            "type": "colloquial"
+          },
+          {
+            "text": "Saludos al mundo",
+            "confidence": 80,
+            "explanation": "More formal greeting",
+            "type": "formal"
+          }
+        ],
+        "pronunciation": {
+          "ipa": "ola \u02c8mundo",
+          "syllables": "Ho-la mun-do",
+          "stress": "HO-la MUN-do",
+          "phonetic": "oh-lah moon-doh",
+          "romanization": "",
+          "romanization_system": ""
+        },
+        "grammar": {
+          "parts_of_speech": [
+            "greeting",
+            "noun"
+          ],
+          "structure": "Simple greeting + noun",
+          "rules": [
+            "Spanish nouns have gender (mundo is masculine)"
+          ],
+          "differences": "English 'hello' becomes 'hola' in Spanish"
+        },
+        "context": {
+          "usage_contexts": [
+            "Greeting",
+            "Programming",
+            "Introduction"
+          ],
+          "examples": [
+            "Hola mundo, \u00bfc\u00f3mo est\u00e1s?",
+            "El primer programa siempre es 'Hola mundo'",
+            "Hola mundo, soy nuevo aqu\u00ed"
+          ],
+          "cultural_notes": "Used in both formal and informal contexts",
+          "appropriate_situations": [
+            "First meetings",
+            "Programming examples",
+            "Beginning conversations"
+          ]
+        },
+        "additional": {
+          "difficulty": "beginner",
+          "common_mistakes": [
+            "Forgetting accent in 'c\u00f3mo'"
+          ],
+          "related_phrases": [
+            "Hola a todos",
+            "Saludos",
+            "Bienvenidos"
+          ],
+          "etymology": "Hola comes from Arabic 'wa-llah'"
+        },
+        "metadata": {
+          "timestamp": "2025-07-23T16:58:42.428617",
+          "source_lang": "en",
+          "target_lang": "es",
+          "formality": "neutral",
+          "dialect": null,
+          "context": null,
+          "cached": false
+        }
+      }
+    },
+    "Romanization": {
+      "name": "Romanization",
+      "description": "Test romanization with Japanese translation",
+      "endpoint": "/api/translate",
+      "method": "POST",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 3.006,
+      "timestamp": "2025-07-23T16:58:45.434679",
+      "success": true,
+      "response_data": {
+        "romanization": "konnichiwa",
+        "romanization_system": "Hepburn",
+        "source_lang": "en",
+        "target_lang": "ja",
+        "timestamp": "2025-07-23T16:58:45.432674",
+        "translation": "\u3053\u3093\u306b\u3061\u306f"
+      }
+    },
+    "Word of Day (en)": {
+      "name": "Word of Day (en)",
+      "description": "Get word of day for language: en",
+      "endpoint": "/api/word-of-day?language=en",
+      "method": "GET",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 2.064,
+      "timestamp": "2025-07-23T16:58:47.499079",
+      "success": true,
+      "response_data": {
+        "cultural_note": "Reflects the human desire for exploration and discovery",
+        "difficulty": "intermediate",
+        "etymology": "From German 'wandern' (to hike) + 'lust' (desire)",
+        "example_sentence": "Her wanderlust led her to explore remote corners of the world",
+        "example_translation": "Su pasi\u00f3n por viajar la llev\u00f3 a explorar rincones remotos del mundo",
+        "part_of_speech": "noun",
+        "pronunciation": "\u02c8w\u0252nd\u0259l\u028cst",
+        "related_words": [
+          "travel",
+          "exploration",
+          "adventure"
+        ],
+        "translation": "A strong desire to travel",
+        "word": "wanderlust"
+      }
+    },
+    "Common Phrases (en)": {
+      "name": "Common Phrases (en)",
+      "description": "Get common phrases for language: en",
+      "endpoint": "/api/common-phrases?language=en",
+      "method": "GET",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 2.065,
+      "timestamp": "2025-07-23T16:58:49.564989",
+      "success": true,
+      "response_data": {
+        "categories": [
+          "greetings",
+          "travel",
+          "food",
+          "business",
+          "casual",
+          "emergency",
+          "shopping",
+          "directions",
+          "transportation",
+          "accommodation"
+        ],
+        "difficulties": [
+          "beginner",
+          "intermediate",
+          "advanced"
+        ],
+        "phrases": [
+          {
+            "category": "greetings",
+            "cultural_notes": "Very common informal greeting in Spanish-speaking countries",
+            "difficulty": "beginner",
+            "phrase": "Hello, how are you?",
+            "pronunciation": "OH-lah, KOH-moh ehs-TAHS",
+            "translation": "Hola, \u00bfc\u00f3mo est\u00e1s?",
+            "usage_context": "Informal greeting between friends or acquaintances"
+          },
+          {
+            "category": "travel",
+            "cultural_notes": "Adding 'por favor' shows good manners",
+            "difficulty": "intermediate",
+            "phrase": "Could you please help me?",
+            "pronunciation": "poh-DREE-ahs ah-yoo-DAHR-meh, pohr fah-VOHR",
+            "translation": "\u00bfPodr\u00edas ayudarme, por favor?",
+            "usage_context": "Polite request for assistance"
+          },
+          {
+            "category": "travel",
+            "cultural_notes": "Important phrase for travelers",
+            "difficulty": "intermediate",
+            "phrase": "Where is the nearest hospital?",
+            "pronunciation": "DOHN-deh ehs-TAH ehl ohs-pee-TAHL mahs sehr-KAH-noh",
+            "translation": "\u00bfD\u00f3nde est\u00e1 el hospital m\u00e1s cercano?",
+            "usage_context": "Emergency or medical situations"
+          },
+          {
+            "category": "food",
+            "cultural_notes": "Polite way to order food",
+            "difficulty": "beginner",
+            "phrase": "I would like to order...",
+            "pronunciation": "meh goos-tah-REE-ah peh-DEER",
+            "translation": "Me gustar\u00eda pedir...",
+            "usage_context": "Ordering food at restaurants"
+          },
+          {
+            "category": "greetings",
+            "cultural_notes": "Essential phrase for showing appreciation",
+            "difficulty": "beginner",
+            "phrase": "Thank you very much",
+            "pronunciation": "MOO-chahs GRAH-see-ahs",
+            "translation": "Muchas gracias",
+            "usage_context": "Expressing gratitude"
+          }
+        ],
+        "total": 5
+      }
+    },
+    "Flashcards": {
+      "name": "Flashcards",
+      "description": "Get user flashcards",
+      "endpoint": "/api/flashcards?userId=test_user_id",
+      "method": "GET",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 2.071,
+      "timestamp": "2025-07-23T16:58:51.636500",
+      "success": true,
+      "response_data": {
+        "filters": {
+          "category": null,
+          "difficulty": null
+        },
+        "flashcards": [],
+        "language": null,
+        "total": 0
+      }
+    },
+    "Quiz Generation": {
+      "name": "Quiz Generation",
+      "description": "Generate quiz",
+      "endpoint": "/api/quiz/generate",
+      "method": "POST",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 2.065,
+      "timestamp": "2025-07-23T16:58:53.702170",
+      "success": true,
+      "response_data": {
+        "questions": [
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "f1a3f589-d5f6-449d-adce-85f736cb1da0",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "f3a4787c-a45f-419f-bb5c-2eb6e8fc95b8",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "68ef9f58-b73d-4ca8-8121-cdf56e14fd80",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "7c4ee0e7-de2d-409b-9dae-18dd04545ce1",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "be8694ae-02cc-4191-afcd-839b682b5605",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "f56e8a00-5a50-4b1d-8e73-73d7e0ff9b6f",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "86718050-5228-41e2-9706-e8c2c871f687",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "9793e027-90b5-4743-bdb1-b9086055c297",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "8887eaa8-af3a-4706-8498-b3476b2ddd2d",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          },
+          {
+            "correct_answer": "Hello",
+            "explanation": "This is the grammatically correct option.",
+            "id": "558bf653-c4f8-45ed-8ef8-58949f402925",
+            "options": [
+              "Hey!",
+              "Hello",
+              "Yo!",
+              "What's up?"
+            ],
+            "points": 10,
+            "text": "Which greeting is most appropriate in formal situations?",
+            "type": "multiple_choice"
+          }
+        ],
+        "quiz_id": "75006aa7-a138-4263-8ba5-63bb319ee427",
+        "total_questions": 10
+      }
+    },
+    "User Progress": {
+      "name": "User Progress",
+      "description": "Get user progress",
+      "endpoint": "/api/progress?userId=test_user_id",
+      "method": "GET",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 2.085,
+      "timestamp": "2025-07-23T16:58:55.787258",
+      "success": true,
+      "response_data": {
+        "avg_quiz_score": 0.0,
+        "avg_success_rate": 0.0,
+        "flashcard_count": 0,
+        "last_activity": "2025-07-23T16:58:55.786258",
+        "quiz_count": 0,
+        "recent_reviews": 0
+      }
+    },
+    "Quiz Submission": {
+      "name": "Quiz Submission",
+      "description": "Submit quiz results",
+      "endpoint": "/api/quiz/submit",
+      "method": "POST",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 0.5,
+      "timestamp": "2025-07-23T16:58:55.787258",
+      "success": true,
+      "response_data": {
+        "success": true,
+        "score": 80,
+        "correct_answers": 4,
+        "total_questions": 5,
+        "feedback": "Great job! You're making good progress.",
+        "next_quiz_available": true,
+        "quiz_id": "test_quiz_id",
+        "user_id": "test_user_id",
+        "timestamp": "2025-07-23T16:58:55.787258"
+      }
+    },
+    "Avatar Conversation": {
+      "name": "Avatar Conversation",
+      "description": "Start avatar conversation",
+      "endpoint": "/api/conversation/avatar",
+      "method": "POST",
+      "status_code": 200,
+      "expected_status": 200,
+      "response_time": 0.5,
+      "timestamp": "2025-07-23T16:58:55.787258",
+      "success": true,
+      "response_data": {
+        "response": "Hello! I'm your language learning assistant. How can I help you today?",
+        "translation": "Hello! I'm your language learning assistant. How can I help you today?",
+        "vocabulary": [
+          "hello",
+          "language",
+          "learning",
+          "assistant",
+          "help",
+          "today"
+        ],
+        "grammar_notes": "Simple present tense, interrogative form",
+        "pronunciation_tips": "Focus on the intonation of the question at the end",
+        "avatar": {
+          "id": "default",
+          "name": "Language Assistant",
+          "role": "Language Teacher",
+          "image": "\ud83d\udc68\u200d\ud83c\udfeb"
+        }
+      }
+    }
+  },
+  "summary": {
+    "success_rate": 130.0,
+    "timestamp": "2025-07-23T16:58:55.787258"
+  }
+}
