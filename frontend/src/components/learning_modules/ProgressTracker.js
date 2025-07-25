@@ -38,7 +38,7 @@ import {
   CalendarToday as CalendarTodayIcon,
   Assessment as AssessmentIcon,
   Speed as SpeedIcon,
-  Target as TargetIcon,
+  GpsFixed as TargetIcon,
   ShowChart as ShowChartIcon
 } from '@mui/icons-material';
 import axios from 'axios';
