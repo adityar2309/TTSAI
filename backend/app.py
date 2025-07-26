@@ -440,6 +440,30 @@ def health_check():
         logger.error(f"Health check error: {e}")
         return jsonify({'status': 'unhealthy', 'error': str(e)}), 500
 
+@app.route('/api/debug/files', methods=['GET'])
+def debug_files():
+    """Debug endpoint to list files in the container"""
+    try:
+        import os
+        files = []
+        for root, dirs, filenames in os.walk('/app'):
+            for filename in filenames:
+                if filename.endswith('.py'):
+                    files.append(os.path.join(root, filename))
+        
+        return jsonify({
+            'python_files': files,
+            'current_dir': os.getcwd(),
+            'auth_files_exist': {
+                'auth_routes.py': os.path.exists('/app/auth_routes.py'),
+                'auth_service.py': os.path.exists('/app/auth_service.py'),
+                'auth_config.py': os.path.exists('/app/auth_config.py'),
+                'db_service_auth.py': os.path.exists('/app/db_service_auth.py')
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/supported-languages', methods=['GET'])
 @rate_limit
 def get_supported_languages():
