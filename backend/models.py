@@ -42,6 +42,11 @@ class User(Base):
     __tablename__ = 'users'
     
     id = Column(String(50), primary_key=True)  # user_id from frontend
+    google_id = Column(String(100), unique=True, index=True)  # Google OAuth ID
+    email = Column(String(255), unique=True, index=True)
+    name = Column(String(255))
+    profile_picture = Column(Text)  # URL to profile picture
+    last_login = Column(DateTime)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     last_active = Column(DateTime)

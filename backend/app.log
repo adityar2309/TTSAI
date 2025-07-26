@@ -615,3 +615,32 @@ message: "API key not valid. Please pass a valid API key."
  * Running on http://127.0.0.1:5000
  * Running on http://192.168.1.4:5000
 2025-07-26 12:56:31,320 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-26 13:56:29,780 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-07-26 14:00:44,084 - __main__ - INFO - Successfully imported models and db_service
+2025-07-26 14:00:44,093 - __main__ - INFO - Successfully imported auth components
+2025-07-26 14:00:44,097 - db_service_auth - INFO - Auth tables created successfully
+2025-07-26 14:00:44,099 - __main__ - INFO - Authentication integration completed successfully
+2025-07-26 14:00:44,099 - __main__ - INFO - Initializing Google Cloud Speech client...
+2025-07-26 14:00:45,295 - __main__ - INFO - Google Cloud Speech client initialized successfully
+2025-07-26 14:00:45,295 - __main__ - INFO - Initializing Google Cloud TTS client...
+2025-07-26 14:00:46,216 - __main__ - INFO - Google Cloud TTS client initialized successfully
+2025-07-26 14:00:46,217 - __main__ - INFO - Configuring Google AI Studio with model: gemini-2.0-flash-exp
+2025-07-26 14:00:46,217 - __main__ - INFO - API key: AIzaSyCZ...f-OM
+2025-07-26 14:00:46,934 - __main__ - INFO - Gemini connection test successful
+2025-07-26 14:00:46,942 - __main__ - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-07-26 14:00:46,946 - __main__ - INFO - Starting TTSAI Backend Server...
+2025-07-26 14:00:46,946 - __main__ - INFO - Initializing database...
+2025-07-26 14:00:46,949 - __main__ - INFO - Database tables created successfully
+2025-07-26 14:00:46,949 - __main__ - INFO - Attempting database migration...
+2025-07-26 14:00:47,364 - __main__ - INFO - Database migration completed successfully
+2025-07-26 14:00:47,365 - __main__ - INFO - Checking word-of-day data...
+2025-07-26 14:00:47,418 - __main__ - INFO - [OK] Word-of-day data exists: serendipity
+2025-07-26 14:00:47,423 - __main__ - INFO - Database initialization completed successfully
+2025-07-26 14:00:47,424 - __main__ - INFO - Server starting on port 5000
+2025-07-26 14:00:47,430 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.4:5000
+2025-07-26 14:00:47,430 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-26 14:00:58,805 - werkzeug - INFO - 127.0.0.1 - - [26/Jul/2025 14:00:58] "[33mGET / HTTP/1.1[0m" 404 -
+2025-07-26 14:00:58,870 - werkzeug - INFO - 127.0.0.1 - - [26/Jul/2025 14:00:58] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
