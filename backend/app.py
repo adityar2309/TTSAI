@@ -60,14 +60,16 @@ except ImportError as e:
     logger.error(f"Files in current directory: {os.listdir('.')}")
     raise
 
-# Import authentication integration
+# Import authentication components directly
 try:
-    from auth_integration import integrate_auth
-    logger.info("Successfully imported auth_integration")
+    from auth_routes import register_auth_routes
+    from db_service_auth import extend_db_service_with_auth
+    from auth_config import get_auth_config
+    logger.info("Successfully imported auth components")
+    auth_available = True
 except ImportError as e:
-    logger.error(f"Failed to import auth_integration: {e}")
-    # Continue without auth if not available
-    integrate_auth = None
+    logger.error(f"Failed to import auth components: {e}")
+    auth_available = False
 
 # Load environment variables
 load_dotenv()
@@ -92,16 +94,31 @@ CORS(app, resources={
 # Configure database URL for auth integration
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL', 'sqlite:///ttsai.db')
 
-# Integrate authentication
-if integrate_auth:
+# Integrate authentication directly
+if auth_available:
     try:
-        app = integrate_auth(app, db_service)
+        # Get database path from app config
+        db_path = app.config.get('DATABASE_URL', '').replace('sqlite:///', '')
+        
+        # Extend database service with auth methods
+        extended_db = extend_db_service_with_auth(db_service, db_path)
+        
+        # Add extended db_service to app config
+        app.config['db_service'] = extended_db
+        
+        # Register auth routes
+        register_auth_routes(app)
+        
+        # Configure session
+        auth_config = get_auth_config()
+        app.secret_key = auth_config['jwt_secret']
+        
         logger.info("Authentication integration completed successfully")
     except Exception as e:
         logger.error(f"Failed to integrate authentication: {e}")
         logger.warning("Continuing without authentication features")
 else:
-    logger.warning("Authentication integration not available")
+    logger.warning("Authentication components not available")
 
 # Rate limiting configuration
 RATE_LIMIT_REQUESTS = 100  # requests per window
