@@ -1,166 +1,285 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import api from '../utils/apiClient';
-import sessionService from '../services/sessionService';
+
+// Initial state
+const initialState = {
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  isLoading: true,
+  error: null
+};
+
+// Action types
+const AUTH_ACTIONS = {
+  LOGIN_START: 'LOGIN_START',
+  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
+  LOGIN_FAILURE: 'LOGIN_FAILURE',
+  LOGOUT: 'LOGOUT',
+  SET_LOADING: 'SET_LOADING',
+  CLEAR_ERROR: 'CLEAR_ERROR',
+  UPDATE_USER: 'UPDATE_USER'
+};
+
+// Reducer
+function authReducer(state, action) {
+  switch (action.type) {
+    case AUTH_ACTIONS.LOGIN_START:
+      return {
+        ...state,
+        isLoading: true,
+        error: null
+      };
+    
+    case AUTH_ACTIONS.LOGIN_SUCCESS:
+      return {
+        ...state,
+        user: action.payload.user,
+        token: action.payload.token,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null
+      };
+    
+    case AUTH_ACTIONS.LOGIN_FAILURE:
+      return {
+        ...state,
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: action.payload.error
+      };
+    
+    case AUTH_ACTIONS.LOGOUT:
+      return {
+        ...state,
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null
+      };
+    
+    case AUTH_ACTIONS.SET_LOADING:
+      return {
+        ...state,
+        isLoading: action.payload
+      };
+    
+    case AUTH_ACTIONS.CLEAR_ERROR:
+      return {
+        ...state,
+        error: null
+      };
+    
+    case AUTH_ACTIONS.UPDATE_USER:
+      return {
+        ...state,
+        user: { ...state.user, ...action.payload }
+      };
+    
+    default:
+      return state;
+  }
+}
 
 // Create context
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// Auth provider component
+export function AuthProvider({ children }) {
+  const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Initialize auth state from session service
+  // Check for existing token on app load
   useEffect(() => {
-    const initializeAuth = async () => {
+    const checkExistingAuth = () => {
       try {
-        // Get user from token
-        const userFromToken = sessionService.getUserFromToken();
+        const token = localStorage.getItem('auth_token');
         
-        if (userFromToken) {
-          // Verify token with backend
-          const isValid = await sessionService.verifySession();
+        if (token) {
+          // Verify token is not expired
+          const decodedToken = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
           
-          if (isValid) {
-            // Set user state
-            setUser({
-              ...userFromToken,
-              token: sessionService.getToken()
+          if (decodedToken.exp > currentTime) {
+            // Token is valid
+            const user = {
+              id: decodedToken.sub,
+              name: decodedToken.name,
+              email: decodedToken.email
+            };
+            
+            dispatch({
+              type: AUTH_ACTIONS.LOGIN_SUCCESS,
+              payload: { user, token }
             });
           } else {
-            // Token invalid, clear session
-            sessionService.clearSession();
-            setUser(null);
+            // Token expired, remove it
+            localStorage.removeItem('auth_token');
+            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
           }
+        } else {
+          dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         }
-      } catch (err) {
-        console.error('Auth initialization error:', err);
-        sessionService.clearSession();
-        setUser(null);
-        setError('Session expired. Please log in again.');
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error('Error checking existing auth:', error);
+        localStorage.removeItem('auth_token');
+        dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
       }
     };
 
-    // Initialize session service
-    sessionService.init(
-      // Session expired callback
-      () => {
-        setUser(null);
-        setError('Session expired. Please log in again.');
-      }
-    );
-
-    initializeAuth();
+    checkExistingAuth();
   }, []);
 
-  // Handle Google login
-  const handleGoogleLogin = async (credentialResponse) => {
+  // Auth actions
+  const login = async (googleToken) => {
+    dispatch({ type: AUTH_ACTIONS.LOGIN_START });
+    
     try {
-      setLoading(true);
-      setError(null);
-
-      // Send token to backend for verification
-      const response = await api.auth.login(credentialResponse.credential);
-
-      // Store token using session service
-      sessionService.setToken(response.data.token);
-
-      // Set user state
-      setUser({
-        id: response.data.user.id,
-        name: response.data.user.name,
-        email: response.data.user.email,
-        profilePicture: response.data.user.profile_picture,
-        token: response.data.token
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      
+      const response = await fetch(`${API_URL}/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: googleToken }),
       });
 
-      return true;
-    } catch (err) {
-      console.error('Google login error:', err);
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
-      return false;
-    } finally {
-      setLoading(false);
+      if (!response.ok) {
+        throw new Error(`Authentication failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      // Store token in localStorage
+      localStorage.setItem('auth_token', data.token);
+      
+      dispatch({
+        type: AUTH_ACTIONS.LOGIN_SUCCESS,
+        payload: {
+          user: data.user,
+          token: data.token
+        }
+      });
+
+      return { success: true, user: data.user };
+    } catch (error) {
+      console.error('Login error:', error);
+      dispatch({
+        type: AUTH_ACTIONS.LOGIN_FAILURE,
+        payload: { error: error.message }
+      });
+      return { success: false, error: error.message };
     }
   };
 
-  // Logout
   const logout = async () => {
     try {
-      setLoading(true);
+      // Remove token from localStorage
+      localStorage.removeItem('auth_token');
       
-      // Call logout endpoint
-      if (user?.token) {
-        await api.auth.logout();
+      // Optional: Call backend logout endpoint
+      if (state.token) {
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        
+        await fetch(`${API_URL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${state.token}`,
+            'Content-Type': 'application/json',
+          },
+        });
       }
-      
-      // Clear session and state
-      sessionService.clearSession();
-      setUser(null);
-    } catch (err) {
-      console.error('Logout error:', err);
-      // Still clear session and state on error
-      sessionService.clearSession();
-      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
     } finally {
-      setLoading(false);
+      dispatch({ type: AUTH_ACTIONS.LOGOUT });
     }
   };
 
-  // Refresh token
+  const clearError = () => {
+    dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
+  };
+
+  const updateUser = (userData) => {
+    dispatch({
+      type: AUTH_ACTIONS.UPDATE_USER,
+      payload: userData
+    });
+  };
+
   const refreshToken = async () => {
+    if (!state.token) return false;
+
     try {
-      setLoading(true);
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
       
-      // Use session service to refresh token
-      const success = await sessionService.refreshToken();
-      
-      if (success) {
-        // Update user state with new token
-        const userFromToken = sessionService.getUserFromToken();
-        setUser(prev => ({
-          ...prev,
-          ...userFromToken,
-          token: sessionService.getToken()
-        }));
+      const response = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${state.token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('auth_token', data.token);
+        
+        dispatch({
+          type: AUTH_ACTIONS.LOGIN_SUCCESS,
+          payload: {
+            user: state.user,
+            token: data.token
+          }
+        });
+        
+        return true;
       }
-      
-      return success;
-    } catch (err) {
-      console.error('Token refresh error:', err);
-      return false;
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Token refresh error:', error);
     }
+    
+    return false;
   };
 
-  // Get user profile
-  const getUserProfile = async () => {
-    try {
-      if (!user) return null;
+  // Auto-refresh token before expiration
+  useEffect(() => {
+    if (!state.token || !state.isAuthenticated) return;
 
-      const response = await api.auth.getUser();
-      return response.data.user;
-    } catch (err) {
-      console.error('Get user profile error:', err);
-      return null;
-    }
-  };
+    const checkTokenExpiration = () => {
+      try {
+        const decodedToken = jwtDecode(state.token);
+        const currentTime = Date.now() / 1000;
+        const timeUntilExpiry = decodedToken.exp - currentTime;
+        
+        // Refresh token if it expires in less than 5 minutes
+        if (timeUntilExpiry < 300) {
+          refreshToken();
+        }
+      } catch (error) {
+        console.error('Error checking token expiration:', error);
+      }
+    };
 
-  // Context value
+    // Check immediately
+    checkTokenExpiration();
+    
+    // Check every minute
+    const interval = setInterval(checkTokenExpiration, 60000);
+    
+    return () => clearInterval(interval);
+  }, [state.token, state.isAuthenticated]);
+
   const value = {
-    user,
-    loading,
-    error,
-    isAuthenticated: !!user,
-    handleGoogleLogin,
+    ...state,
+    login,
     logout,
-    refreshToken,
-    getUserProfile,
-    clearError: () => setError(null)
+    clearError,
+    updateUser,
+    refreshToken
   };
 
   return (
@@ -168,15 +287,15 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 // Custom hook to use auth context
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}
 
-export default AuthContext;
+export { AUTH_ACTIONS };

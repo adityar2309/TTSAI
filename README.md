@@ -77,9 +77,17 @@ pip install -r requirements.txt
 GEMINI_API_KEY=your_google_ai_studio_api_key_here
 FLASK_ENV=development
 
+# Google OAuth Configuration (required for user authentication)
+GOOGLE_CLIENT_ID=your_google_oauth_client_id_from_console
+GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret_from_console
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+JWT_SECRET=your_generated_jwt_secret_here
+
 # Optional: For Google Cloud TTS/STT services
 # GOOGLE_APPLICATION_CREDENTIALS=path/to/your/google-cloud-credentials.json
 ```
+
+**Important**: For Google OAuth setup, see the detailed guide in `backend/GOOGLE_AUTH_SETUP.md`
 
 ### Frontend Setup
 
@@ -93,6 +101,9 @@ npm install
 ```bash
 # Create .env file in frontend directory
 REACT_APP_API_URL=http://localhost:5000/api
+
+# Google OAuth Configuration (required for user authentication)
+REACT_APP_GOOGLE_CLIENT_ID=your_google_oauth_client_id_from_console
 ```
 
 ## Running the Application

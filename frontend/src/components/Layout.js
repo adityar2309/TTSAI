@@ -14,14 +14,17 @@ import {
   useMediaQuery,
   Tooltip,
   Fade,
+  Button,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import TranslateIcon from '@mui/icons-material/Translate';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from './Logo';
+import { UserProfile, useAuth } from './auth';
 
 const Layout = ({ children, toggleColorMode, mode }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -29,10 +32,17 @@ const Layout = ({ children, toggleColorMode, mode }) => {
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isAuthenticated, isLoading } = useAuth();
 
   const menuItems = [
     { text: 'Translator', icon: <TranslateIcon />, path: '/' },
     { text: 'Diagnostics', icon: <BugReportIcon />, path: '/diagnostics' },
+  ];
+
+  // Add login/logout to mobile menu
+  const mobileMenuItems = [
+    ...menuItems,
+    ...(isAuthenticated ? [] : [{ text: 'Sign In', icon: <LoginIcon />, path: '/login' }])
   ];
 
   const handleNavigation = (path) => {
@@ -80,26 +90,53 @@ const Layout = ({ children, toggleColorMode, mode }) => {
             <Logo />
           </Box>
 
-          <Tooltip 
-            title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}
-            TransitionComponent={Fade}
-            TransitionProps={{ timeout: 600 }}
-          >
-            <IconButton
-              color="inherit"
-              onClick={toggleColorMode}
-              sx={{
-                transition: theme.transitions.create(['transform', 'color'], {
-                  duration: theme.transitions.duration.shorter,
-                }),
-                '&:hover': {
-                  transform: 'rotate(12deg)',
-                },
-              }}
+          {/* Authentication Section */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {!isLoading && (
+              <>
+                {isAuthenticated ? (
+                  <UserProfile 
+                    variant="menu"
+                    onSettingsClick={() => navigate('/settings')}
+                    onProfileClick={() => navigate('/profile')}
+                  />
+                ) : (
+                  <Button
+                    color="inherit"
+                    startIcon={<LoginIcon />}
+                    onClick={() => navigate('/login')}
+                    sx={{
+                      textTransform: 'none',
+                      display: { xs: 'none', sm: 'flex' }
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                )}
+              </>
+            )}
+
+            <Tooltip 
+              title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}
+              TransitionComponent={Fade}
+              TransitionProps={{ timeout: 600 }}
             >
-              {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-          </Tooltip>
+              <IconButton
+                color="inherit"
+                onClick={toggleColorMode}
+                sx={{
+                  transition: theme.transitions.create(['transform', 'color'], {
+                    duration: theme.transitions.duration.shorter,
+                  }),
+                  '&:hover': {
+                    transform: 'rotate(12deg)',
+                  },
+                }}
+              >
+                {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -124,8 +161,15 @@ const Layout = ({ children, toggleColorMode, mode }) => {
             pt: `${isMobile ? 56 : 64}px`,
           }}
         >
+          {/* User Profile in Mobile Drawer */}
+          {isAuthenticated && isMobile && (
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <UserProfile variant="minimal" />
+            </Box>
+          )}
+
           <List>
-            {menuItems.map((item) => (
+            {mobileMenuItems.map((item) => (
               <ListItem 
                 button 
                 key={item.text}

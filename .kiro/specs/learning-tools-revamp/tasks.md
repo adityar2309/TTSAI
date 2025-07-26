@@ -12,7 +12,10 @@
 
 
 
-  - [ ] 1.2 Update backend environment variables for Google Auth
+  - [x] 1.2 Update backend environment variables for Google Auth
+
+
+
     - Add Google OAuth client ID and secret to backend .env file
 
 
@@ -23,7 +26,12 @@
 
 
 
-  - [ ] 1.3 Install required frontend dependencies
+
+
+
+  - [x] 1.3 Install required frontend dependencies
+
+
     - Add React Google Login package
     - Add quiz-related UI components
 
@@ -36,12 +44,15 @@
 
     - Implement Google OAuth verification endpoint
     - Create user account creation/linking logic
+
     - Implement JWT token generation for authenticated users
 
 
     - _Requirements: 3.2, 3.3, 3.7_
 
-  - [ ] 2.2 Implement authentication components in frontend
+  - [x] 2.2 Implement authentication components in frontend
+
+
     - Create Google sign-in button component
 
 

@@ -1,9 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import Layout from './components/Layout';
 import Translator from './components/Translator';
 import DiagnosticTool from './components/DiagnosticTool';
+import { AuthProvider } from './contexts/AuthContext';
+import { LoginPage } from './components/auth';
+import AuthTest from './components/auth/AuthTest';
 import { deepPurple, amber } from '@mui/material/colors';
 import './styles/gradients.css';
 
@@ -100,17 +104,29 @@ function App() {
     localStorage.setItem('themeMode', newMode);
   };
 
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
+  if (!googleClientId) {
+    console.error('Google Client ID not found. Please set REACT_APP_GOOGLE_CLIENT_ID in your environment variables.');
+  }
+
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <Layout toggleColorMode={toggleColorMode} mode={mode}>
-          <Routes>
-            <Route path="/" element={<Translator />} />
-            <Route path="/diagnostics" element={<DiagnosticTool />} />
-          </Routes>
-        </Layout>
-      </Router>
-    </ThemeProvider>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Layout toggleColorMode={toggleColorMode} mode={mode}>
+              <Routes>
+                <Route path="/" element={<Translator />} />
+                <Route path="/diagnostics" element={<DiagnosticTool />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth-test" element={<AuthTest />} />
+              </Routes>
+            </Layout>
+          </Router>
+        </ThemeProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 

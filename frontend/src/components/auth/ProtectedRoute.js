@@ -1,23 +1,60 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
+import { Navigate, useLocation } from 'react-router-dom';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 
-const ProtectedRoute = ({ children, redirectTo = '/login' }) => {
-  const { isAuthenticated, loading } = useAuth();
+const ProtectedRoute = ({ 
+  children, 
+  redirectTo = '/login',
+  requireAuth = true,
+  fallback,
+  loadingComponent
+}) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
 
-  if (loading) {
+  // Show custom loading component or default
+  if (isLoading) {
+    if (loadingComponent) {
+      return loadingComponent;
+    }
+    
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: '50vh',
+          gap: 2
+        }}
+      >
         <CircularProgress />
+        <Typography variant="body2" color="text.secondary">
+          Verifying authentication...
+        </Typography>
       </Box>
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to={redirectTo} replace />;
+  // If authentication is required but user is not authenticated
+  if (requireAuth && !isAuthenticated) {
+    // Show custom fallback or redirect to login
+    if (fallback) {
+      return fallback;
+    }
+    
+    return (
+      <Navigate 
+        to={redirectTo} 
+        state={{ from: location }} 
+        replace 
+      />
+    );
   }
 
+  // If authentication is not required or user is authenticated
   return children;
 };
 
