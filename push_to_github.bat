@@ -27,7 +27,7 @@ git commit -m "Implement complete authentication system with Google OAuth
 
 echo.
 echo Pushing to GitHub...
-git push origin main
+git push origin master
 
 if %ERRORLEVEL% equ 0 (
     echo.

@@ -25,21 +25,6 @@ class AuthDBService:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # Create users table
-            cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id TEXT PRIMARY KEY,
-                google_id TEXT UNIQUE,
-                name TEXT,
-                email TEXT UNIQUE,
-                profile_picture TEXT,
-                created_at TEXT,
-                updated_at TEXT,
-                last_login TEXT,
-                preferences TEXT
-            )
-            ''')
-            
             # Create user_sessions table
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_sessions (
@@ -85,9 +70,6 @@ class AuthDBService:
             
             if row:
                 user = dict(row)
-                # Parse preferences JSON if exists
-                if user.get('preferences'):
-                    user['preferences'] = json.loads(user['preferences'])
                 return user
             
             return None
@@ -121,9 +103,6 @@ class AuthDBService:
             
             if row:
                 user = dict(row)
-                # Parse preferences JSON if exists
-                if user.get('preferences'):
-                    user['preferences'] = json.loads(user['preferences'])
                 return user
             
             return None
@@ -157,9 +136,6 @@ class AuthDBService:
             
             if row:
                 user = dict(row)
-                # Parse preferences JSON if exists
-                if user.get('preferences'):
-                    user['preferences'] = json.loads(user['preferences'])
                 return user
             
             return None
@@ -185,17 +161,12 @@ class AuthDBService:
             # Generate UUID for user
             user_id = str(uuid.uuid4())
             
-            # Prepare preferences as JSON if exists
-            preferences = user_data.get('preferences')
-            if preferences:
-                preferences = json.dumps(preferences)
-            
             cursor.execute(
                 """
                 INSERT INTO users (
                     id, google_id, name, email, profile_picture,
-                    created_at, updated_at, last_login, preferences
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    created_at, updated_at, last_login
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     user_id,
@@ -205,8 +176,7 @@ class AuthDBService:
                     user_data.get('profile_picture'),
                     user_data.get('created_at', datetime.now().isoformat()),
                     user_data.get('updated_at', datetime.now().isoformat()),
-                    user_data.get('last_login', datetime.now().isoformat()),
-                    preferences
+                    user_data.get('last_login', datetime.now().isoformat())
                 )
             )
             
@@ -233,11 +203,6 @@ class AuthDBService:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # Prepare preferences as JSON if exists
-            preferences = user_data.get('preferences')
-            if preferences:
-                preferences = json.dumps(preferences)
-            
             cursor.execute(
                 """
                 UPDATE users SET
@@ -245,8 +210,7 @@ class AuthDBService:
                     email = COALESCE(?, email),
                     profile_picture = COALESCE(?, profile_picture),
                     updated_at = ?,
-                    last_login = COALESCE(?, last_login),
-                    preferences = COALESCE(?, preferences)
+                    last_login = COALESCE(?, last_login)
                 WHERE id = ?
                 """,
                 (
@@ -255,7 +219,6 @@ class AuthDBService:
                     user_data.get('profile_picture'),
                     datetime.now().isoformat(),
                     user_data.get('last_login'),
-                    preferences,
                     user_data['id']
                 )
             )

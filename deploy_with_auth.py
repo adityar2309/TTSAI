@@ -272,7 +272,7 @@ def push_to_github():
         run_command(f'git commit -m "{commit_message}"')
         
         # Push to GitHub
-        run_command("git push origin main")
+        run_command("git push origin master")
         
         print("✅ Successfully pushed to GitHub!")
         return True
