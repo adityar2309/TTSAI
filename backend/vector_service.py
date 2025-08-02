@@ -5,6 +5,12 @@ from sentence_transformers import SentenceTransformer
 import os
 import json
 import logging
+from rag_error_handler import (
+    handle_vector_service_errors, 
+    IndexLoadError, 
+    SearchError, 
+    log_error
+)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -37,6 +43,7 @@ class VectorService:
             logger.error(f"Failed to initialize VectorService: {e}")
             raise
     
+    @handle_vector_service_errors
     def load_index(self):
         """
         Loads the FAISS index and metadata from disk.
@@ -47,6 +54,10 @@ class VectorService:
         try:
             index_path = os.path.join(DATA_DIR, INDEX_FILE)
             metadata_path = os.path.join(DATA_DIR, METADATA_FILE)
+            
+            # Store paths for error handling
+            self._last_index_path = index_path
+            self._last_metadata_path = metadata_path
             
             # Check if both files exist
             if not os.path.exists(index_path):
@@ -82,6 +93,7 @@ class VectorService:
             self.metadata = []
             return False
     
+    @handle_vector_service_errors
     def search(self, query_text: str, k: int = 5):
         """
         Searches the index for the most similar documents.

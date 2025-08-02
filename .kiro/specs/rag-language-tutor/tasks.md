@@ -61,6 +61,9 @@
   - Create context augmentation logic to format retrieved documents
   - Build comprehensive LLM prompt template with structured output requirements
   - Integrate with existing call_llm_api() function for explanation generation
+
+
+
   - Add JSON response parsing and validation with error handling
   - Apply existing rate limiting decorator to the new endpoint
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.5, 3.5, 4.4, 6.2, 6.5_

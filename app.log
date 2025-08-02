@@ -235,3 +235,4 @@ ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
 2025-08-02 17:27:51,144 - app - INFO - No language-specific documents found for es, using general results
 2025-08-02 17:27:53,632 - app - INFO - RAG explanation generated successfully (context_used: True)
 2025-08-02 17:31:55,194 - app - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-08-02 17:46:15,546 - app - INFO - Cache cleanup completed. Removed 0 expired entries

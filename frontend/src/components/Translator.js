@@ -652,13 +652,56 @@ export const Translator = ({ initialMode = "type" }) => {
       });
     } catch (err) {
       console.error("Tutor explanation error:", err);
-      const errorMessage = err.response?.data?.error || "Failed to get explanation from the tutor.";
+      
+      // Enhanced error handling with specific error types
+      let errorMessage = "Failed to get explanation from the tutor.";
+      let errorCode = "UNKNOWN_ERROR";
+      let shouldRetry = true;
+      
+      if (err.response) {
+        // Server responded with error status
+        const status = err.response.status;
+        const data = err.response.data;
+        
+        errorCode = data?.error_code || `HTTP_${status}`;
+        errorMessage = data?.error || errorMessage;
+        
+        if (status === 400) {
+          errorMessage = "Invalid request. Please check your input and try again.";
+          shouldRetry = false;
+        } else if (status === 429) {
+          errorMessage = "Too many requests. Please wait a moment and try again.";
+          shouldRetry = true;
+        } else if (status === 503) {
+          errorMessage = "Service temporarily unavailable. Please try again later.";
+          shouldRetry = true;
+        } else if (status >= 500) {
+          errorMessage = "Server error occurred. Please try again later.";
+          shouldRetry = true;
+        }
+      } else if (err.request) {
+        // Network error
+        errorMessage = "Network error. Please check your connection and try again.";
+        errorCode = "NETWORK_ERROR";
+        shouldRetry = true;
+      } else {
+        // Other error
+        errorMessage = "An unexpected error occurred. Please try again.";
+        errorCode = "CLIENT_ERROR";
+        shouldRetry = true;
+      }
+      
       showNotification(errorMessage, "error");
       
-      // Record analytics for failed requests
+      // Record detailed analytics for failed requests
       recordAnalytics("tutor_explanation_failed", {
-        error: errorMessage,
+        error_code: errorCode,
+        error_message: errorMessage,
+        should_retry: shouldRetry,
         target_lang: targetLang,
+        text_length: translatedText.length,
+        response_status: err.response?.status,
+        has_network_error: !err.response && !!err.request,
       });
     } finally {
       setIsExplaining(false);

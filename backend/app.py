@@ -957,6 +957,14 @@ def advanced_translate():
 @rate_limit
 def language_tutor_explain():
     """RAG-powered endpoint to provide detailed explanations for a word or phrase."""
+    from rag_error_handler import (
+        ValidationError, 
+        LLMResponseError, 
+        log_error, 
+        create_fallback_explanation,
+        validate_explanation_response
+    )
+    
     try:
         # Validate request data
         data = request.json
@@ -968,10 +976,10 @@ def language_tutor_explain():
         language = data.get('language', '').strip()
         
         if not query:
-            return jsonify({'error': 'Missing required field: text'}), 400
+            raise ValidationError('Missing required field: text', field='text', value=query)
         
         if not language:
-            return jsonify({'error': 'Missing required field: language'}), 400
+            raise ValidationError('Missing required field: language', field='language', value=language)
         
         logger.info(f"RAG explanation request: '{query}' in {language}")
         
@@ -1064,30 +1072,22 @@ IMPORTANT: Return ONLY valid JSON. Do not include any markdown formatting, code 
         try:
             explanation_data = json.loads(response_text)
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse LLM JSON response: {e}")
-            logger.error(f"Raw response: {response_text}")
+            error = LLMResponseError(
+                "Failed to parse LLM JSON response",
+                raw_response=response_text,
+                parse_error=str(e)
+            )
+            log_error(error, {"query": query, "language": language})
             
-            # Fallback response
-            explanation_data = {
-                "meaning": f"The phrase '{query}' in {language} requires further analysis.",
-                "examples": [
-                    {"sentence": f"Example usage of '{query}'", "translation": "Translation would be provided here."}
-                ],
-                "grammar_tip": "Grammar analysis would be provided with a properly formatted response.",
-                "cultural_insight": "Cultural context would be provided with a properly formatted response."
-            }
+            # Use fallback explanation
+            explanation_data = create_fallback_explanation(
+                query, 
+                language, 
+                "LLM response parsing failed"
+            )
         
-        # Validate response structure
-        required_keys = ['meaning', 'examples', 'grammar_tip', 'cultural_insight']
-        for key in required_keys:
-            if key not in explanation_data:
-                explanation_data[key] = f"Information about {key.replace('_', ' ')} would be provided here."
-        
-        # Ensure examples is a list
-        if not isinstance(explanation_data.get('examples'), list):
-            explanation_data['examples'] = [
-                {"sentence": f"Example with '{query}'", "translation": "English translation"}
-            ]
+        # Validate and sanitize response structure
+        explanation_data = validate_explanation_response(explanation_data, query)
         
         # Log success metrics
         context_used = len(retrieved_docs) > 0
