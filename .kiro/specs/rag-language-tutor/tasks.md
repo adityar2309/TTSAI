@@ -26,10 +26,15 @@
 - [x] 3. Create knowledge base population script
 
 
+
   - Implement populate_kb.py script to process database content into embeddings
   - Add database querying logic for WordOfDay and CommonPhrase tables
   - Implement document processing logic to extract and format text content
   - Add embedding generation using sentence transformers with progress tracking
+
+
+
+
   - Implement FAISS index creation with cosine similarity (IndexFlatIP)
   - Add index and metadata persistence to disk with proper error handling
   - _Requirements: 2.1, 2.2, 2.3, 5.6_

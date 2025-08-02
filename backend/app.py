@@ -953,6 +953,155 @@ def advanced_translate():
             'details': 'An unexpected error occurred'
         }), 500
 
+@app.route('/api/tutor/explain', methods=['POST'])
+@rate_limit
+def language_tutor_explain():
+    """RAG-powered endpoint to provide detailed explanations for a word or phrase."""
+    try:
+        # Validate request data
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+        
+        # Extract required fields
+        query = data.get('text', '').strip()
+        language = data.get('language', '').strip()
+        
+        if not query:
+            return jsonify({'error': 'Missing required field: text'}), 400
+        
+        if not language:
+            return jsonify({'error': 'Missing required field: language'}), 400
+        
+        logger.info(f"RAG explanation request: '{query}' in {language}")
+        
+        # 1. Retrieval: Get relevant context from our knowledge base
+        retrieved_docs = []
+        context_str = ""
+        
+        if vector_service_available and vector_service and vector_service.is_ready():
+            try:
+                logger.debug("Performing vector similarity search...")
+                retrieved_docs = vector_service.search(query, k=5)
+                
+                # Filter docs by the target language for relevance
+                lang_specific_docs = [doc for doc in retrieved_docs if doc.get('language') == language]
+                
+                if lang_specific_docs:
+                    context_str = "\n\n".join([
+                        f"- Source: {doc['source']}\n- Content: {doc['text']}" 
+                        for doc in lang_specific_docs
+                    ])
+                    logger.info(f"Found {len(lang_specific_docs)} relevant documents for {language}")
+                else:
+                    logger.info(f"No language-specific documents found for {language}, using general results")
+                    # Use general results if no language-specific ones found
+                    if retrieved_docs:
+                        context_str = "\n\n".join([
+                            f"- Source: {doc['source']}\n- Content: {doc['text']}" 
+                            for doc in retrieved_docs[:3]  # Limit to top 3 general results
+                        ])
+                
+            except Exception as e:
+                logger.warning(f"Vector search failed, continuing without context: {e}")
+                retrieved_docs = []
+                context_str = ""
+        else:
+            logger.info("Vector service not available, using LLM-only explanation")
+        
+        # 2. Augmentation: Create a detailed prompt for the LLM
+        prompt = f"""You are an expert and friendly Language Learning Tutor. Your student wants to understand the phrase "{query}" in the {language} language.
+
+Use the following context from our knowledge base to provide a rich and helpful explanation. If the context is not relevant, rely on your general knowledge but mention that specific examples were not found.
+
+**Retrieved Context:**
+---
+{context_str if context_str else "No specific context found in our knowledge base."}
+---
+
+Based on this context and your expertise, provide a clear, structured explanation including the following sections:
+
+1. **Meaning & Nuances:** Explain the literal meaning and any subtle connotations.
+2. **Example Sentences (2-3):** Provide practical examples of how it's used. Use examples from the context if they fit.
+3. **Grammar Tip:** Briefly explain a relevant grammar point.
+4. **Cultural Insight:** Offer a cultural note if applicable.
+
+Format your response as a single, clean JSON object with these exact keys: "meaning", "examples", "grammar_tip", "cultural_insight".
+
+Example JSON response format:
+{{
+    "meaning": "A detailed explanation of the phrase's meaning and usage nuances.",
+    "examples": [
+        {{"sentence": "Example sentence 1.", "translation": "English translation 1."}},
+        {{"sentence": "Example sentence 2.", "translation": "English translation 2."}}
+    ],
+    "grammar_tip": "A helpful grammar tip related to the phrase.",
+    "cultural_insight": "An interesting cultural note or context."
+}}
+
+IMPORTANT: Return ONLY valid JSON. Do not include any markdown formatting, code blocks, or additional text."""
+        
+        # 3. Generation: Call the LLM to generate the explanation
+        logger.debug("Calling LLM for explanation generation...")
+        response_text = call_llm_api(prompt, max_tokens=1000)
+        
+        if not response_text:
+            return jsonify({'error': 'Failed to generate explanation'}), 500
+        
+        # Clean and parse the JSON response from the LLM
+        response_text = response_text.strip()
+        
+        # Remove any markdown code block formatting if present
+        if response_text.startswith('```json'):
+            response_text = response_text[7:]
+        if response_text.startswith('```'):
+            response_text = response_text[3:]
+        if response_text.endswith('```'):
+            response_text = response_text[:-3]
+        
+        response_text = response_text.strip()
+        
+        try:
+            explanation_data = json.loads(response_text)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse LLM JSON response: {e}")
+            logger.error(f"Raw response: {response_text}")
+            
+            # Fallback response
+            explanation_data = {
+                "meaning": f"The phrase '{query}' in {language} requires further analysis.",
+                "examples": [
+                    {"sentence": f"Example usage of '{query}'", "translation": "Translation would be provided here."}
+                ],
+                "grammar_tip": "Grammar analysis would be provided with a properly formatted response.",
+                "cultural_insight": "Cultural context would be provided with a properly formatted response."
+            }
+        
+        # Validate response structure
+        required_keys = ['meaning', 'examples', 'grammar_tip', 'cultural_insight']
+        for key in required_keys:
+            if key not in explanation_data:
+                explanation_data[key] = f"Information about {key.replace('_', ' ')} would be provided here."
+        
+        # Ensure examples is a list
+        if not isinstance(explanation_data.get('examples'), list):
+            explanation_data['examples'] = [
+                {"sentence": f"Example with '{query}'", "translation": "English translation"}
+            ]
+        
+        # Log success metrics
+        context_used = len(retrieved_docs) > 0
+        logger.info(f"RAG explanation generated successfully (context_used: {context_used})")
+        
+        return jsonify(explanation_data)
+        
+    except Exception as e:
+        logger.error(f"Tutor explanation error: {e}", exc_info=True)
+        return jsonify({
+            'error': 'Failed to generate explanation',
+            'details': 'An unexpected error occurred while processing your request'
+        }), 500
+
 @app.route('/api/text-to-speech', methods=['POST'])
 @rate_limit
 def text_to_speech():
