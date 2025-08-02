@@ -1,0 +1,631 @@
+[
+  {
+    "source": "Word of Day Example",
+    "language": "en",
+    "text": "An example of using 'hello' (a greeting or expression of goodwill) is: \"Hello, how are you today?\"",
+    "metadata": {
+      "word_id": 1,
+      "word": "hello",
+      "translation": "a greeting or expression of goodwill",
+      "part_of_speech": "interjection",
+      "difficulty": "beginner",
+      "example_translation": "A common greeting used when meeting someone."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "en",
+    "text": "A cultural note about 'hello': The most common greeting in English-speaking countries.",
+    "metadata": {
+      "word_id": 1,
+      "word": "hello",
+      "translation": "a greeting or expression of goodwill",
+      "part_of_speech": "interjection",
+      "difficulty": "beginner"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "en",
+    "text": "The etymology of 'hello': From Old English hæl (whole, healthy)",
+    "metadata": {
+      "word_id": 1,
+      "word": "hello",
+      "translation": "a greeting or expression of goodwill",
+      "part_of_speech": "interjection",
+      "difficulty": "beginner"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "en",
+    "text": "An example of using 'serendipity' (the occurrence of events by chance in a happy way) is: \"It was pure serendipity that we met at the coffee shop.\"",
+    "metadata": {
+      "word_id": 2,
+      "word": "serendipity",
+      "translation": "the occurrence of events by chance in a happy way",
+      "part_of_speech": "noun",
+      "difficulty": "advanced",
+      "example_translation": "Describes pleasant surprises or fortunate accidents."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "en",
+    "text": "A cultural note about 'serendipity': A beloved English word expressing life's pleasant surprises.",
+    "metadata": {
+      "word_id": 2,
+      "word": "serendipity",
+      "translation": "the occurrence of events by chance in a happy way",
+      "part_of_speech": "noun",
+      "difficulty": "advanced"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "en",
+    "text": "The etymology of 'serendipity': Coined by Horace Walpole in 1754 from the Persian fairy tale",
+    "metadata": {
+      "word_id": 2,
+      "word": "serendipity",
+      "translation": "the occurrence of events by chance in a happy way",
+      "part_of_speech": "noun",
+      "difficulty": "advanced"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "en",
+    "text": "An example of using 'wanderlust' (a strong desire to travel and explore the world) is: \"Her wanderlust led her to visit 30 countries.\"",
+    "metadata": {
+      "word_id": 3,
+      "word": "wanderlust",
+      "translation": "a strong desire to travel and explore the world",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate",
+      "example_translation": "Used to describe someone with a passion for traveling."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "en",
+    "text": "A cultural note about 'wanderlust': Reflects the human desire for exploration and discovery.",
+    "metadata": {
+      "word_id": 3,
+      "word": "wanderlust",
+      "translation": "a strong desire to travel and explore the world",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "en",
+    "text": "The etymology of 'wanderlust': From German wandern (to hike) + lust (desire)",
+    "metadata": {
+      "word_id": 3,
+      "word": "wanderlust",
+      "translation": "a strong desire to travel and explore the world",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "es",
+    "text": "An example of using 'sobremesa' (time spent at the table after finishing a meal) is: \"La sobremesa duró más que la cena.\"",
+    "metadata": {
+      "word_id": 4,
+      "word": "sobremesa",
+      "translation": "time spent at the table after finishing a meal",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate",
+      "example_translation": "The after-dinner conversation lasted longer than dinner."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "es",
+    "text": "A cultural note about 'sobremesa': An important social custom in Spanish-speaking countries.",
+    "metadata": {
+      "word_id": 4,
+      "word": "sobremesa",
+      "translation": "time spent at the table after finishing a meal",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "es",
+    "text": "The etymology of 'sobremesa': From sobre (over) + mesa (table)",
+    "metadata": {
+      "word_id": 4,
+      "word": "sobremesa",
+      "translation": "time spent at the table after finishing a meal",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "es",
+    "text": "An example of using 'duende' (a quality of passion and inspiration, especially in flamenco) is: \"El bailaor de flamenco tiene mucho duende.\"",
+    "metadata": {
+      "word_id": 5,
+      "word": "duende",
+      "translation": "a quality of passion and inspiration, especially in flamenco",
+      "part_of_speech": "noun",
+      "difficulty": "advanced",
+      "example_translation": "The flamenco dancer has great spirit and charm."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "es",
+    "text": "A cultural note about 'duende': Essential concept in flamenco and Spanish arts.",
+    "metadata": {
+      "word_id": 5,
+      "word": "duende",
+      "translation": "a quality of passion and inspiration, especially in flamenco",
+      "part_of_speech": "noun",
+      "difficulty": "advanced"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "es",
+    "text": "The etymology of 'duende': From dueño (owner), originally meaning a magical creature",
+    "metadata": {
+      "word_id": 5,
+      "word": "duende",
+      "translation": "a quality of passion and inspiration, especially in flamenco",
+      "part_of_speech": "noun",
+      "difficulty": "advanced"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "fr",
+    "text": "An example of using 'dépaysement' (the feeling of being in a foreign place) is: \"Le dépaysement total lors de mon premier voyage à Tokyo.\"",
+    "metadata": {
+      "word_id": 6,
+      "word": "dépaysement",
+      "translation": "the feeling of being in a foreign place",
+      "part_of_speech": "noun",
+      "difficulty": "advanced",
+      "example_translation": "The complete feeling of displacement during my first trip to Tokyo."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "fr",
+    "text": "A cultural note about 'dépaysement': Unique French concept with no direct English equivalent.",
+    "metadata": {
+      "word_id": 6,
+      "word": "dépaysement",
+      "translation": "the feeling of being in a foreign place",
+      "part_of_speech": "noun",
+      "difficulty": "advanced"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "fr",
+    "text": "The etymology of 'dépaysement': From dé- (un-) + pays (country)",
+    "metadata": {
+      "word_id": 6,
+      "word": "dépaysement",
+      "translation": "the feeling of being in a foreign place",
+      "part_of_speech": "noun",
+      "difficulty": "advanced"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "fr",
+    "text": "An example of using 'flâner' (to wander aimlessly with pleasure) is: \"J'aime flâner dans les rues de Paris.\"",
+    "metadata": {
+      "word_id": 7,
+      "word": "flâner",
+      "translation": "to wander aimlessly with pleasure",
+      "part_of_speech": "verb",
+      "difficulty": "intermediate",
+      "example_translation": "I love strolling through the streets of Paris."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "fr",
+    "text": "A cultural note about 'flâner': Central to Parisian culture and the art of leisurely observation.",
+    "metadata": {
+      "word_id": 7,
+      "word": "flâner",
+      "translation": "to wander aimlessly with pleasure",
+      "part_of_speech": "verb",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "fr",
+    "text": "The etymology of 'flâner': From Old Norse flana (to rush about)",
+    "metadata": {
+      "word_id": 7,
+      "word": "flâner",
+      "translation": "to wander aimlessly with pleasure",
+      "part_of_speech": "verb",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "de",
+    "text": "An example of using 'Fernweh' (longing for distant places; wanderlust) is: \"Sie hat Fernweh nach den Bergen.\"",
+    "metadata": {
+      "word_id": 8,
+      "word": "Fernweh",
+      "translation": "longing for distant places; wanderlust",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate",
+      "example_translation": "She longs for the mountains."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "de",
+    "text": "A cultural note about 'Fernweh': Reflects German romantic ideals of travel and exploration.",
+    "metadata": {
+      "word_id": 8,
+      "word": "Fernweh",
+      "translation": "longing for distant places; wanderlust",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "de",
+    "text": "The etymology of 'Fernweh': From fern (far) + Weh (pain)",
+    "metadata": {
+      "word_id": 8,
+      "word": "Fernweh",
+      "translation": "longing for distant places; wanderlust",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "de",
+    "text": "An example of using 'Gemütlichkeit' (warmth, coziness, and good cheer) is: \"Die Gemütlichkeit des Cafés lädt zum Verweilen ein.\"",
+    "metadata": {
+      "word_id": 9,
+      "word": "Gemütlichkeit",
+      "translation": "warmth, coziness, and good cheer",
+      "part_of_speech": "noun",
+      "difficulty": "advanced",
+      "example_translation": "The coziness of the café invites you to linger."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "de",
+    "text": "A cultural note about 'Gemütlichkeit': Central to German culture and hospitality.",
+    "metadata": {
+      "word_id": 9,
+      "word": "Gemütlichkeit",
+      "translation": "warmth, coziness, and good cheer",
+      "part_of_speech": "noun",
+      "difficulty": "advanced"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "de",
+    "text": "The etymology of 'Gemütlichkeit': From Gemüt (mind, spirit) + -lich (like) + -keit (-ness)",
+    "metadata": {
+      "word_id": 9,
+      "word": "Gemütlichkeit",
+      "translation": "warmth, coziness, and good cheer",
+      "part_of_speech": "noun",
+      "difficulty": "advanced"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "ja",
+    "text": "An example of using '木漏れ日' (sunlight filtering through trees) is: \"木漏れ日が森の中で踊っている。\"",
+    "metadata": {
+      "word_id": 10,
+      "word": "木漏れ日",
+      "translation": "sunlight filtering through trees",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate",
+      "example_translation": "Sunlight is dancing through the trees in the forest."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "ja",
+    "text": "A cultural note about '木漏れ日': Reflects Japanese appreciation for subtle natural beauty.",
+    "metadata": {
+      "word_id": 10,
+      "word": "木漏れ日",
+      "translation": "sunlight filtering through trees",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "ja",
+    "text": "The etymology of '木漏れ日': From 木 (tree) + 漏れ (leak) + 日 (sun)",
+    "metadata": {
+      "word_id": 10,
+      "word": "木漏れ日",
+      "translation": "sunlight filtering through trees",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "ja",
+    "text": "An example of using 'もったいない' (regret over waste; too good to waste) is: \"まだ食べられるのに捨てるなんてもったいない。\"",
+    "metadata": {
+      "word_id": 11,
+      "word": "もったいない",
+      "translation": "regret over waste; too good to waste",
+      "part_of_speech": "adjective",
+      "difficulty": "intermediate",
+      "example_translation": "It's wasteful to throw it away when it's still edible."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "ja",
+    "text": "A cultural note about 'もったいない': Reflects Japanese values of conservation and respect for resources.",
+    "metadata": {
+      "word_id": 11,
+      "word": "もったいない",
+      "translation": "regret over waste; too good to waste",
+      "part_of_speech": "adjective",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "ja",
+    "text": "The etymology of 'もったいない': From Buddhist concept of intrinsic value",
+    "metadata": {
+      "word_id": 11,
+      "word": "もったいない",
+      "translation": "regret over waste; too good to waste",
+      "part_of_speech": "adjective",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "zh",
+    "text": "An example of using '缘分' (predestined relationship or connection) is: \"我们能相遇真是缘分。\"",
+    "metadata": {
+      "word_id": 12,
+      "word": "缘分",
+      "translation": "predestined relationship or connection",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate",
+      "example_translation": "Our meeting is truly fate."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "zh",
+    "text": "A cultural note about '缘分': Important concept in Chinese philosophy and relationships.",
+    "metadata": {
+      "word_id": 12,
+      "word": "缘分",
+      "translation": "predestined relationship or connection",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "zh",
+    "text": "The etymology of '缘分': From 缘 (connection) + 分 (portion)",
+    "metadata": {
+      "word_id": 12,
+      "word": "缘分",
+      "translation": "predestined relationship or connection",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "zh",
+    "text": "An example of using '面子' (face; dignity and reputation in social contexts) is: \"给他留点面子吧。\"",
+    "metadata": {
+      "word_id": 13,
+      "word": "面子",
+      "translation": "face; dignity and reputation in social contexts",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate",
+      "example_translation": "Let's save some face for him."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "zh",
+    "text": "A cultural note about '面子': Crucial concept in Chinese social interactions.",
+    "metadata": {
+      "word_id": 13,
+      "word": "面子",
+      "translation": "face; dignity and reputation in social contexts",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "zh",
+    "text": "The etymology of '面子': From 面 (face) + 子 (suffix)",
+    "metadata": {
+      "word_id": 13,
+      "word": "面子",
+      "translation": "face; dignity and reputation in social contexts",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "it",
+    "text": "An example of using 'dolce far niente' (the sweetness of doing nothing) is: \"Oggi ho voglia di dolce far niente.\"",
+    "metadata": {
+      "word_id": 14,
+      "word": "dolce far niente",
+      "translation": "the sweetness of doing nothing",
+      "part_of_speech": "phrase",
+      "difficulty": "intermediate",
+      "example_translation": "Today I feel like enjoying the sweetness of doing nothing."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "it",
+    "text": "A cultural note about 'dolce far niente': Italian appreciation for leisure and contemplation.",
+    "metadata": {
+      "word_id": 14,
+      "word": "dolce far niente",
+      "translation": "the sweetness of doing nothing",
+      "part_of_speech": "phrase",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "it",
+    "text": "The etymology of 'dolce far niente': From dolce (sweet) + far (to do) + niente (nothing)",
+    "metadata": {
+      "word_id": 14,
+      "word": "dolce far niente",
+      "translation": "the sweetness of doing nothing",
+      "part_of_speech": "phrase",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "it",
+    "text": "An example of using 'passeggiata' (evening stroll for socializing) is: \"Facciamo una passeggiata in centro?\"",
+    "metadata": {
+      "word_id": 15,
+      "word": "passeggiata",
+      "translation": "evening stroll for socializing",
+      "part_of_speech": "noun",
+      "difficulty": "beginner",
+      "example_translation": "Shall we take a stroll in the city center?"
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "it",
+    "text": "A cultural note about 'passeggiata': Important Italian social tradition, especially in small towns.",
+    "metadata": {
+      "word_id": 15,
+      "word": "passeggiata",
+      "translation": "evening stroll for socializing",
+      "part_of_speech": "noun",
+      "difficulty": "beginner"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "it",
+    "text": "The etymology of 'passeggiata': From passeggiare (to walk, to stroll)",
+    "metadata": {
+      "word_id": 15,
+      "word": "passeggiata",
+      "translation": "evening stroll for socializing",
+      "part_of_speech": "noun",
+      "difficulty": "beginner"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "pt",
+    "text": "An example of using 'saudade' (deep nostalgic longing for something absent) is: \"Tenho saudade dos tempos de escola.\"",
+    "metadata": {
+      "word_id": 16,
+      "word": "saudade",
+      "translation": "deep nostalgic longing for something absent",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate",
+      "example_translation": "I have nostalgia for school days."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "pt",
+    "text": "A cultural note about 'saudade': Quintessential Portuguese emotion, untranslatable to other languages.",
+    "metadata": {
+      "word_id": 16,
+      "word": "saudade",
+      "translation": "deep nostalgic longing for something absent",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "pt",
+    "text": "The etymology of 'saudade': From Latin solitas (solitude)",
+    "metadata": {
+      "word_id": 16,
+      "word": "saudade",
+      "translation": "deep nostalgic longing for something absent",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Word of Day Example",
+    "language": "pt",
+    "text": "An example of using 'cafuné' (gently running fingers through someone's hair) is: \"Ela fazia cafuné no filho para ele dormir.\"",
+    "metadata": {
+      "word_id": 17,
+      "word": "cafuné",
+      "translation": "gently running fingers through someone's hair",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate",
+      "example_translation": "She gently stroked her son's hair to help him sleep."
+    }
+  },
+  {
+    "source": "Cultural Note",
+    "language": "pt",
+    "text": "A cultural note about 'cafuné': Tender gesture common in Brazilian family relationships.",
+    "metadata": {
+      "word_id": 17,
+      "word": "cafuné",
+      "translation": "gently running fingers through someone's hair",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  },
+  {
+    "source": "Etymology",
+    "language": "pt",
+    "text": "The etymology of 'cafuné': From African languages brought to Brazil",
+    "metadata": {
+      "word_id": 17,
+      "word": "cafuné",
+      "translation": "gently running fingers through someone's hair",
+      "part_of_speech": "noun",
+      "difficulty": "intermediate"
+    }
+  }
+]

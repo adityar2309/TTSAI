@@ -60,6 +60,17 @@ except ImportError as e:
     logger.error(f"Files in current directory: {os.listdir('.')}")
     raise
 
+# Import vector service for RAG functionality
+try:
+    from vector_service import vector_service
+    logger.info("Successfully imported vector_service")
+    vector_service_available = True
+except ImportError as e:
+    logger.error(f"Failed to import vector_service: {e}")
+    logger.warning("RAG functionality will not be available")
+    vector_service_available = False
+    vector_service = None
+
 # Import authentication components directly
 try:
     from auth_routes import register_auth_routes
@@ -2760,11 +2771,60 @@ def initialize_data_files():
                 }
                 db_service.add_word_of_day(lang, basic_word)
         
+        # Initialize vector service for RAG functionality
+        if vector_service_available and vector_service:
+            logger.info("Initializing RAG vector service...")
+            try:
+                # Attempt to load existing vector index
+                if vector_service.load_index():
+                    stats = vector_service.get_stats()
+                    logger.info(f"✅ Vector service initialized successfully")
+                    logger.info(f"   - Model: {stats['model_name']}")
+                    logger.info(f"   - Documents: {stats['total_documents']}")
+                    logger.info(f"   - Index size: {stats['index_size']} vectors")
+                    logger.info("RAG-enhanced explanations are now available")
+                else:
+                    logger.warning("⚠️  Vector index not found")
+                    logger.warning("RAG functionality will use LLM-only explanations")
+                    logger.warning("Run 'python populate_kb.py' to create the knowledge base")
+            except Exception as e:
+                logger.error(f"❌ Failed to initialize vector service: {e}")
+                logger.warning("RAG functionality will be limited to LLM-only explanations")
+        else:
+            logger.warning("Vector service not available - RAG functionality disabled")
+        
         logger.info("Database initialization completed successfully")
         
     except Exception as e:
         logger.error(f"Error during database initialization: {e}")
         # Don't fail startup, just log the error
+
+# Vector service status endpoint for monitoring
+@app.route('/api/vector-service/status', methods=['GET'])
+def get_vector_service_status():
+    """Get vector service status and statistics"""
+    try:
+        if not vector_service_available or not vector_service:
+            return jsonify({
+                'available': False,
+                'message': 'Vector service not available'
+            }), 503
+        
+        stats = vector_service.get_stats()
+        return jsonify({
+            'available': True,
+            'ready': vector_service.is_ready(),
+            'stats': stats,
+            'message': 'Vector service operational' if vector_service.is_ready() else 'Vector service loaded but no index available'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting vector service status: {e}")
+        return jsonify({
+            'available': False,
+            'error': str(e),
+            'message': 'Error retrieving vector service status'
+        }), 500
 
 @app.route('/api/debug/populate-words', methods=['POST'])
 def populate_word_data():

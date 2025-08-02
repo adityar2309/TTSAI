@@ -11,3 +11,77 @@
 2025-05-29 17:27:52,079 - google.auth._default - WARNING - Authentication failed using Compute Engine authentication due to unavailable metadata server.
 2025-05-29 17:27:52,080 - __main__ - ERROR - Failed to initialize Google Cloud TTS client: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
 2025-05-29 17:27:52,080 - __main__ - ERROR - GEMINI_API_KEY not found in environment variables
+2025-08-02 16:31:36,363 - app - INFO - Successfully imported models and db_service
+2025-08-02 16:31:36,423 - faiss.loader - INFO - Loading faiss with AVX2 support.
+2025-08-02 16:31:36,423 - faiss.loader - INFO - Could not load library with AVX2 support due to:
+ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
+2025-08-02 16:31:36,423 - faiss.loader - INFO - Loading faiss.
+2025-08-02 16:31:36,438 - faiss.loader - INFO - Successfully loaded faiss.
+2025-08-02 16:31:46,733 - tensorflow - WARNING - From C:\Users\qatty\AppData\Local\Programs\Python\Python310\lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-08-02 16:31:47,473 - vector_service - INFO - Initializing VectorService with model: all-MiniLM-L6-v2
+2025-08-02 16:31:47,475 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-02 16:31:47,475 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-02 16:31:51,483 - vector_service - INFO - VectorService initialized successfully
+2025-08-02 16:31:51,483 - app - INFO - Successfully imported vector_service
+2025-08-02 16:31:51,515 - app - INFO - Successfully imported auth components
+2025-08-02 16:31:51,521 - db_service_auth - ERROR - Database error creating auth tables: unable to open database file
+2025-08-02 16:31:51,521 - app - ERROR - Failed to integrate authentication: unable to open database file
+2025-08-02 16:31:51,521 - app - WARNING - Continuing without authentication features
+2025-08-02 16:31:51,522 - app - INFO - Initializing Google Cloud Speech client...
+2025-08-02 16:31:53,426 - app - INFO - Google Cloud Speech client initialized successfully
+2025-08-02 16:31:53,426 - app - INFO - Initializing Google Cloud TTS client...
+2025-08-02 16:31:54,346 - app - INFO - Google Cloud TTS client initialized successfully
+2025-08-02 16:31:54,346 - app - INFO - Configuring Google AI Studio with model: gemini-2.0-flash-exp
+2025-08-02 16:31:54,346 - app - INFO - API key: AIzaSyCZ...f-OM
+2025-08-02 16:31:55,160 - app - INFO - Gemini connection test successful
+2025-08-02 16:31:55,169 - app - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-08-02 16:45:57,521 - app - INFO - Successfully imported models and db_service
+2025-08-02 16:45:57,581 - faiss.loader - INFO - Loading faiss with AVX2 support.
+2025-08-02 16:45:57,582 - faiss.loader - INFO - Could not load library with AVX2 support due to:
+ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
+2025-08-02 16:45:57,582 - faiss.loader - INFO - Loading faiss.
+2025-08-02 16:45:57,616 - faiss.loader - INFO - Successfully loaded faiss.
+2025-08-02 16:46:07,717 - tensorflow - WARNING - From C:\Users\qatty\AppData\Local\Programs\Python\Python310\lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-08-02 16:46:08,453 - vector_service - INFO - Initializing VectorService with model: all-MiniLM-L6-v2
+2025-08-02 16:46:08,455 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-02 16:46:08,455 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-02 16:46:12,358 - vector_service - INFO - VectorService initialized successfully
+2025-08-02 16:46:12,358 - app - INFO - Successfully imported vector_service
+2025-08-02 16:46:12,372 - app - INFO - Successfully imported auth components
+2025-08-02 16:46:12,377 - db_service_auth - ERROR - Database error creating auth tables: unable to open database file
+2025-08-02 16:46:12,377 - app - ERROR - Failed to integrate authentication: unable to open database file
+2025-08-02 16:46:12,378 - app - WARNING - Continuing without authentication features
+2025-08-02 16:46:12,378 - app - INFO - Initializing Google Cloud Speech client...
+2025-08-02 16:46:13,615 - app - INFO - Google Cloud Speech client initialized successfully
+2025-08-02 16:46:13,615 - app - INFO - Initializing Google Cloud TTS client...
+2025-08-02 16:46:14,538 - app - INFO - Google Cloud TTS client initialized successfully
+2025-08-02 16:46:14,539 - app - INFO - Configuring Google AI Studio with model: gemini-2.0-flash-exp
+2025-08-02 16:46:14,539 - app - INFO - API key: AIzaSyCZ...f-OM
+2025-08-02 16:46:15,512 - app - INFO - Gemini connection test successful
+2025-08-02 16:46:15,521 - app - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-08-02 17:06:56,679 - app - INFO - Successfully imported models and db_service
+2025-08-02 17:06:56,772 - faiss.loader - INFO - Loading faiss with AVX2 support.
+2025-08-02 17:06:56,773 - faiss.loader - INFO - Could not load library with AVX2 support due to:
+ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
+2025-08-02 17:06:56,773 - faiss.loader - INFO - Loading faiss.
+2025-08-02 17:06:56,824 - faiss.loader - INFO - Successfully loaded faiss.
+2025-08-02 17:07:07,414 - tensorflow - WARNING - From C:\Users\qatty\AppData\Local\Programs\Python\Python310\lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-08-02 17:07:08,148 - vector_service - INFO - Initializing VectorService with model: all-MiniLM-L6-v2
+2025-08-02 17:07:08,150 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-02 17:07:08,150 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-02 17:07:12,416 - vector_service - INFO - VectorService initialized successfully
+2025-08-02 17:07:12,416 - app - INFO - Successfully imported vector_service
+2025-08-02 17:07:12,428 - app - INFO - Successfully imported auth components
+2025-08-02 17:07:12,441 - db_service_auth - INFO - Auth tables created successfully
+2025-08-02 17:07:12,443 - app - INFO - Authentication integration completed successfully
+2025-08-02 17:07:12,444 - app - INFO - Initializing Google Cloud Speech client...
+2025-08-02 17:07:13,449 - app - INFO - Google Cloud Speech client initialized successfully
+2025-08-02 17:07:13,449 - app - INFO - Initializing Google Cloud TTS client...
+2025-08-02 17:07:14,371 - app - INFO - Google Cloud TTS client initialized successfully
+2025-08-02 17:07:14,371 - app - INFO - Configuring Google AI Studio with model: gemini-2.0-flash-exp
+2025-08-02 17:07:14,371 - app - INFO - API key: AIzaSyCZ...f-OM
+2025-08-02 17:07:15,102 - app - INFO - Gemini connection test successful
+2025-08-02 17:07:15,112 - app - INFO - Cache cleanup completed. Removed 0 expired entries
