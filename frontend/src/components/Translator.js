@@ -83,6 +83,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import AdvancedTranslation from "./AdvancedTranslation";
 import LearningHub from "./LearningHub";
+import LanguageTutor from "./LanguageTutor";
 import "../styles/gradients.css";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
@@ -248,6 +249,10 @@ export const Translator = ({ initialMode = "type" }) => {
 
   // Settings dialog
   const [showSettings, setShowSettings] = useState(false);
+
+  // Language tutor state
+  const [tutorExplanation, setTutorExplanation] = useState(null);
+  const [isExplaining, setIsExplaining] = useState(false);
   const [settingsTab, setSettingsTab] = useState(0);
 
   // Other state
@@ -618,6 +623,46 @@ export const Translator = ({ initialMode = "type" }) => {
   // Enhanced utility functions
   const showNotification = (message, severity = "info") => {
     setNotification({ open: true, message, severity });
+  };
+
+  // Language tutor explanation handler
+  const handleTutorExplain = async () => {
+    if (!translatedText) {
+      showNotification("Translate something first to get an explanation.", "warning");
+      return;
+    }
+
+    setIsExplaining(true);
+    setTutorExplanation(null);
+
+    try {
+      const response = await axios.post(`${API_URL}/tutor/explain`, {
+        text: translatedText, // We ask for an explanation of the translated text
+        language: targetLang,
+      });
+
+      setTutorExplanation(response.data);
+      showNotification("Explanation generated successfully!", "success");
+      
+      // Record analytics
+      recordAnalytics("tutor_explanation_requested", {
+        source_lang: sourceLang,
+        target_lang: targetLang,
+        text_length: translatedText.length,
+      });
+    } catch (err) {
+      console.error("Tutor explanation error:", err);
+      const errorMessage = err.response?.data?.error || "Failed to get explanation from the tutor.";
+      showNotification(errorMessage, "error");
+      
+      // Record analytics for failed requests
+      recordAnalytics("tutor_explanation_failed", {
+        error: errorMessage,
+        target_lang: targetLang,
+      });
+    } finally {
+      setIsExplaining(false);
+    }
   };
 
   const handleSwapLanguages = () => {
@@ -1338,6 +1383,19 @@ export const Translator = ({ initialMode = "type" }) => {
                                       <BookmarkIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
+                                  <Tooltip title="Explain with Tutor">
+                                    <IconButton
+                                      size="small"
+                                      onClick={handleTutorExplain}
+                                      disabled={isExplaining || !translatedText}
+                                    >
+                                      {isExplaining ? (
+                                        <CircularProgress size={20} />
+                                      ) : (
+                                        <SchoolIcon fontSize="small" />
+                                      )}
+                                    </IconButton>
+                                  </Tooltip>
                                 </>
                               )}
                             </Box>
@@ -1426,6 +1484,18 @@ export const Translator = ({ initialMode = "type" }) => {
                                 </Box>
                               )}
                           </Box>
+
+                          {/* Language Tutor Explanation */}
+                          {(isExplaining || tutorExplanation) && (
+                            <Box sx={{ mt: 2 }}>
+                              {isExplaining && (
+                                <LinearProgress sx={{ mb: 2 }} />
+                              )}
+                              {tutorExplanation && (
+                                <LanguageTutor explanation={tutorExplanation} />
+                              )}
+                            </Box>
+                          )}
 
                           {translation && (
                             <Box sx={{ mt: 2 }}>

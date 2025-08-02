@@ -209,3 +209,29 @@ ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
 2025-08-02 17:20:24,787 - app - INFO - RAG explanation request: 'hello' in en
 2025-08-02 17:20:24,788 - app - INFO - Vector service not available, using LLM-only explanation
 2025-08-02 17:20:27,874 - app - INFO - RAG explanation generated successfully (context_used: False)
+2025-08-02 17:27:40,656 - app - INFO - Successfully imported models and db_service
+2025-08-02 17:27:40,656 - app - INFO - Successfully imported vector_service
+2025-08-02 17:27:40,665 - app - INFO - Successfully imported auth components
+2025-08-02 17:27:40,668 - db_service_auth - INFO - Auth tables created successfully
+2025-08-02 17:27:40,670 - app - INFO - Authentication integration completed successfully
+2025-08-02 17:27:40,670 - app - INFO - Initializing Google Cloud Speech client...
+2025-08-02 17:27:41,720 - app - INFO - Google Cloud Speech client initialized successfully
+2025-08-02 17:27:41,721 - app - INFO - Initializing Google Cloud TTS client...
+2025-08-02 17:27:42,638 - app - INFO - Google Cloud TTS client initialized successfully
+2025-08-02 17:27:42,638 - app - INFO - Configuring Google AI Studio with model: gemini-2.0-flash-exp
+2025-08-02 17:27:42,638 - app - INFO - API key: AIzaSyCZ...f-OM
+2025-08-02 17:27:43,413 - app - INFO - Gemini connection test successful
+2025-08-02 17:27:43,419 - app - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-08-02 17:27:43,429 - app - INFO - RAG explanation request: 'hello' in en
+2025-08-02 17:27:43,442 - app - INFO - Found 4 relevant documents for en
+2025-08-02 17:27:46,177 - app - INFO - RAG explanation generated successfully (context_used: True)
+2025-08-02 17:27:46,183 - app - INFO - RAG explanation request: 'hello' in en
+2025-08-02 17:27:46,197 - app - INFO - Found 4 relevant documents for en
+2025-08-02 17:27:48,415 - app - INFO - RAG explanation generated successfully (context_used: True)
+2025-08-02 17:27:48,417 - app - INFO - RAG explanation request: 'bonjour' in fr
+2025-08-02 17:27:48,433 - app - INFO - Found 2 relevant documents for fr
+2025-08-02 17:27:51,128 - app - INFO - RAG explanation generated successfully (context_used: True)
+2025-08-02 17:27:51,131 - app - INFO - RAG explanation request: 'hola' in es
+2025-08-02 17:27:51,144 - app - INFO - No language-specific documents found for es, using general results
+2025-08-02 17:27:53,632 - app - INFO - RAG explanation generated successfully (context_used: True)
+2025-08-02 17:31:55,194 - app - INFO - Cache cleanup completed. Removed 0 expired entries
