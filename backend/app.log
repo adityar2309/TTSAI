@@ -644,3 +644,34 @@ message: "API key not valid. Please pass a valid API key."
 2025-07-26 14:00:47,430 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
 2025-07-26 14:00:58,805 - werkzeug - INFO - 127.0.0.1 - - [26/Jul/2025 14:00:58] "[33mGET / HTTP/1.1[0m" 404 -
 2025-07-26 14:00:58,870 - werkzeug - INFO - 127.0.0.1 - - [26/Jul/2025 14:00:58] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-08-03 16:41:09,365 - app - INFO - Successfully imported models and db_service
+2025-08-03 16:41:09,507 - faiss.loader - INFO - Loading faiss with AVX2 support.
+2025-08-03 16:41:09,508 - faiss.loader - INFO - Could not load library with AVX2 support due to:
+ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
+2025-08-03 16:41:09,508 - faiss.loader - INFO - Loading faiss.
+2025-08-03 16:41:09,526 - faiss.loader - INFO - Successfully loaded faiss.
+2025-08-03 16:41:21,428 - tensorflow - WARNING - From C:\Users\qatty\AppData\Local\Programs\Python\Python310\lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-08-03 16:41:22,465 - vector_service - INFO - Initializing VectorService with model: all-MiniLM-L6-v2
+2025-08-03 16:41:22,466 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-03 16:41:22,466 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-03 16:41:26,544 - vector_service - INFO - VectorService initialized successfully
+2025-08-03 16:41:26,545 - app - INFO - Successfully imported vector_service
+2025-08-03 16:41:26,566 - app - INFO - Successfully imported auth components
+2025-08-03 16:41:26,569 - db_service_auth - INFO - Auth tables created successfully
+2025-08-03 16:41:26,570 - app - INFO - Authentication integration completed successfully
+2025-08-03 16:41:26,570 - app - INFO - Initializing Google Cloud Speech client...
+2025-08-03 16:41:28,072 - app - INFO - Google Cloud Speech client initialized successfully
+2025-08-03 16:41:28,072 - app - INFO - Initializing Google Cloud TTS client...
+2025-08-03 16:41:29,013 - app - INFO - Google Cloud TTS client initialized successfully
+2025-08-03 16:41:29,013 - app - INFO - Configuring Google AI Studio with model: gemini-2.0-flash-exp
+2025-08-03 16:41:29,013 - app - INFO - API key: AIzaSyCZ...f-OM
+2025-08-03 16:41:29,680 - app - INFO - Gemini connection test successful
+2025-08-03 16:41:29,686 - app - INFO - Cache cleanup completed. Removed 0 expired entries
+2025-08-03 16:41:29,695 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-08-03 16:41:29,695 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-03 16:41:32,705 - werkzeug - INFO - 127.0.0.1 - - [03/Aug/2025 16:41:32] "GET /api/health HTTP/1.1" 200 -
+2025-08-03 16:41:32,709 - app - INFO - Getting word of day for language: en
+2025-08-03 16:41:32,738 - app - INFO - Successfully retrieved word of day: serendipity
+2025-08-03 16:41:32,738 - werkzeug - INFO - 127.0.0.1 - - [03/Aug/2025 16:41:32] "GET /api/word-of-day?language=en HTTP/1.1" 200 -

@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 MODEL_NAME = 'all-MiniLM-L6-v2'
 INDEX_FILE = 'learning_kb.index'
 METADATA_FILE = 'learning_kb_meta.json'
-DATA_DIR = 'data'
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')  # Root data directory
 
 class VectorService:
     """
@@ -94,13 +94,14 @@ class VectorService:
             return False
     
     @handle_vector_service_errors
-    def search(self, query_text: str, k: int = 5):
+    def search(self, query_text: str, k: int = 5, language_filter: str = None):
         """
         Searches the index for the most similar documents.
         
         Args:
             query_text (str): The text to search for
             k (int): Number of similar documents to return (default: 5)
+            language_filter (str): Optional language code to filter results
             
         Returns:
             list: List of similar documents with metadata, empty list if no index loaded
@@ -145,11 +146,17 @@ class VectorService:
                 
                 # Get document metadata
                 doc = self.metadata[idx].copy()
+                
+                # Apply language filter if specified
+                if language_filter and doc.get('language') != language_filter:
+                    continue
+                
                 doc['similarity_score'] = float(distance)  # Inner product score
-                doc['rank'] = i + 1
+                doc['rank'] = len(results) + 1  # Rank after filtering
                 results.append(doc)
             
-            logger.debug(f"Found {len(results)} similar documents")
+            logger.debug(f"Found {len(results)} similar documents" + 
+                        (f" (filtered by language: {language_filter})" if language_filter else ""))
             return results
             
         except Exception as e:
@@ -165,6 +172,23 @@ class VectorService:
         """
         return self.index is not None and len(self.metadata) > 0
     
+    def get_available_languages(self):
+        """
+        Get list of available languages in the knowledge base.
+        
+        Returns:
+            list: List of language codes available in the index
+        """
+        if not self.metadata:
+            return []
+        
+        languages = set()
+        for doc in self.metadata:
+            if 'language' in doc:
+                languages.add(doc['language'])
+        
+        return sorted(list(languages))
+    
     def get_stats(self):
         """
         Get statistics about the loaded index.
@@ -178,10 +202,24 @@ class VectorService:
             'total_documents': len(self.metadata),
             'index_size': self.index.ntotal if self.index else 0,
             'embedding_dimension': 384,  # all-MiniLM-L6-v2 dimension
+            'available_languages': self.get_available_languages(),
         }
         
         if self.index:
             stats['index_type'] = type(self.index).__name__
+        
+        # Add language and source breakdown
+        if self.metadata:
+            lang_counts = {}
+            source_counts = {}
+            for doc in self.metadata:
+                lang = doc.get('language', 'unknown')
+                source = doc.get('source', 'unknown')
+                lang_counts[lang] = lang_counts.get(lang, 0) + 1
+                source_counts[source] = source_counts.get(source, 0) + 1
+            
+            stats['language_breakdown'] = dict(sorted(lang_counts.items()))
+            stats['source_breakdown'] = dict(sorted(source_counts.items()))
         
         return stats
 

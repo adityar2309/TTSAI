@@ -71,6 +71,33 @@ except ImportError as e:
     vector_service_available = False
     vector_service = None
 
+# Vector service metrics tracking
+vector_service_metrics = {
+    'total_searches': 0,
+    'successful_searches': 0,
+    'failed_searches': 0,
+    'average_search_time': 0.0,
+    'total_search_time': 0.0
+}
+
+def update_vector_metrics(search_time, success=True):
+    """Update vector service performance metrics"""
+    global vector_service_metrics
+    vector_service_metrics['total_searches'] += 1
+    vector_service_metrics['total_search_time'] += search_time
+    
+    if success:
+        vector_service_metrics['successful_searches'] += 1
+    else:
+        vector_service_metrics['failed_searches'] += 1
+    
+    # Calculate average search time
+    if vector_service_metrics['total_searches'] > 0:
+        vector_service_metrics['average_search_time'] = (
+            vector_service_metrics['total_search_time'] / 
+            vector_service_metrics['total_searches']
+        )
+
 # Import authentication components directly
 try:
     from auth_routes import register_auth_routes
@@ -989,33 +1016,48 @@ def language_tutor_explain():
         
         if vector_service_available and vector_service and vector_service.is_ready():
             try:
-                logger.debug("Performing vector similarity search...")
-                retrieved_docs = vector_service.search(query, k=5)
+                import time
+                search_start = time.time()
+                logger.debug("🔍 Performing vector similarity search...")
                 
-                # Filter docs by the target language for relevance
-                lang_specific_docs = [doc for doc in retrieved_docs if doc.get('language') == language]
+                # First try language-specific search
+                lang_specific_docs = vector_service.search(query, k=5, language_filter=language)
                 
                 if lang_specific_docs:
                     context_str = "\n\n".join([
                         f"- Source: {doc['source']}\n- Content: {doc['text']}" 
                         for doc in lang_specific_docs
                     ])
-                    logger.info(f"Found {len(lang_specific_docs)} relevant documents for {language}")
+                    search_time = time.time() - search_start
+                    update_vector_metrics(search_time, success=True)
+                    logger.info(f"✅ Found {len(lang_specific_docs)} relevant documents for {language} in {search_time:.3f}s")
+                    retrieved_docs = lang_specific_docs
                 else:
-                    logger.info(f"No language-specific documents found for {language}, using general results")
+                    logger.info(f"No language-specific documents found for {language}, trying general search...")
                     # Use general results if no language-specific ones found
-                    if retrieved_docs:
+                    general_docs = vector_service.search(query, k=3)
+                    if general_docs:
                         context_str = "\n\n".join([
                             f"- Source: {doc['source']}\n- Content: {doc['text']}" 
-                            for doc in retrieved_docs[:3]  # Limit to top 3 general results
+                            for doc in general_docs
                         ])
+                        search_time = time.time() - search_start
+                        update_vector_metrics(search_time, success=True)
+                        logger.info(f"✅ Found {len(general_docs)} general documents in {search_time:.3f}s")
+                        retrieved_docs = general_docs
+                    else:
+                        search_time = time.time() - search_start
+                        update_vector_metrics(search_time, success=True)
+                        logger.info(f"No relevant documents found in {search_time:.3f}s")
                 
             except Exception as e:
-                logger.warning(f"Vector search failed, continuing without context: {e}")
+                search_time = time.time() - search_start if 'search_start' in locals() else 0
+                update_vector_metrics(search_time, success=False)
+                logger.warning(f"❌ Vector search failed, continuing without context: {e}")
                 retrieved_docs = []
                 context_str = ""
         else:
-            logger.info("Vector service not available, using LLM-only explanation")
+            logger.info("⚠️  Vector service not available, using LLM-only explanation")
         
         # 2. Augmentation: Create a detailed prompt for the LLM
         prompt = f"""You are an expert and friendly Language Learning Tutor. Your student wants to understand the phrase "{query}" in the {language} language.
@@ -2922,25 +2964,34 @@ def initialize_data_files():
         
         # Initialize vector service for RAG functionality
         if vector_service_available and vector_service:
-            logger.info("Initializing RAG vector service...")
+            logger.info("🧠 Initializing RAG vector service...")
             try:
+                import time
+                start_time = time.time()
+                
                 # Attempt to load existing vector index
                 if vector_service.load_index():
+                    load_time = time.time() - start_time
                     stats = vector_service.get_stats()
-                    logger.info(f"✅ Vector service initialized successfully")
+                    
+                    logger.info(f"✅ Vector service initialized successfully in {load_time:.2f}s")
                     logger.info(f"   - Model: {stats['model_name']}")
                     logger.info(f"   - Documents: {stats['total_documents']}")
                     logger.info(f"   - Index size: {stats['index_size']} vectors")
-                    logger.info("RAG-enhanced explanations are now available")
+                    logger.info(f"   - Languages: {', '.join(stats.get('available_languages', []))}")
+                    logger.info(f"   - Sources: {', '.join(stats.get('source_breakdown', {}).keys())}")
+                    logger.info("🎉 RAG-enhanced explanations are now available")
                 else:
                     logger.warning("⚠️  Vector index not found")
                     logger.warning("RAG functionality will use LLM-only explanations")
-                    logger.warning("Run 'python populate_kb.py' to create the knowledge base")
+                    logger.warning("💡 Run 'python populate_kb.py' to create the knowledge base")
             except Exception as e:
                 logger.error(f"❌ Failed to initialize vector service: {e}")
+                logger.exception("Full error traceback:")
                 logger.warning("RAG functionality will be limited to LLM-only explanations")
         else:
-            logger.warning("Vector service not available - RAG functionality disabled")
+            logger.warning("⚠️  Vector service not available - RAG functionality disabled")
+            logger.info("💡 Install required dependencies: pip install sentence-transformers faiss-cpu")
         
         logger.info("Database initialization completed successfully")
         
@@ -2956,23 +3007,113 @@ def get_vector_service_status():
         if not vector_service_available or not vector_service:
             return jsonify({
                 'available': False,
-                'message': 'Vector service not available'
+                'ready': False,
+                'message': 'Vector service not available',
+                'suggestion': 'Install required dependencies: pip install sentence-transformers faiss-cpu'
             }), 503
         
         stats = vector_service.get_stats()
-        return jsonify({
+        is_ready = vector_service.is_ready()
+        
+        response_data = {
             'available': True,
-            'ready': vector_service.is_ready(),
+            'ready': is_ready,
             'stats': stats,
-            'message': 'Vector service operational' if vector_service.is_ready() else 'Vector service loaded but no index available'
-        })
+            'metrics': vector_service_metrics.copy(),
+            'message': 'Vector service operational' if is_ready else 'Vector service loaded but no index available'
+        }
+        
+        if not is_ready:
+            response_data['suggestion'] = 'Run "python populate_kb.py" to create the knowledge base'
+        
+        return jsonify(response_data)
         
     except Exception as e:
         logger.error(f"Error getting vector service status: {e}")
         return jsonify({
             'available': False,
+            'ready': False,
             'error': str(e),
             'message': 'Error retrieving vector service status'
+        }), 500
+
+# Vector service health check endpoint
+@app.route('/api/vector-service/health', methods=['GET'])
+def vector_service_health_check():
+    """Perform a health check on the vector service"""
+    try:
+        if not vector_service_available or not vector_service:
+            return jsonify({
+                'healthy': False,
+                'message': 'Vector service not available'
+            }), 503
+        
+        # Perform a simple search to test functionality
+        if vector_service.is_ready():
+            test_results = vector_service.search("test", k=1)
+            search_working = True
+        else:
+            search_working = False
+            test_results = []
+        
+        health_data = {
+            'healthy': vector_service.is_ready() and search_working,
+            'index_loaded': vector_service.is_ready(),
+            'search_functional': search_working,
+            'test_results_count': len(test_results),
+            'message': 'Vector service is healthy' if (vector_service.is_ready() and search_working) else 'Vector service has issues'
+        }
+        
+        status_code = 200 if health_data['healthy'] else 503
+        return jsonify(health_data), status_code
+        
+    except Exception as e:
+        logger.error(f"Error during vector service health check: {e}")
+        return jsonify({
+            'healthy': False,
+            'error': str(e),
+            'message': 'Health check failed'
+        }), 500
+
+# Vector service metrics endpoint
+@app.route('/api/vector-service/metrics', methods=['GET'])
+def get_vector_service_metrics():
+    """Get vector service performance metrics"""
+    try:
+        return jsonify({
+            'metrics': vector_service_metrics.copy(),
+            'message': 'Vector service metrics retrieved successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error getting vector service metrics: {e}")
+        return jsonify({
+            'error': str(e),
+            'message': 'Error retrieving vector service metrics'
+        }), 500
+
+# Vector service metrics reset endpoint (for development/testing)
+@app.route('/api/vector-service/metrics/reset', methods=['POST'])
+def reset_vector_service_metrics():
+    """Reset vector service performance metrics"""
+    try:
+        global vector_service_metrics
+        vector_service_metrics = {
+            'total_searches': 0,
+            'successful_searches': 0,
+            'failed_searches': 0,
+            'average_search_time': 0.0,
+            'total_search_time': 0.0
+        }
+        
+        return jsonify({
+            'message': 'Vector service metrics reset successfully',
+            'metrics': vector_service_metrics.copy()
+        })
+    except Exception as e:
+        logger.error(f"Error resetting vector service metrics: {e}")
+        return jsonify({
+            'error': str(e),
+            'message': 'Error resetting vector service metrics'
         }), 500
 
 @app.route('/api/debug/populate-words', methods=['POST'])

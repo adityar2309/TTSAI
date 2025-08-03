@@ -10,7 +10,7 @@ import time
 
 def set_environment_variable():
     """Set the Gemini API key in the current environment"""
-    api_key = "AIzaSyCZd37vcyOUdxhQ5XWJrDCOkbRRDadf-OM"
+    api_key = "AIzaSyCZzto0BK9sPgX8_QEidRP4mM8-90tf-OM"
     
     print("🔧 Setting GEMINI_API_KEY environment variable...")
     os.environ['GEMINI_API_KEY'] = api_key
