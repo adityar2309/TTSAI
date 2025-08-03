@@ -195,7 +195,6 @@ const LanguageTutor = ({ explanation }) => {
                 pl: 1, 
                 lineHeight: 1.7,
                 color: 'text.primary',
-                bgcolor: 'success.light',
                 bgcolor: theme.palette.mode === 'dark' 
                   ? 'rgba(76, 175, 80, 0.08)' 
                   : 'rgba(76, 175, 80, 0.04)',
