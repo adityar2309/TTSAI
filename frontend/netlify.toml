@@ -3,9 +3,9 @@
   publish = "build"
 
 [build.environment]
-  REACT_APP_API_URL = "https://ttsai-backend-321805997355.us-central1.run.app/api"
+  REACT_APP_API_URL = "https://ttsai-backend-6w4fv6a2la-uc.a.run.app/api"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
