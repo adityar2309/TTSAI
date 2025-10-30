@@ -23,7 +23,7 @@ gcloud auth list --filter=status:ACTIVE --format="value(account)" | findstr "@" 
 if errorlevel 1 (
     echo ERROR: Not authenticated with Google Cloud. Please run:
     echo   gcloud auth login
-    echo   gcloud config set project ttsai-461209
+    echo   gcloud config set project ttsai-476712
     pause
     exit /b 1
 )
@@ -57,7 +57,7 @@ if not exist "Dockerfile" (
 
 REM Build and push using Cloud Build for faster, more reliable builds
 echo Building with Cloud Build (faster than local Docker build)...
-gcloud builds submit --tag gcr.io/ttsai-461209/ttsai-backend:latest .
+gcloud builds submit --tag gcr.io/ttsai-476712/ttsai-backend:latest .
 if errorlevel 1 (
     echo ERROR: Docker build failed.
     cd /d "%~dp0"
@@ -79,7 +79,7 @@ if "%GEMINI_API_KEY%"=="" (
 )
 
 echo Deploying with configuration:
-echo   - Image: gcr.io/ttsai-461209/ttsai-backend:latest
+echo   - Image: gcr.io/ttsai-476712/ttsai-backend:latest
 echo   - Region: us-central1
 echo   - Memory: 2Gi
 echo   - CPU: 2
@@ -88,7 +88,7 @@ echo   - Min instances: 0
 echo   - Environment: Using Google AI Studio (Gemini)
 
 gcloud run deploy ttsai-backend ^
-  --image gcr.io/ttsai-461209/ttsai-backend:latest ^
+  --image gcr.io/ttsai-476712/ttsai-backend:latest ^
   --platform managed ^
   --region us-central1 ^
   --allow-unauthenticated ^

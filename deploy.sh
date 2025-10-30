@@ -9,11 +9,11 @@ if [ -z "$GEMINI_API_KEY" ]; then
 fi
 
 echo "Building and pushing Docker image..."
-gcloud builds submit --tag gcr.io/ttsai-461209/ttsai-backend:latest ./backend
+gcloud builds submit --tag gcr.io/ttsai-476712/ttsai-backend:latest ./backend
 
 echo "Deploying to Cloud Run..."
 gcloud run deploy ttsai-backend \
-  --image gcr.io/ttsai-461209/ttsai-backend:latest \
+  --image gcr.io/ttsai-476712/ttsai-backend:latest \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \

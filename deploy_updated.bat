@@ -24,7 +24,7 @@ gcloud auth list --filter=status:ACTIVE --format="value(account)" | findstr "@" 
 if errorlevel 1 (
     echo ERROR: Not authenticated with Google Cloud. Please run:
     echo   gcloud auth login
-    echo   gcloud config set project ttsai-461209
+    echo   gcloud config set project ttsai-476712
     pause
     exit /b 1
 )
@@ -52,7 +52,7 @@ if not exist "Dockerfile" (
 
 REM Build and push using Cloud Build
 echo Building backend with Cloud Build...
-gcloud builds submit --tag gcr.io/ttsai-461209/ttsai-backend:latest .
+gcloud builds submit --tag gcr.io/ttsai-476712/ttsai-backend:latest .
 if errorlevel 1 (
     echo ERROR: Backend Docker build failed.
     cd /d "%~dp0"
@@ -70,7 +70,7 @@ REM Set environment variables for deployment (including new auth variables)
 set "ENV_VARS=GEMINI_API_KEY=%GEMINI_API_KEY%,DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production,GOOGLE_CLIENT_ID=your_client_id_here,GOOGLE_CLIENT_SECRET=your_client_secret_here,GOOGLE_CALLBACK_URL=https://ttsai-backend-321805997355.us-central1.run.app/api/auth/google/callback,JWT_SECRET=your_jwt_secret_here"
 
 echo Deploying backend with configuration:
-echo   - Image: gcr.io/ttsai-461209/ttsai-backend:latest
+echo   - Image: gcr.io/ttsai-476712/ttsai-backend:latest
 echo   - Region: us-central1
 echo   - Memory: 2Gi
 echo   - CPU: 2
@@ -79,7 +79,7 @@ echo   - Min instances: 0
 echo   - Environment: Google AI Studio + Authentication
 
 gcloud run deploy ttsai-backend ^
-  --image gcr.io/ttsai-461209/ttsai-backend:latest ^
+  --image gcr.io/ttsai-476712/ttsai-backend:latest ^
   --platform managed ^
   --region us-central1 ^
   --allow-unauthenticated ^

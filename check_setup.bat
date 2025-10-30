@@ -21,7 +21,7 @@ echo.
 echo 3. Checking current project...
 gcloud config get-value project
 if %ERRORLEVEL% neq 0 (
-    echo ERROR: No project set. Run: gcloud config set project ttsai-461209
+    echo ERROR: No project set. Run: gcloud config set project ttsai-476712
     exit /b 1
 )
 

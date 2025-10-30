@@ -14,7 +14,7 @@ This guide walks you through deploying the TTSAI backend with SQLite database to
 1. **Authenticate with Google Cloud:**
    ```bash
    gcloud auth login
-   gcloud config set project ttsai-461209
+   gcloud config set project ttsai-476712
    ```
 
 2. **Enable required APIs:**
@@ -55,13 +55,13 @@ chmod +x deploy.sh
 
 1. **Build and push Docker image:**
    ```bash
-   gcloud builds submit --tag gcr.io/ttsai-461209/ttsai-backend:latest ./backend
+   gcloud builds submit --tag gcr.io/ttsai-476712/ttsai-backend:latest ./backend
    ```
 
 2. **Deploy to Cloud Run:**
    ```bash
    gcloud run deploy ttsai-backend \
-     --image gcr.io/ttsai-461209/ttsai-backend:latest \
+     --image gcr.io/ttsai-476712/ttsai-backend:latest \
      --platform managed \
      --region us-central1 \
      --allow-unauthenticated \

@@ -28,7 +28,7 @@ $authCheck = gcloud auth list --filter=status:ACTIVE --format="value(account)" 2
 if (-not $authCheck) {
     Write-Host "ERROR: Not authenticated with Google Cloud. Please run:" -ForegroundColor Red
     Write-Host "  gcloud auth login" -ForegroundColor Red
-    Write-Host "  gcloud config set project ttsai-461209" -ForegroundColor Red
+    Write-Host "  gcloud config set project ttsai-476712" -ForegroundColor Red
     Read-Host "Press Enter to exit"
     exit 1
 }
@@ -57,7 +57,7 @@ if (-not (Test-Path "Dockerfile")) {
 }
 
 Write-Host "Building backend with Cloud Build..." -ForegroundColor Cyan
-$buildResult = gcloud builds submit --tag gcr.io/ttsai-461209/ttsai-backend:latest . 2>&1
+$buildResult = gcloud builds submit --tag gcr.io/ttsai-476712/ttsai-backend:latest . 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Backend Docker build failed." -ForegroundColor Red
     Write-Host $buildResult -ForegroundColor Red
@@ -76,13 +76,13 @@ Set-Location -Path ".."
 $ENV_VARS = "GEMINI_API_KEY=$GEMINI_API_KEY,DATABASE_URL=sqlite:///app/ttsai.db,FLASK_ENV=production,GOOGLE_CLIENT_ID=your_client_id_here,GOOGLE_CLIENT_SECRET=your_client_secret_here,GOOGLE_CALLBACK_URL=https://ttsai-backend-321805997355.us-central1.run.app/api/auth/google/callback,JWT_SECRET=your_jwt_secret_here"
 
 Write-Host "Deploying backend with configuration:" -ForegroundColor Cyan
-Write-Host "  - Image: gcr.io/ttsai-461209/ttsai-backend:latest" -ForegroundColor Cyan
+Write-Host "  - Image: gcr.io/ttsai-476712/ttsai-backend:latest" -ForegroundColor Cyan
 Write-Host "  - Region: us-central1" -ForegroundColor Cyan
 Write-Host "  - Memory: 2Gi" -ForegroundColor Cyan
 Write-Host "  - CPU: 2" -ForegroundColor Cyan
 
 $deployResult = gcloud run deploy ttsai-backend `
-  --image gcr.io/ttsai-461209/ttsai-backend:latest `
+  --image gcr.io/ttsai-476712/ttsai-backend:latest `
   --platform managed `
   --region us-central1 `
   --allow-unauthenticated `

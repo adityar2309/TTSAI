@@ -51,7 +51,7 @@ try {
     if (!$authList) {
         Write-Host "ERROR: Not authenticated with Google Cloud. Please run:" -ForegroundColor Red
         Write-Host "  gcloud auth login" -ForegroundColor Yellow
-        Write-Host "  gcloud config set project ttsai-461209" -ForegroundColor Yellow
+        Write-Host "  gcloud config set project ttsai-476712" -ForegroundColor Yellow
         exit 1
     }
     Write-Host "✓ Authenticated as: $authList" -ForegroundColor Green
@@ -88,7 +88,7 @@ try {
     Push-Location $backendPath
     try {
         Write-Host "Building with Cloud Build (faster than local Docker build)..." -ForegroundColor Cyan
-        $buildResult = gcloud builds submit --tag gcr.io/ttsai-461209/ttsai-backend:latest . 2>&1
+        $buildResult = gcloud builds submit --tag gcr.io/ttsai-476712/ttsai-backend:latest . 2>&1
         
         if ($LASTEXITCODE -ne 0) {
             Write-Host "ERROR: Docker build failed." -ForegroundColor Red
@@ -113,7 +113,7 @@ try {
     }
     
     Write-Host "Deploying with configuration:" -ForegroundColor Cyan
-    Write-Host "  - Image: gcr.io/ttsai-461209/ttsai-backend:latest"
+    Write-Host "  - Image: gcr.io/ttsai-476712/ttsai-backend:latest"
     Write-Host "  - Region: us-central1"
     Write-Host "  - Memory: 2Gi"
     Write-Host "  - CPU: 2"
@@ -123,7 +123,7 @@ try {
     
     $deployArgs = @(
         "run", "deploy", "ttsai-backend",
-        "--image", "gcr.io/ttsai-461209/ttsai-backend:latest",
+        "--image", "gcr.io/ttsai-476712/ttsai-backend:latest",
         "--platform", "managed",
         "--region", "us-central1",
         "--allow-unauthenticated",

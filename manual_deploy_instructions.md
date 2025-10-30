@@ -25,7 +25,7 @@ set GEMINI_API_KEY=YOUR_NEW_API_KEY_HERE
 ### Step 3: Authenticate with Google Cloud
 ```bash
 gcloud auth login
-gcloud config set project ttsai-461209
+gcloud config set project ttsai-476712
 ```
 
 ### Step 4: Deploy to Cloud Run

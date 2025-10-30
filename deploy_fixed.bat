@@ -23,7 +23,7 @@ gcloud auth list --filter=status:ACTIVE --format="value(account)" | findstr "@" 
 if errorlevel 1 (
     echo ERROR: Not authenticated with Google Cloud. Please run:
     echo   gcloud auth login
-    echo   gcloud config set project ttsai-461209
+    echo   gcloud config set project ttsai-476712
     pause
     exit /b 1
 )

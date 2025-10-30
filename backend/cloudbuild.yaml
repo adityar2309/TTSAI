@@ -1,11 +1,11 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/ttsai-461209/ttsai-backend', '.']
+    args: ['build', '-t', 'gcr.io/ttsai-476712/ttsai-backend', '.']
 
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/ttsai-461209/ttsai-backend']
+    args: ['push', 'gcr.io/ttsai-476712/ttsai-backend']
 
 images:
-  - 'gcr.io/ttsai-461209/ttsai-backend' 
+  - 'gcr.io/ttsai-476712/ttsai-backend'
