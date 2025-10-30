@@ -42,7 +42,7 @@ try {
         Write-Host "Visit: https://cloud.google.com/sdk/docs/install" -ForegroundColor Red
         exit 1
     }
-    Write-Host "✓ Google Cloud CLI found" -ForegroundColor Green
+    Write-Host "OK: Google Cloud CLI found" -ForegroundColor Green
     
     # Step 2: Check authentication
     Write-Host "[2/6] Checking authentication..." -ForegroundColor Yellow
@@ -54,7 +54,7 @@ try {
         Write-Host "  gcloud config set project ttsai-476712" -ForegroundColor Yellow
         exit 1
     }
-    Write-Host "✓ Authenticated as: $authList" -ForegroundColor Green
+    Write-Host "OK: Authenticated as: $authList" -ForegroundColor Green
     
     # Step 3: Check environment variables
     Write-Host "[3/6] Checking environment variables..." -ForegroundColor Yellow
@@ -73,7 +73,7 @@ try {
         }
     } else {
         $keyPreview = $geminiKey.Substring(0, [Math]::Min(8, $geminiKey.Length)) + "..."
-        Write-Host "✓ GEMINI_API_KEY is set: $keyPreview" -ForegroundColor Green
+        Write-Host "OK: GEMINI_API_KEY is set: $keyPreview" -ForegroundColor Green
     }
     
     # Step 4: Build Docker image
@@ -96,7 +96,7 @@ try {
             exit 1
         }
         
-        Write-Host "✓ Docker image built and pushed successfully" -ForegroundColor Green
+        Write-Host "OK: Docker image built and pushed successfully" -ForegroundColor Green
     }
     finally {
         Pop-Location
@@ -145,7 +145,7 @@ try {
         exit 1
     }
     
-    Write-Host "✓ Deployment completed successfully!" -ForegroundColor Green
+    Write-Host "OK: Deployment completed successfully!" -ForegroundColor Green
     
     # Step 6: Test deployment
     Write-Host "[6/6] Testing deployment..." -ForegroundColor Yellow
@@ -158,32 +158,32 @@ try {
         Write-Host "========================================" -ForegroundColor Cyan
         Write-Host "    Deployment Summary" -ForegroundColor Cyan
         Write-Host "========================================" -ForegroundColor Cyan
-        Write-Host "✓ Backend URL: $serviceUrl" -ForegroundColor Green
-        Write-Host "✓ Health Check: $serviceUrl/api/health" -ForegroundColor Green
+        Write-Host "OK: Backend URL: $serviceUrl" -ForegroundColor Green
+        Write-Host "OK: Health Check: $serviceUrl/api/health" -ForegroundColor Green
         
         if (!$SkipTests) {
-            Write-Host "✓ Testing health endpoint..." -ForegroundColor Yellow
+            Write-Host "OK: Testing health endpoint..." -ForegroundColor Yellow
             Start-Sleep -Seconds 5  # Wait for service to start
             
             if (Test-Url "$serviceUrl/api/health") {
-                Write-Host "✓ Health check passed!" -ForegroundColor Green
+                Write-Host "OK: Health check passed!" -ForegroundColor Green
             } else {
-                Write-Host "⚠️  Health check failed - service might still be starting up" -ForegroundColor Yellow
+                Write-Host "WARNING: Health check failed - service might still be starting up" -ForegroundColor Yellow
                 Write-Host "   Wait a minute and test manually: $serviceUrl/api/health" -ForegroundColor Yellow
             }
         }
         
         Write-Host ""
         Write-Host "Next steps:" -ForegroundColor Cyan
-        Write-Host "1. Update frontend API_BASE_URL to: $serviceUrl/api"
-        Write-Host "2. Test the learning tools with: python test_learning_tools_deployed.py"
-        Write-Host "3. Redeploy frontend if needed"
+        Write-Host "1. Update frontend API_BASE_URL to: $serviceUrl/api" -ForegroundColor Cyan
+        Write-Host "2. Test the learning tools with: python test_learning_tools_deployed.py" -ForegroundColor Cyan
+        Write-Host "3. Redeploy frontend if needed" -ForegroundColor Cyan
         Write-Host ""
-        Write-Host "Manual update needed:"
-        Write-Host "Edit test_learning_tools_deployed.py and change API_BASE to: $serviceUrl/api"
+        Write-Host "Manual update needed:" -ForegroundColor Cyan
+        Write-Host "Edit test_learning_tools_deployed.py and change API_BASE to: $serviceUrl/api" -ForegroundColor Cyan
         
     } else {
-        Write-Host "⚠️  Could not retrieve service URL. Check deployment manually." -ForegroundColor Yellow
+        Write-Host "WARNING: Could not retrieve service URL. Check deployment manually." -ForegroundColor Yellow
     }
     
     Write-Host ""
@@ -200,6 +200,6 @@ catch {
 # Pause only if running interactively
 if ($Host.Name -eq "ConsoleHost") {
     Write-Host ""
-    Write-Host "Press any key to continue..." -ForegroundColor Gray
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-} 
+    Write-Host 'Press any key to continue...' -ForegroundColor Gray
+    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+}
